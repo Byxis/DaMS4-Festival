@@ -1,0 +1,27 @@
+.mat-toolbar-row {
+  display: flex;
+  align-items: center;
+  background-color: var(--mat-sys-on-primary-fixed);
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+@mixin navItem {
+  text-decoration: none;
+  padding: 5px 15px;
+  border-radius: 8px;
+  color: var(--mat-sys-on-primary-container);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-item {
+  @include navItem;
+
+  &:hover {
+    background-color: var(--mat-sys-primary-container);
+  }
+}
