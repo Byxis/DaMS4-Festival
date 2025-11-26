@@ -1,0 +1,7 @@
+@if (this.users().length > 0) {
+<p>Here is the list of all users:</p>
+@for (user of this.users(); track user.id) {
+<user-card [user]="user"></user-card>
+} } @else {
+<p>No users found.</p>
+}
