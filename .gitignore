@@ -3,6 +3,7 @@
 
 # Certs files
 **/certs/
+**/.env
 
 # Compiled output
 /dist
