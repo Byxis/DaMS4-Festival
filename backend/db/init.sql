@@ -3,4 +3,19 @@ CREATE TABLE IF NOT EXISTS users (
     login TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
     role TEXT DEFAULT 'user'
+);
+
+CREATE TABLE IF NOT EXISTS publisher (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL
 ); 
+
+CREATE TABLE IF NOT EXISTS contact (
+    id SERIAL PRIMARY KEY,
+    publisher_id INTEGER REFERENCES publisher(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    family_name TEXT NOT NULL,
+    role TEXT,
+    telephone TEXT,
+    email TEXT
+);
