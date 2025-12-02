@@ -1,0 +1,26 @@
+
+<div class="counter-festival">    
+    @if(svc.festivals().length ==0){
+        <p> Il n'y a aucun festival.</p>
+    }@else{
+        <p> Il y a {{svc.festivals().length}} festivals dans notre liste.</p>
+    }
+</div>
+<div class = "festivals-container">
+    @for(festival of this.svc.festivals(); track festival.id; let i =$index){ 
+        <app-festival-card [festival] = "festival"
+            (remove)="remove($event)">    
+        </app-festival-card>
+    }
+</div>
+
+
+<div class="form-container">
+    <input #name type="text" placeholder="Nom">
+    <input #location type="text" placeholder="Lieu">
+    <input #startDate type="date" placeholder="Début du festival">
+    <input #endDate type="date" placeholder="Fin du festival">
+    <button (click)="add(name.value, location.value, startDate.valueAsDate, endDate.valueAsDate)">Ajouter un festival</button>
+</div>
+
+<button class="clear-button" (click)="removeAll()">Vider la liste</button>
