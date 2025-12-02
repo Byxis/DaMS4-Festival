@@ -7,7 +7,7 @@ import { Festival } from '../festival';
 @Component({
   selector: 'app-festival-card',
   standalone: true,
-  imports: [MatCardModule, MatButtonModule],
+  imports: [MatCardModule, MatButtonModule, DatePipe],
   templateUrl: './festival-card.html',
   styleUrl: './festival-card.scss'
 })

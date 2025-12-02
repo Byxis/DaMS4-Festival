@@ -1,0 +1,26 @@
+<form [formGroup]="form" (ngSubmit)="submit()">
+   <mat-form-field appearance="outline">
+    <mat-label>Nom du festival</mat-label>
+    <input matInput type ="text" formControlName="name" placeholder="Nom du festival">
+        <mat-error > Le nom est requis.  </mat-error>
+    </mat-form-field>
+    
+    <mat-form-field appearance="outline">
+    <mat-label>Lieu du festival</mat-label>
+    <input matInput type ="text" formControlName="location" placeholder="Lieu du festival">
+        <mat-error > Le lieu est requis. </mat-error>
+    </mat-form-field>   
+
+    <mat-form-field appearance="outline">
+    <mat-label>Date de début</mat-label>
+    <input matInput type ="date" formControlName="startDate" placeholder="Date de début">
+    <mat-error> Rentrez une date de début</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+    <mat-label>Date de fin</mat-label>
+    <input matInput type ="date" formControlName="endDate" placeholder="Date de fin">
+    <mat-error> Rentrez une date de fin</mat-error>
+    </mat-form-field>
+    <button mat-raised-button color="primary" type="submit">Créer le festival</button>
+</form>

@@ -14,13 +14,8 @@
   <mat-card-content>
     <p>
       Lieu : {{this.festival().location}} <br>
-      @switch (this.festival().location) {
-        @case ('Montpellier') { <p>☀ Sud de la France</p> }
-        @case ('Clermont Ferrand') { <p>🌤 Au fond de l'Auvergne</p> }
-        @case ('Belfort') { <p>🌤 🇨🇭 Proche de la Suisse </p> }
-        @default { <p>⛈ Autre région</p> }
-        }
-      Année : {{this.festival().startDate.getFullYear()}}
+      Début : {{this.festival().startDate | date : "shortDate"}} <br>
+      Fin : {{this.festival().endDate | date : "shortDate"}} <br>
 
       @if (this.festival().currentlyGoing){
         <p>Festival en cours!</p>
