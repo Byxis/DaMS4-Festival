@@ -8,12 +8,13 @@ import { Festival } from '../festival';
 
 export class FestivalService {
   private readonly _festivals = signal<Festival[]>([
-    new Festival(1, "Sironastra", "Clermont Ferrand", new Date(2025, 9, 31), new Date(2025, 10, 4)),
-    new Festival(2, "What The Fest", "Montpellier", new Date(2025, 8, 13), new Date(2025, 8, 27)),
-    new Festival(3, "Negative Club", "Montpellier", new Date(2025, 8, 6), new Date(2026, 11, 30))
+    new Festival(1, "Sironastra", "Clermont Ferrand", new Date(2025, 9, 31), new Date(2025, 10, 4), 10, 2, 0),
+    new Festival(2, "What The Fest", "Montpellier", new Date(2025, 8, 13), new Date(2025, 8, 27), 10, 2, 0),
+    new Festival(3, "Negative Club", "Montpellier", new Date(2025, 8, 6), new Date(2026, 11, 30), 10, 3, 4)
   ]);
-
   readonly festivals = this._festivals.asReadonly(); // Contrat public : lecture seule
+
+
 
   private idCounter = this._festivals.length +1
   //On génère le prochain ID : 
@@ -29,7 +30,10 @@ export class FestivalService {
       festivalData.name,
       festivalData.location,
       festivalData.startDate,
-      festivalData.endDate
+      festivalData.endDate,
+      festivalData.table, 
+      festivalData.bigTable,
+      festivalData.townTable
     );
     this._festivals.update(list => [...list, festival]);
   }

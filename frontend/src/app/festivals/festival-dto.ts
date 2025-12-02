@@ -15,4 +15,7 @@ export interface FestivalDto {
     location : string
     startDate : Date
     endDate: Date
+    table : number
+    bigTable: number
+    townTable : number
 }

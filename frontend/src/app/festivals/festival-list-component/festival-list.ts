@@ -15,16 +15,6 @@ import { FestivalNewFormComponent } from "../festival-new-form-component/festiva
 export class FestivalList {
   readonly svc = inject(FestivalService);
 
-  add(name: string, location: string, startDate: Date | null, endDate: Date | null): void {
-    if (!startDate || !endDate) {
-      console.error("Choissisez une date valide.")
-      return;
-    } else {
-      this.svc.addFestival({ name, location, startDate, endDate });
-    }
-
-  }
-
   remove(id: number): void { this.svc.remove(id) }
 
   removeAll(): void { this.svc.removeAll() }
@@ -32,6 +22,8 @@ export class FestivalList {
   activeFestivals = computed(() => {
     return this.svc.festivals().filter(f => f.currentlyGoing).length;
   });
+
+  
   constructor() {
     effect(() => {
       console.log("Nombre de festivals total : ", this.svc.festivals().length)
