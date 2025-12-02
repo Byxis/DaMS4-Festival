@@ -4,15 +4,15 @@
       <img src="{{ this.publisher.logoUrl }}" alt="Logo" class="logo-img" />
       <h1>{{ this.publisher.name }}</h1>
     </div>
-    <button mat-flat-button (click)="deletePublisher()" color="warn" class="delete-btn">
+    <button mat-flat-button (click)="this.deletePublisher()" color="warn" class="delete-btn">
       Supprimer <mat-icon>delete</mat-icon>
     </button>
   </header>
 
   <contact-list
     [contacts]="this.contacts"
-    (addContact)="openAddDialog()"
-    (editContact)="openEditDialog($event)"
+    (addContact)="this.openAddDialog()"
+    (editContact)="this.openEditDialog($event)"
   >
   </contact-list>
 
