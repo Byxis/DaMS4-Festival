@@ -135,11 +135,11 @@ router.post(
     requireAdmin,
     async (req: Request, res: Response) => {
         const { id } = req.params;
-        const { name, familyName, role, telephone, email } = req.body;
+        const { name, family_name, role, telephone, email } = req.body;
         if (!name) {
             return res.status(400).json({ error: "Name is required" });
         }
-        if (!familyName) {
+        if (!family_name) {
             return res.status(400).json({ error: "Family name is required" });
         }
 
@@ -151,7 +151,7 @@ router.post(
         try {
             const { rows } = await pool.query<Contact>(
                 "INSERT INTO contact (publisher_id, name, family_name, role, telephone, email) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-                [id, name, familyName, role, telephone, email]
+                [id, name, family_name, role, telephone, email]
             );
             res.status(201).json(rows[0]);
         } catch (err: any) {
