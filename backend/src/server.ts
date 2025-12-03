@@ -59,7 +59,7 @@ app.use("/api/users", verifyToken, usersRouter); // protégé
 app.use("/api/admin", verifyToken, requireAdmin, (req, res) => {
     res.json({ message: "Bienvenue admin" });
 });
-app.use("/api/publishers", verifyToken, requireAdmin, publisherRouter);
+app.use("/api/publishers", verifyToken, publisherRouter);
 
 // Chargement du certificat et clé générés par mkcert (étape 0)
 const key = fs.readFileSync("./certs/localhost-key.pem");
