@@ -1,4 +1,14 @@
-export interface PublisherDto {
+export interface PublisherDTO {
   id?: number;
   name: string;
+  contacts?: ContactDTO[];
+}
+
+export interface ContactDTO {
+  id?: number;
+  familyName: string;
+  name: string;
+  role?: string;
+  telephone?: string;
+  email?: string;
 }
