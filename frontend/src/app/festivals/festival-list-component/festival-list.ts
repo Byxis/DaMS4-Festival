@@ -8,7 +8,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { FestivalNewFormComponent } from "../festival-new-form-component/festival-new-form-component";
 @Component({
   selector: 'app-festival-list',
-  imports: [FestivalCard, MatFormField, MatLabel, FestivalNewFormComponent],
+  imports: [FestivalCard, FestivalNewFormComponent],
   templateUrl: './festival-list.html',
   styleUrl: './festival-list.scss'
 })
@@ -23,12 +23,5 @@ export class FestivalList {
     return this.svc.festivals().filter(f => f.currentlyGoing).length;
   });
 
-  
-  constructor() {
-    effect(() => {
-      console.log("Nombre de festivals total : ", this.svc.festivals().length)
-      console.log("Nombre de festivals actifs :", this.activeFestivals())
-    });
-  }
 
 }
