@@ -1,0 +1,29 @@
+<br>
+<mat-form-field appearance="outline">
+  <mat-label>Rechercher un jeu</mat-label>
+  <input matInput [(ngModel)]="searchTerm" (ngModelChange)="onSearchGame($event)" placeholder="name of the game">
+  <button mat-icon-button matSuffix aria-label="Chercher" (click)="onSearchGame(searchTerm)">
+    <mat-icon>search</mat-icon>
+  </button>
+</mat-form-field>
+
+
+<app-game-form
+     (addGame)="this.gameService.createGameFromForm($event)"></app-game-form>
+
+
+@if(this.gameService.games(); as g){
+    @for ( game of g; track game.id) {
+        <pre><strong>Name : {{ game.name}}</strong></pre>
+        <pre><strong>Editor : {{game.editor}}</strong></pre>
+        <pre><strong>Type : {{ game.type}}</strong></pre>
+
+        <pre><strong>Minimum number of player : {{ game.minimum_number_of_player}}</strong></pre>
+        <pre><strong>Maximum number of player : {{ game.maximum_number_of_player}}</strong></pre>
+        @if(game.id){
+            <button (click)="this.gameService.remove(game.id)">Remove</button>
+        }
+        <p> ----------- </p>
+    }
+
+}

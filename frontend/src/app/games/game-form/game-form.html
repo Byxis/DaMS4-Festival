@@ -1,0 +1,20 @@
+<form [formGroup]="form" (ngSubmit)="submit()">
+<input type="text" formControlName="name" placeholder="game's name" />
+
+<input type="text" formControlName="editor" placeholder="game's editor" />
+
+
+
+<input type="text" formControlName="type" placeholder="game's type" />
+@if (form.controls.type.errors) {
+    {{getErrorMessage(form.controls['type'])}}
+}
+
+
+<input type="number" formControlName="number_minimal_of_player" placeholder="number minimum of player" />
+
+<input type="number" formControlName="number_maximal_of_player" placeholder="number maximum of player" />
+
+
+<button type = "submit">Submit</button>
+</form>
