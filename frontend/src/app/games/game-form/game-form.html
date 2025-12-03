@@ -1,20 +1,31 @@
 <form [formGroup]="form" (ngSubmit)="submit()">
-<input type="text" formControlName="name" placeholder="game's name" />
 
-<input type="text" formControlName="editor" placeholder="game's editor" />
+<mat-form-field appearance="outline">
+  <mat-label>Name</mat-label>
+  <input matInput type="text" formControlName="name" placeholder="game's name" />
+</mat-form-field>
 
+<mat-form-field appearance="outline">
+  <mat-label>Editor</mat-label>
+  <input matInput type="text" formControlName="editor" placeholder="game's editor" />
+</mat-form-field>
 
+<mat-form-field appearance="outline">
+  <mat-label>Type</mat-label>
+  <input matInput type="text" formControlName="type" placeholder="game's type" />
+</mat-form-field>
 
-<input type="text" formControlName="type" placeholder="game's type" />
-@if (form.controls.type.errors) {
-    {{getErrorMessage(form.controls['type'])}}
-}
+<mat-form-field appearance="outline">
+  <mat-label>Number minimum of player</mat-label>
+  <input matInput type="number" formControlName="number_minimal_of_player" placeholder="number minimum of player" />
+</mat-form-field>
 
+<mat-form-field appearance="outline">
+  <mat-label>Number maximum of player</mat-label>
+  <input matInput type="number" formControlName="number_maximal_of_player" placeholder="number maximum of player" />
+</mat-form-field>
 
-<input type="number" formControlName="number_minimal_of_player" placeholder="number minimum of player" />
-
-<input type="number" formControlName="number_maximal_of_player" placeholder="number maximum of player" />
-
-
-<button type = "submit">Submit</button>
+ <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
+    Submit
+  </button>
 </form>

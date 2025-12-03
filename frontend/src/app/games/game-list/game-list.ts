@@ -32,6 +32,15 @@ export class GameList {
     
     )*/
 
+    setShowFormTrue(){
+      this.showForm = true;
+    }
+
+    setShowFormFalse(){
+      this.showForm = false;
+    }
+
+
   onSearchGame(value : string){
     
   }

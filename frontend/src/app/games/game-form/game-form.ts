@@ -1,10 +1,13 @@
 import { Component, effect, inject, input, output, WritableSignal } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GameService } from '../game-service/game-service';
+import { MatFormField } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-game-form',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, MatFormField, MatInputModule, FormsModule, MatButtonModule],
   templateUrl: './game-form.html',
   styleUrl: './game-form.scss'
 })
@@ -23,14 +26,14 @@ export class GameForm {
     nonNullable: true,
     validators: [Validators.required, Validators.pattern('[a-zA-Z ]*'), Validators.minLength(2)]
    }),
-   number_minimal_of_player: new FormControl(0, { 
+   number_minimal_of_player: new FormControl(1, { 
     nonNullable: true,
-    validators: [Validators.required, Validators.pattern('[0-9]*'), Validators.minLength(1)]
+    validators: [Validators.required, Validators.min(1), Validators.max(99)]
    }),
 
-   number_maximal_of_player: new FormControl(0, { 
+   number_maximal_of_player: new FormControl(1, { 
     nonNullable: true,
-    validators: [Validators.required, Validators.pattern('[0-9 ]*'), Validators.minLength(1)]
+    validators: [Validators.required, Validators.min(1), Validators.max(99)]
    }),
 
   
@@ -43,7 +46,7 @@ readonly gameService = inject(GameService);
 
   
   
-
+  submitExecuted = output<boolean>();
   
   addGame = output<any>();
 
@@ -61,6 +64,7 @@ readonly gameService = inject(GameService);
    
       console.log("Student creation");
        this.addGame.emit(data);
+       this.submitExecuted.emit(true);
        this.form.reset();
        
   }

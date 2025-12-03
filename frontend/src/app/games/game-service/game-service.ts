@@ -33,7 +33,18 @@ export class GameService {
   this._games.set(games);
 }
 
-  remove(id: number): Observable<GameDto> {
+  deleteGame(id: number): void{
+    this.removeObservable(id).subscribe({
+      next: () => {
+        this._games.update(list => list.filter(s => s.id !== id))
+      }
+      
+    });
+  }
+
+
+  removeObservable(id: number): Observable<GameDto> {
+    console.log("remove game from db")
     return this.http.delete<GameDto>(`${environment.apiUrl}/game/delete`,{
       body:{id}
     });
@@ -62,14 +73,13 @@ export class GameService {
   add(game: GameDto): void { 
     game.id = this.lastID+1
     this.addGameToDb(game).subscribe()
-    this._games.update(list => [...list, game]) 
+    this._games.update(list => [game,...list]) 
     
     this.lastID +=1
   }
 
   loadAll(): Observable<GameDto[]>{
     return this.http.get<GameDto[]>(`${environment.apiUrl}/game/loadAll`);
-
   }
   
   
