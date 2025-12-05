@@ -29,7 +29,6 @@ import { passwordMatchValidator } from '../../validators/password-match/password
 })
 export class RegisterComponent {
 
-  
   private readonly svc = inject(AuthService);
   private readonly router = inject(Router);
 
@@ -37,11 +36,11 @@ export class RegisterComponent {
   readonly error = this.svc.error;
 
   readonly form = new FormGroup({
-    firstname: new FormControl('', {
+    firstName: new FormControl('', {
       nonNullable: true,
       validators: [Validators.minLength(1), Validators.required],
     }),
-    lastname: new FormControl('', {
+    lastName: new FormControl('', {
       nonNullable: true,
       validators: [Validators.minLength(1), Validators.required],
     }),
@@ -63,8 +62,15 @@ export class RegisterComponent {
 );
 
   submit() {
-    
-    console.log ('Registering user with data:', this.form.value);
+    if (this.form.valid) {
+      var login: string = this.form.value.email ?? '';
+      var password: string = this.form.value.password ?? '';
+      var firstName: string = this.form.value.firstName ?? '';
+      var lastName: string = this.form.value.lastName ?? '';
+      if (login && password && firstName && lastName) {
+        this.svc.register(login, password, firstName, lastName);
+      }
+    }
   }
 
 }

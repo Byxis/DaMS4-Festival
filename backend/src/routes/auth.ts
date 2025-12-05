@@ -58,7 +58,11 @@ router.post("/login", async (req, res) => {
 
     res.json({
         message: "Authentification réussie",
-        user: { login: user.login, role: user.role },
+        user: { 
+            login: user.login,
+            firstName: user.first_name,
+            lastName: user.last_name, 
+            role: user.role },
     }); //connexion successful
 });
 
@@ -70,18 +74,31 @@ router.post("/logout", (_req, res) => {
 });
 
 router.post("/register", async (req, res) => {
-    const { login, password } = req.body;
-    if (!login || !password)
+    const { login, password, firstName, lastName } = req.body;
+    if (!login || !password || !firstName || !lastName)
         return res.status(400).json({ error: "Champs manquants" });
     const hashed = await bcrypt.hash(password, 10);
     try {
         const { rows } = await pool.query(
-            `INSERT INTO users (login, password_hash, role)
-            VALUES ($1, $2, 'user')
-            RETURNING id, login, role`,
-            [login, hashed]
+            `INSERT INTO users (login, password_hash, first_name, last_name, role)
+            VALUES ($1, $2, $3, $4, 'user')
+            RETURNING id, login, first_name, last_name, role`,
+            [login, hashed, firstName, lastName]
         );
-        res.status(201).json({ message: "Utilisateur créé", user: rows[0] });
+        const user = rows[0];
+
+        // map DB snake_case to API camelCase
+        res.status(201).json({
+            message: "Utilisateur créé",
+            user: {
+                id: user.id,
+                login: user.login,
+                firstName: user.first_name,
+                lastName: user.last_name,
+                role: user.role,
+            },
+        });
+        
     } catch (err: any) {
         if (err.code === "23505")
             // doublon PostgreSQL

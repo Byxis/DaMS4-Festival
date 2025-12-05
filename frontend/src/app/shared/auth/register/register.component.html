@@ -5,14 +5,14 @@
       <br />
       <mat-form-field appearance="outline">
         <mat-label>Prénom</mat-label>
-        <input matInput formControlName="firstname" type="text" />
+        <input matInput formControlName="firstName" type="text" />
         <mat-error align="end">Obligatoire</mat-error>
       </mat-form-field>
       <br />
 
       <mat-form-field appearance="outline">
         <mat-label>Nom</mat-label>
-        <input matInput formControlName="lastname" type="text" />
+        <input matInput formControlName="lastName" type="text" />
         <mat-error align="end">Obligatoire</mat-error>
       </mat-form-field>
       <br />
@@ -43,6 +43,10 @@
       <button mat-raised-button color="primary" type="submit" [disabled]="this.form.invalid">
         @if (isLoading()) { Inscription... } @else { Inscription }
       </button>
+
+      @if(error()) {
+        <mat-error>{{ this.error() }}</mat-error>
+      }
     </form>
   </mat-card-content>
   
