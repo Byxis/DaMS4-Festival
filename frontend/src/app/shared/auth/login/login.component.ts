@@ -12,7 +12,7 @@ import {
 import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@auth/auth.service';
 
 @Component({
@@ -32,7 +32,8 @@ import { AuthService } from '@auth/auth.service';
     MatButton,
     ReactiveFormsModule,
     MatCardFooter,
-  ],
+    RouterLink
+],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
   standalone: true,

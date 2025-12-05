@@ -4,9 +4,11 @@ import { HomePage } from './pages/home/home.component';
 import { AdminComponent } from '@admin/admin/admin.component';
 import { authGuard } from '@auth/auth.guard';
 import { adminGuard } from '@admin/admin.guard';
+import { RegisterPage } from '@auth/register-page/register-page.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPage },
+  { path: 'register', component: RegisterPage},
   { path: 'home', component: HomePage, canActivate: [authGuard] },
   { path: 'admin', component: AdminComponent, canActivate: [authGuard, adminGuard] },
   { path: '', pathMatch: 'full', redirectTo: 'home' },
