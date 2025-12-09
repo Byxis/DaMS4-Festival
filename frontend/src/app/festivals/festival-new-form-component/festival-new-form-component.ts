@@ -18,11 +18,11 @@ export class FestivalNewFormComponent {
   readonly form = new FormGroup({
     name: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     location: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    startDate: new FormControl<Date | null>(null, { validators: [Validators.required] }),
-    endDate: new FormControl<Date | null>(null, { validators: [Validators.required] }),
-    table: new FormControl(0, { nonNullable: true, validators: [Validators.min(0)] }),
-    bigTable: new FormControl(0, { nonNullable: true, validators: [Validators.min(0)] }),
-    townTable: new FormControl(0, { nonNullable: true, validators: [Validators.min(0)] })
+    start_date: new FormControl<Date | null>(null, { validators: [Validators.required] }),
+    end_date: new FormControl<Date | null>(null, { validators: [Validators.required] }),
+    table_count: new FormControl(0, { nonNullable: true, validators: [Validators.min(0)] }),
+    big_table_count: new FormControl(0, { nonNullable: true, validators: [Validators.min(0)] }),
+    town_table_count: new FormControl(0, { nonNullable: true, validators: [Validators.min(0)] })
   });
 
 
@@ -31,28 +31,29 @@ export class FestivalNewFormComponent {
       const newFestival = { 
         name : this.form.value.name,
         location : this.form.value.location,
-        startDate : this.form.value.startDate,
-        endDate : this.form.value.endDate,
-        table : this.form.value.table,
-        bigTable: this.form.value.bigTable,
-        townTable: this.form.value.townTable
+        start_date : this.form.value.start_date,
+        end_date : this.form.value.end_date,
+        table_count : this.form.value.table_count,
+        big_table_count: this.form.value.big_table_count,
+        town_table_count: this.form.value.town_table_count
       };
       this.festivalService.addFestival(newFestival as Omit<FestivalDto, 'id'>);
+      
 
 
       // Log the added festival details
-      console.log( "Festival ajouté :",
+      console.log( "Festival ajouté en frontEnd",
         {
         name: newFestival.name,
         location: newFestival.location,
-        startDate: newFestival.startDate,
-        endDate: newFestival.endDate,
-        table: newFestival.table
+        start_date: newFestival.start_date,
+        end_date: newFestival.end_date,
+        table_count: newFestival.table_count
       });
       this.form.reset();
     } else {
       console.error("Formulaire invalide");
-    }
+    } 
   }
   
 }

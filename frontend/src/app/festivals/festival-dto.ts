@@ -13,9 +13,9 @@ export interface FestivalDto {
     id? : number, 
     name : string
     location : string
-    startDate : Date
-    endDate: Date
-    table : number
-    bigTable: number
-    townTable : number
+    start_date : Date
+    end_date: Date
+    table_count : number
+    big_table_count: number
+    town_table_count : number
 }
