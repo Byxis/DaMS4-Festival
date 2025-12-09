@@ -10,21 +10,21 @@ import { requireAdmin } from "../middleware/auth-admin.js";
 
 /**
  * Routes for managing publishers and their contacts, including logo uploads.
- * All routes that modify data require admin privileges.
+ * All routes that modify data require admin privileges (and are marked with and !).
  *
  * Endpoints:
  * - GET /api/publishers - Retrieve all publishers with their contacts
- * - POST /api/publishers - Create a new publisher
+ * !- POST /api/publishers - Create a new publisher
  *
  * - GET /api/publishers/:id - Retrieve a specific publisher by ID
- * - DELETE /api/publishers/:id - Delete a specific publisher by ID
+ * !- DELETE /api/publishers/:id - Delete a specific publisher by ID
  *
- * - POST /api/publishers/:id/contacts - Add a contact to a specific publisher
- * - DELETE /api/publishers/:id/contacts/:contactId - Delete a specific contact from a specific publisher
+ * !- POST /api/publishers/:id/contacts - Add a contact to a specific publisher
+ * !- DELETE /api/publishers/:id/contacts/:contactId - Delete a specific contact from a specific publisher
  *
  * - GET /api/publishers/:id/logo - Retrieve the logo of a specific publisher
- * - POST /api/publishers/:id/logo - Upload a logo for a specific publisher
- * - DELETE /api/publishers/:id/logo - Delete the logo of a specific publisher
+ * !- POST /api/publishers/:id/logo - Upload a logo for a specific publisher
+ * !- DELETE /api/publishers/:id/logo - Delete the logo of a specific publisher
  */
 
 const router = Router();
@@ -72,7 +72,7 @@ router.get("/", async (_req: Request, res: Response) => {
     res.json(publisherRows);
 });
 
-// POST /api/publishers - Create a new publisher
+//! POST /api/publishers - Create a new publisher
 router.post("/", requireAdmin, async (req: Request, res: Response) => {
     const { name } = req.body;
     if (!name) {
@@ -107,7 +107,7 @@ router.get("/:id", async (req: Request, res: Response) => {
     res.json(rows[0]);
 });
 
-// DELETE /api/publishers/:id - Delete a specific publisher by ID
+//! DELETE /api/publishers/:id - Delete a specific publisher by ID
 router.delete("/:id", requireAdmin, async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
@@ -129,7 +129,7 @@ router.delete("/:id", requireAdmin, async (req: Request, res: Response) => {
 
 /* ---------- /api/publishers/:id/contacts ----------*/
 
-// POST /api/publishers/:id/contacts - Add a contact to a specific publisher
+//! POST /api/publishers/:id/contacts - Add a contact to a specific publisher
 router.post(
     "/:id/contacts",
     requireAdmin,
@@ -163,7 +163,7 @@ router.post(
     }
 );
 
-// DELETE /api/publishers/:id/contacts/:contactId - Delete a specific contact from a specific publisher
+//! DELETE /api/publishers/:id/contacts/:contactId - Delete a specific contact from a specific publisher
 router.delete(
     "/:id/contacts/:contactId",
     requireAdmin,
@@ -211,7 +211,7 @@ router.get("/:id/logo", async (req: Request, res: Response) => {
     res.sendFile(path.resolve(`./uploads/logos/${files[0]}`));
 });
 
-// POST /api/publishers/:id/logo - Upload a logo for a specific publisher
+//! POST /api/publishers/:id/logo - Upload a logo for a specific publisher
 router.post(
     "/:id/logo",
     requireAdmin,
@@ -244,7 +244,7 @@ router.post(
     }
 );
 
-// DELETE /api/publishers/:id/logo - Delete the logo of a specific publisher
+//! DELETE /api/publishers/:id/logo - Delete the logo of a specific publisher
 router.delete(
     "/:id/logo",
     requireAdmin,
