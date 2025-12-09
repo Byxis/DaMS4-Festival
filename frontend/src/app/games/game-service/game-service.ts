@@ -51,6 +51,8 @@ export class GameService {
     
   }
 
+  
+
   removeAll(): void { 
     this._games.set([]) 
   }
@@ -67,6 +69,14 @@ export class GameService {
   console.log("jeu ajouté dans la bdd");
   return this.http.post<GameDto>(`${environment.apiUrl}/game`, game);
 }
+
+searchGameByEditorInDBObservable(editorName: string): Observable<GameDto[]>{
+  return this.http.get<GameDto[]>(`${environment.apiUrl}/game/filterByEditor`,{
+      params:{editorName}
+    });
+}
+
+
 
 
   
@@ -108,16 +118,12 @@ export class GameService {
   const game: GameDto = {
     id: this.lastID + 1,
     name: form.name,
-    editor: form.editor,
+    editor_name: form.editor,
     type: form.type,
     minimum_number_of_player: form.number_minimal_of_player,
     maximum_number_of_player: form.number_maximal_of_player
   };
   this.add(game);
 }
-
-     
-     
-
 
 }

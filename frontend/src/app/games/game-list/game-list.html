@@ -4,10 +4,18 @@
   <div class="add_new_game">
     <button matButton="filled" (click)="setShowFormTrue()">Add New Game</button>
     
-    <br>
+    
 
   </div>
+  <br>
 }
+
+<div class="add_new_game">
+    <button matButton="filled" (click)="setShowFormTrue()">Remove All</button>
+    
+    
+
+  </div>
 
 
 @if(this.showForm){
@@ -25,22 +33,39 @@
 <br>
 
 <mat-form-field appearance="outline">
-  <mat-label>Rechercher un jeu</mat-label>
-  <input matInput [(ngModel)]="searchTerm" (ngModelChange)="onSearchGame($event)" placeholder="name of the game">
-  <button mat-icon-button matSuffix aria-label="Chercher" (click)="onSearchGame(searchTerm)">
+  <mat-label>Search a game</mat-label>
+  <input matInput [(ngModel)]="searchTerm"  placeholder="name of the game">
+  <button mat-icon-button matSuffix aria-label="Chercher" (click)="">
     <mat-icon>search</mat-icon>
   </button>
 </mat-form-field>
 
-<button mat-icon-button matSuffix aria-label="Filter">
-    <mat-icon>filter</mat-icon>
-  </button>
+
+<br>
+
+@if(this.showFilterForm == false){
+  <button matButton="filled" (click)="setFilterFormTrue()">Filter by editor</button>
+}
+
+
+@if(this.showFilterForm){
+<mat-form-field appearance="outline">
+  <mat-label>editor's name</mat-label>
+  <input matInput type="text" placeholder="editor's name"
+    (input)="searchGameByEditorName($event.target.value)" />
+</mat-form-field>
+
+<button matFab aria-label="Example icon button with a delete icon" (click)="setFilterFormFalse()">
+        <mat-icon>close</mat-icon>
+      </button>
+}
+
 
 
 @if(this.gameService.games(); as g){
     @for ( game of g; track game.id) {
         <pre><strong>Name : {{ game.name}}</strong></pre>
-        <pre><strong>Editor : {{game.editor}}</strong></pre>
+        <pre><strong>Editor : {{game.editor_name}}</strong></pre>
         <pre><strong>Type : {{ game.type}}</strong></pre>
 
         <pre><strong>Minimum number of player : {{ game.minimum_number_of_player}}</strong></pre>

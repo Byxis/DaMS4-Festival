@@ -11,9 +11,25 @@ const router = Router();
 
 
 router.get("/search", async (req, res) => {
-  
+ const gameName = (req.query.gameName || '').toString();
+  try {
+    const q = `
+      SELECT g.id, g.name, g.minimum_number_of_player, g.maximum_number_of_player,
+             g.editor_id, g.type_of_games_id, g.logo,
+             e.name AS editor_name
+      FROM games g
+      JOIN editors e ON e.id = g.editor_id
+      WHERE g.name ILIKE $1
+      ORDER BY g.id;
+    `;
+    const params = [`%${gameName}%`]; 
+    const result = await pool.query(q, params);
+    res.status(200).json(result.rows);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Erreur lors de la recherche par game's name" });
+  }
 });
-
 
 router.post("/", async (req, res) => {
   console.log("POST /api/game", req.body);
@@ -36,8 +52,21 @@ router.get("/loadAll", async (req, res) => {
   
   try {
     const result = await pool.query(
-      `SELECT * FROM games`
-    );
+      `
+      SELECT g.id,
+             g.name,
+             g.minimum_number_of_player,
+             g.maximum_number_of_player,
+             g.editor_id,
+             g.type_of_games_id,
+             g.logo,
+             e.name AS editor_name,
+             t.description AS type
+      FROM games g
+      LEFT JOIN editors e ON e.id = g.editor_id
+      LEFT JOIN type_of_games t ON g.type_of_games_id = t.id
+      ORDER BY g.id;
+    `);
     res.status(200).json(result.rows);
   } catch (e) {
     console.error(e);
@@ -57,6 +86,28 @@ router.delete("/delete", async (req, res) => {
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: "Erreur lors de la suppression" });
+  }
+});
+
+
+router.get("/filterByEditor", async (req, res) => {
+  const editorName = (req.query.editorName || '').toString();
+  try {
+    const q = `
+      SELECT g.id, g.name, g.minimum_number_of_player, g.maximum_number_of_player,
+             g.editor_id, g.type_of_games_id, g.logo,
+             e.name AS editor_name
+      FROM games g
+      JOIN editors e ON e.id = g.editor_id
+      WHERE e.name ILIKE $1
+      ORDER BY g.id;
+    `;
+    const params = [`%${editorName}%`]; 
+    const result = await pool.query(q, params);
+    res.status(200).json(result.rows);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Erreur lors de la recherche par editor" });
   }
 });
 

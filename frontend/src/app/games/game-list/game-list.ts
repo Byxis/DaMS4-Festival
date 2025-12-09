@@ -19,6 +19,7 @@ import { MatIconModule } from '@angular/material/icon';
 export class GameList {
 
   showForm = false;
+  showFilterForm = false;
   searchTerm = '';
   
   readonly http = inject(HttpClient)
@@ -40,10 +41,30 @@ export class GameList {
       this.showForm = false;
     }
 
+    setFilterFormTrue(){
+      this.showFilterForm = true;
+    }
 
-  onSearchGame(value : string){
-    
+    setFilterFormFalse() {
+    this.showFilterForm = false;
+    this.gameService.loadAll().subscribe(games => {
+    this.gameService.setGames(games); 
+  });
+}
+
+
+  searchGameByEditorName(editorName: string): void {
+    this.gameService.searchGameByEditorInDBObservable(editorName).subscribe({
+      next: (games) => {
+        this.gameService.setGames(games); // met à jour la liste affichée
+      },
+      error: (err) => {
+        console.error('Erreur lors de la recherche', err);
+      }
+    });
   }
+
+
 
   constructor() {
   this.gameService.loadAll().subscribe(games => {

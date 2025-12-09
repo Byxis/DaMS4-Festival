@@ -5,7 +5,7 @@ export interface GameDto {
         
     id: number | undefined
     name: string
-    editor: string,
+    editor_name: string,
     type: string
     minimum_number_of_player: number
     maximum_number_of_player: number

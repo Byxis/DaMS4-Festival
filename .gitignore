@@ -10,6 +10,9 @@
 */out-tsc
 */bazel-out
 
+#Festival's data
+*/Data/
+
 # Node
 **/node_modules
 */npm-debug.log

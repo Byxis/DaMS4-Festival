@@ -1,3 +1,4 @@
+
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     login TEXT UNIQUE NOT NULL,
@@ -5,14 +6,56 @@ CREATE TABLE IF NOT EXISTS users (
     role TEXT DEFAULT 'user'
 ); 
 
-CREATE TABLE IF NOT EXISTS games (
+
+
+
+
+-- <-- remove the INSERT FROM games_tmp block here
+
+CREATE TABLE IF NOT EXISTS editors (
     id SERIAL PRIMARY KEY,
     name TEXT UNIQUE NOT NULL,
-    editor TEXT NOT NULL,
-    type TEXT DEFAULT '--',
-    minimum_number_of_player INTEGER,
-    maximum_number_of_player integer
+    logo TEXT
+);
+
+CREATE TABLE IF NOT EXISTS type_of_games (
+    id SERIAL PRIMARY KEY,
+    description TEXT UNIQUE NOT NULL
 ); 
+
+
+CREATE TABLE IF NOT EXISTS games (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    type TEXT DEFAULT 'other',
+    minimum_number_of_player INTEGER,
+    maximum_number_of_player INTEGER,
+    logo TEXT,
+    editor_id INTEGER REFERENCES editors(id),
+    type_of_games_id INTEGER REFERENCES type_of_games(id)
+); 
+
+
+
+
+
+COPY editors(id, name, logo)
+FROM '/Data/editorsData.csv'
+DELIMITER ','
+CSV HEADER;
+
+-- Pour les types de jeux
+COPY type_of_games(id, description)
+FROM '/Data/typesOfGamesData.csv'
+DELIMITER ','
+CSV HEADER;
+
+-- Pour les jeux
+COPY games(id, name, minimum_number_of_player, maximum_number_of_player, editor_id, type_of_games_id, logo)
+FROM '/Data/GamesDATA.csv'
+DELIMITER ','
+CSV HEADER;
+
 
 
 
