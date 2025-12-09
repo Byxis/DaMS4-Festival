@@ -3,16 +3,16 @@ export class Festival {
         public id: number,
         public name: string,
         public location: string,
-        public startDate: Date,
-        public endDate: Date,
-        public table: number = 0,
-        public bigTable: number = 0,
-        public townTable: number = 0
+        public start_date: Date,
+        public end_date: Date,
+        public table_count: number = 0,
+        public big_table_count: number = 0,
+        public town_table_count: number = 0
 
     ) {}
     get currentlyGoing(): boolean{
         const now = new Date();
-        if (now > this.startDate && now < this.endDate) {
+        if (now > this.start_date && now < this.end_date) {
             return true;
         }else{
             return false;

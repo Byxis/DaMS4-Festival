@@ -13,6 +13,11 @@ import { FestivalNewFormComponent } from "../festival-new-form-component/festiva
   styleUrl: './festival-list.scss'
 })
 export class FestivalList {
+
+
+  constructor() {
+    effect(() => {this.svc.loadFestivalsFromServer()});
+  }
   readonly svc = inject(FestivalService);
 
   remove(id: number): void { this.svc.remove(id) }

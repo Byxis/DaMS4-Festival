@@ -4,6 +4,7 @@ import { Festival } from '../festival';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { catchError, of, tap } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +25,19 @@ export class FestivalService {
 
   readonly festivals = this._festivals.asReadonly(); // Contrat public : lecture seule
 
+  readonly festivals_back = signal<FestivalDto[]>([]);
 
+  // -- Actions --
+  loadFestivalsFromServer(): void {
+    this.http.get<FestivalDto[]>(`${environment.apiUrl}/festivals`, { withCredentials: true })
+    .pipe(catchError(err => {
+      console.error('👎 Erreur HTTP lors du chargement des festivals', err);
+      return of([]);
+    }))
+    .subscribe(response => {
+      this.festivals_back.set(response);
+    });
+  }
 
   private idCounter = this._festivals.length + 1
   //On génère le prochain ID : 
@@ -34,18 +47,18 @@ export class FestivalService {
   }
 
   addFestival(festivalData: Omit<FestivalDto, 'id'>): void {
-    const nextId = this.getNextId();
-    const festival = new Festival(
-      nextId,
-      festivalData.name,
-      festivalData.location,
-      festivalData.start_date,
-      festivalData.end_date,
-      festivalData.table_count,
-      festivalData.big_table_count,
-      festivalData.town_table_count
-    );
-    this._festivals.update(list => [...list, festival]);
+    // const nextId = this.getNextId();
+    // const festival = new Festival(
+    //   nextId,
+    //   festivalData.name,
+    //   festivalData.location,
+    //   festivalData.start_date,
+    //   festivalData.end_date,
+    //   festivalData.table_count,
+    //   festivalData.big_table_count,
+    //   festivalData.town_table_count
+    // );
+    // this._festivals.update(list => [...list, festival]);
     this.sendFestivalToServer(festivalData);
   }
 

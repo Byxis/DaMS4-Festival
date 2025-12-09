@@ -1,10 +1,12 @@
-<mat-card 
+<!-- <mat-card 
   class="festival-card" 
   appearance="outlined"
   [style.background]="getFestivalHighlight()"
-  [style.color] ="getFestivalHighlightColor()">
+  [style.color] ="getFestivalHighlightColor()"> -->
 
-
+<mat-card 
+  class="festival-card" 
+  appearance="outlined">
   <mat-card-header>
     <!-- <div mat-card-avatar class="example-header-image"></div> -->
     <mat-card-title>{{this.festival().name}}</mat-card-title>
@@ -14,31 +16,31 @@
   <mat-card-content>
     <p>
       Lieu : {{this.festival().location}} <br>
-      Début : {{this.festival().startDate | date : "shortDate"}} <br>
-      Fin : {{this.festival().endDate | date : "shortDate"}} <br>
+      Début : {{this.festival().start_date | date : "shortDate"}} <br>
+      Fin : {{this.festival().end_date | date : "shortDate"}} <br>
 
-
+<!-- 
       @if (this.festival().currentlyGoing){
         <p>Festival en cours!</p>
       }@else{
-         @if (this.festival().startDate > getCurrentDate()){
+         @if (this.festival().start_date > getCurrentDate()){
           <p> Festival à venir !</p>
          }@else{
           <p> Festival passé!</p>
          }
       }
-    </p>
+    </p> -->
 
     <p>Tables disponibles :
-      {{this.festival().table}}</p> <br>
+      {{this.festival().table_count}}</p> <br>
     <p>Grandes tables disponibles : 
-      {{this.festival().bigTable}}</p> <br>
+      {{this.festival().big_table_count}}</p> <br>
     <p>Tables de mairie disponibles : 
-      {{this.festival().townTable}}</p> <br>
+      {{this.festival().town_table_count}}</p> <br>
   </mat-card-content>
-
+<!-- 
   <mat-card-actions>
     <button matButton (click)="remove.emit(this.festival().id)">Supprimer</button>
-  </mat-card-actions>
+  </mat-card-actions> -->
 
 </mat-card>
