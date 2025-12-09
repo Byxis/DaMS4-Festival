@@ -1,31 +1,27 @@
 <mat-card>
   <mat-card-header>
-    <mat-card-title><h2>Login</h2></mat-card-title>
-    <mat-card-subtitle>Please enter your credentials</mat-card-subtitle>
+    <mat-card-title><h2>Connexion</h2></mat-card-title>
+    <mat-card-subtitle>Entrez vos informations de connexion</mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
     <form [formGroup]="this.form" (submit)="this.submit()">
       <br />
       <mat-form-field appearance="outline">
-        <mat-label>Login</mat-label>
+        <mat-label>Email</mat-label>
         <input matInput formControlName="login" />
-        <mat-error align="end">Login is at least 5 characters</mat-error>
+        <mat-error align="end">Obligatoire</mat-error>
       </mat-form-field>
       <br />
 
       <mat-form-field appearance="outline">
-        <mat-label>Password</mat-label>
+        <mat-label>Mot de passe</mat-label>
         <input matInput formControlName="password" type="password" />
-        <mat-error align="end">Password is required</mat-error>
+        <mat-error align="end">Obligatoire</mat-error>
       </mat-form-field>
       <br />
 
       <button mat-raised-button color="primary" type="submit" [disabled]="this.form.invalid">
-        @if (isLoading()) {
-        <mat-icon>autorenew</mat-icon>
-        } @else {
-        <mat-icon>arrow_forward</mat-icon>
-        } @if (isLoading()) { Logging in... } @else { Login }
+        @if (isLoading()) { Connexion... } @else { Connexion }
       </button>
       <a routerLink="/register" class="register-link">Pas encore inscrit?</a>
     </form>

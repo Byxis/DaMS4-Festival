@@ -10,7 +10,6 @@ import {
   MatCardFooter,
 } from '@angular/material/card';
 import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@auth/auth.service';
@@ -19,20 +18,19 @@ import { AuthService } from '@auth/auth.service';
   selector: 'login',
   imports: [
     MatCard,
-    MatCardHeader,
-    MatCardTitle,
-    MatCardSubtitle,
     MatCardContent,
     MatFormField,
     MatLabel,
     MatError,
-    MatIcon,
     MatCardContent,
     MatInput,
     MatButton,
     ReactiveFormsModule,
     MatCardFooter,
-    RouterLink
+    RouterLink,
+    MatCardHeader,
+    MatCardTitle,
+    MatCardSubtitle,
 ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',

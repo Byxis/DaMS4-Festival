@@ -1,13 +1,12 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
-import { MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent, MatCardFooter } from '@angular/material/card';
+import { MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent } from '@angular/material/card';
 import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
-import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from '@auth/auth.service';
-import { passwordMatchValidator } from '../../validators/password-match/password-match.validator';
+import { passwordMatchValidator } from '../../validators/password-match.validator';
 
 @Component({
   selector: 'register',
@@ -21,6 +20,9 @@ import { passwordMatchValidator } from '../../validators/password-match/password
     MatInput,
     MatButton,
     ReactiveFormsModule,
+    MatCardHeader,
+    MatCardTitle,
+    MatCardSubtitle,
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
