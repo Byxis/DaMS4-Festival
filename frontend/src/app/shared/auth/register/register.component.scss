@@ -42,11 +42,12 @@ button {
   font-weight:normal;
 
   background-color: var(--mat-sys-on-surface);
-  color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface-variant);
 }
 
 button:hover {
   background-color: color-mix(in srgb, var(--mat-sys-on-surface) 90%, transparent);
+  color: var(--mat-sys-surface);
 }
 
 mat-card-title {
