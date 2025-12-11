@@ -1,9 +1,10 @@
-import { Component, input, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { ContactDTO } from '../contact-dto';
 import { output } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatCard, MatCardTitle } from '@angular/material/card';
 import { MatIconButton } from '@angular/material/button';
+import { AuthService } from '@auth/auth.service';
 
 @Component({
   selector: 'contact-list',
@@ -12,6 +13,8 @@ import { MatIconButton } from '@angular/material/button';
   styleUrl: './contact-list.scss',
 })
 export class ContactList {
+  readonly authSvc = inject(AuthService);
+
   readonly contacts = input.required<ContactDTO[]>();
 
   readonly addContact = output<void>();
