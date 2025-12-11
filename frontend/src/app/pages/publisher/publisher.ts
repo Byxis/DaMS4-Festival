@@ -57,6 +57,7 @@ export class Publisher {
         this.contacts = [...this.contacts, result];
       }
     });
+    //TODO: send to the backend
   }
 
   openEditDialog(contact: ContactDTO): void {
@@ -75,8 +76,19 @@ export class Publisher {
             ...this.contacts.slice(index + 1),
           ];
         }
+        //TODO: send to the backend
       }
     });
+  }
+
+  deleteContact(contact: ContactDTO): void {
+    if (confirm(`Êtes-vous sûr de supprimer le contact ${contact.name} ?`)) {
+      const index = this.contacts.findIndex((c) => c.id === contact.id);
+      if (index !== -1) {
+        this.contacts = [...this.contacts.slice(0, index), ...this.contacts.slice(index + 1)];
+        //TODO: send to the backend
+      }
+    }
   }
 
   deletePublisher(): void {

@@ -16,6 +16,7 @@ export class ContactList {
 
   readonly addContact = output<void>();
   readonly editContact = output<ContactDTO>();
+  readonly deleteContact = output<ContactDTO>();
 
   onAdd(): void {
     this.addContact.emit();
@@ -23,5 +24,9 @@ export class ContactList {
 
   onEdit(contact: ContactDTO): void {
     this.editContact.emit(contact);
+  }
+
+  onDelete(contact: ContactDTO): void {
+    this.deleteContact.emit(contact);
   }
 }
