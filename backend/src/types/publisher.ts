@@ -4,4 +4,5 @@ export interface Publisher {
     id: number;
     name: string;
     contacts?: Contact[];
+    logoUrl?: string;
 }

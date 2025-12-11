@@ -2,6 +2,7 @@ export interface PublisherDTO {
   id?: number;
   name: string;
   contacts?: ContactDTO[];
+  logoUrl?: string;
 }
 
 export interface ContactDTO {
