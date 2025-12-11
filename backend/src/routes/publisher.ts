@@ -4,6 +4,7 @@ import pool from "../db/database.js";
 import type { Publisher } from "../types/publisher.js";
 import path from "path";
 import fs from "fs";
+import fsPromises from "fs/promises";
 import multer from "multer";
 import type { Contact } from "../types/contact.js";
 import { requireAdmin } from "../middleware/auth-admin.js";
@@ -68,6 +69,13 @@ router.get("/", async (_req: Request, res: Response) => {
         publisher.contacts = contactRows.filter(
             (contact) => contact.publisher_id === publisher.id
         );
+        const logoFiles = fs
+            .readdirSync("./uploads/logos")
+            .filter((f: string) => f.startsWith(`${publisher.id}.`));
+
+        if (logoFiles.length > 0) {
+            publisher.logoUrl = `/publishers/${publisher.id}/logo`;
+        }
     });
     res.json(publisherRows);
 });
@@ -208,6 +216,7 @@ router.get("/:id/logo", async (req: Request, res: Response) => {
         return res.status(404).json({ error: "Logo not found" });
     }
 
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
     res.sendFile(path.resolve(`./uploads/logos/${files[0]}`));
 });
 
@@ -236,11 +245,21 @@ router.post(
             .readdirSync("./uploads/logos")
             .filter((f: string) => f.startsWith(`${id}.`));
 
+        existingFiles.forEach((f: string) =>
+            fs.unlinkSync(`./uploads/logos/${f}`)
+        );
+
         const ext = path.extname(req.file.originalname);
         const newPath = `./uploads/logos/${id}${ext}`;
+
         fs.renameSync(req.file.path, newPath);
 
-        res.json({ message: "Logo updated", url: `/publishers/${id}/logo` });
+        fs.accessSync(newPath);
+
+        res.json({
+            message: "Logo updated",
+            url: `/publishers/${id}/logo`,
+        });
     }
 );
 

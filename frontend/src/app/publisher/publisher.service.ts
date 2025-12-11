@@ -24,10 +24,12 @@ export class PublisherService {
       .pipe(catchError(() => of([])))
       .subscribe({
         next: (data) => {
-          if (this.FORCE_UPDATE) {
-            this.loadAll();
-          } else {
-            this.publishers.set(data);
+          this.publishers.set(data);
+          for (const publisher of data) {
+            if (publisher.logoUrl) {
+              publisher.logoUrl = `${environment.apiUrl}${publisher.logoUrl}`;
+              console.log('Loaded logo URL for publisher', publisher.id, publisher.logoUrl);
+            }
           }
         },
         error: (err) => console.error('Error loading publishers:', err),
@@ -96,6 +98,57 @@ export class PublisherService {
             return publishers;
           }),
         error: (err) => console.error('Error removing contact:', err),
+      });
+  }
+
+  uploadLogo(publisherId: number, formData: FormData) {
+    return this.http
+      .post<{ url: string }>(`${environment.apiUrl}/publishers/${publisherId}/logo`, formData, {
+        withCredentials: true,
+      })
+      .subscribe({
+        next: (response) => {
+          if (this.FORCE_UPDATE) {
+            this.loadAll();
+          } else {
+            console.log('Updating new logo');
+            const timestamp = Date.now();
+            this.publishers.update((publishers) => {
+              const publisher = publishers.find((p) => p.id === publisherId);
+              if (publisher) {
+                const baseUrl = response.url || `/publishers/${publisherId}/logo`;
+                publisher.logoUrl = `${environment.apiUrl}${baseUrl}${
+                  baseUrl.includes('?') ? '&' : '?'
+                }t=${timestamp}`;
+              }
+              return publishers;
+            });
+          }
+        },
+        error: (err) => console.error('Error uploading logo:', err),
+      });
+  }
+
+  deleteLogo(publisherId: number) {
+    return this.http
+      .delete<void>(`${environment.apiUrl}/publishers/${publisherId}/logo`, {
+        withCredentials: true,
+      })
+      .subscribe({
+        next: () => {
+          if (this.FORCE_UPDATE) {
+            this.loadAll();
+          } else {
+            this.publishers.update((publishers) => {
+              const publisher = publishers.find((p) => p.id === publisherId);
+              if (publisher) {
+                publisher.logoUrl = undefined;
+              }
+              return publishers;
+            });
+          }
+        },
+        error: (err) => console.error('Error deleting logo:', err),
       });
   }
 }
