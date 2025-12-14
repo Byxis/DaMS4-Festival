@@ -44,18 +44,50 @@
   min-width: 140px;
 }
 
-// ...existing code...
-.actions-row {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 18px; /* espace sous les boutons */
-}
 
 /* espace au dessus du champ de recherche si nécessaire */
 .search-field {
   margin-top: 8px;
 }
  
-/* ...existing code... */
+
+.actions-row {
+  display: flex;
+  justify-content: space-between; /* left block + right block */
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+/* left group keeps buttons together */
+.actions-left {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* right group stays glued to the right */
+.actions-right {
+  display: flex;
+  align-items: center;
+}
+
+/* ensure mat-form-field doesn't grow too much on small screens */
+.actions-right mat-form-field {
+  min-width: 220px;
+  max-width: 360px;
+  width: 100%;
+}
+
+/* responsive: stack on narrow screens */
+@media (max-width: 680px) {
+  .actions-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .actions-right {
+    margin-top: 8px;
+    justify-content: flex-start;
+  }
+}

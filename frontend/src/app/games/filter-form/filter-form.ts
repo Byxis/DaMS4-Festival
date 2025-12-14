@@ -16,8 +16,11 @@ import { GameService } from '../game-service/game-service';
 })
 export class FilterForm {
 
-    
     readonly form = new FormGroup({
+      editor_name: new FormControl('', { 
+      nonNullable: false,
+      validators: [ Validators.pattern('^[A-Za-z0-9 ]+$'), Validators.minLength(1)]
+    }),
     type: new FormControl('', { 
       nonNullable: false,
       validators: [ Validators.pattern('[a-zA-Z ]*'), Validators.minLength(1)]
@@ -45,6 +48,10 @@ export class FilterForm {
 
   close(): void{
     this.closeRequired.emit(true);
+    this.gameService.loadAll().subscribe({
+      next: games => this.gameService.setGames(games),
+      error: err => console.error('loadAll failed', err)
+    });
   }
 
   reset(): void {
@@ -54,7 +61,10 @@ export class FilterForm {
       number_maximal_of_player: 99
     });
 
-    this.gameService.loadAll();
+    this.gameService.loadAll().subscribe({
+      next: games => this.gameService.setGames(games),
+      error: err => console.error('loadAll failed', err)
+    });
   }
   
 

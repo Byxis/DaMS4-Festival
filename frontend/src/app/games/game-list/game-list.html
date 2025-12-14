@@ -1,37 +1,46 @@
 <br>
 
-<div class="actions-row">
-    @if(this.showForm == false){
-    <div class="add_new_game">
-      <button matButton="filled" (click)="setShowFormTrue()">Add New Game</button>
-      
-      
 
-    </div>
-    <br>
-  }
+ 
 
 
 
-  @if(this.showForm){
-    <app-game-form
-        (addGame)="this.gameService.createGameFromForm($event)"
-      (submitExecuted)="setShowFormFalse()">
-    </app-game-form>
-        <div class="example-flex-container">
-        <button matFab aria-label="Example icon button with a delete icon" (click)="setShowFormFalse()">
-          <mat-icon>close</mat-icon>
-        </button>
-        </div>
-  }
-
+  
   <br>
 
 
-  @if(this.showFilterForm == false){
-    <button matButton="filled" (click)="setFilterFormTrue()">Filter</button>
-  }
+  
 
+<div class="actions-row">
+  <div class="actions-left">
+    <div class="add_new_game">
+      <button matButton="filled" (click)="setShowFormTrue()">Add New Game</button>
+      
+
+        
+        
+    </div>
+
+    <button matButton="filled" (click)="setFilterFormTrue()">Filter</button>
+  </div>
+
+  <div class="actions-right">
+    <mat-form-field>
+      <mat-label>Sort by</mat-label>
+      <mat-select [(value)]="orderSelection" (selectionChange)="changeOrder($event.value)">
+        <mat-option value="name_game_asc">Game's Name ⬇️</mat-option>
+        <mat-option value="name_game_desc">Game's Name ⬆️</mat-option>
+        <mat-option value="name_editor_asc">Editor's Name ⬇️</mat-option>
+        <mat-option value="name_editor_desc">Editor's Name ⬆️</mat-option>
+        <mat-option value="type_asc">Type ⬇️</mat-option>
+        <mat-option value="type_desc">Type ⬆️</mat-option>
+        <mat-option value="min_asc">Minimum number ⬇️</mat-option>
+        <mat-option value="min_desc">Minimum number ⬆️</mat-option>
+        <mat-option value="max_asc">Maximum number ⬇️</mat-option>
+        <mat-option value="max_desc">Maximum number ⬆️</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
 </div>
 
 <mat-form-field appearance="outline">
@@ -48,10 +57,18 @@
 
 <app-filter-form
   (addFilter)="makeFilterSearch($event)"
-  >
+  (closeRequired)="setFilterFormFalse()">
 </app-filter-form>
 
 }
+
+@if(this.showForm){
+        <app-game-form
+            (addGame)="this.gameService.createGameFromForm($event)"
+            (closeRequired)="setShowFormFalse()"
+          (submitExecuted)="setShowFormFalse()">
+        </app-game-form>
+      }
 
 
 

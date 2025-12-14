@@ -4,10 +4,11 @@ import { GameService } from '../game-service/game-service';
 import { MatFormField } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-game-form',
-  imports: [ReactiveFormsModule, MatFormField, MatInputModule, FormsModule, MatButtonModule],
+  imports: [ReactiveFormsModule, MatFormField, MatInputModule, FormsModule, MatButtonModule, MatInputModule, MatIcon],
   templateUrl: './game-form.html',
   styleUrl: './game-form.scss'
 })
@@ -16,11 +17,11 @@ export class GameForm {
   readonly form = new FormGroup({
   name: new FormControl('', { 
     nonNullable: true,
-    validators: [Validators.required, Validators.pattern('[a-zA-Z ]*'), Validators.minLength(2)]
+    validators: [Validators.required, Validators.pattern('^[A-Za-z0-9 ]+$'), Validators.minLength(2)]
    }),
    editor: new FormControl('', { 
     nonNullable: true,
-    validators: [Validators.required, Validators.pattern('[a-zA-Z ]*'), Validators.minLength(2)]
+    validators: [Validators.required, Validators.pattern('^[A-Za-z0-9 ]+$'), Validators.minLength(2)]
    }),
    type: new FormControl('', { 
     nonNullable: true,
@@ -52,7 +53,7 @@ readonly gameService = inject(GameService);
 
   isSubmitFinished = output<boolean>();
 
-
+  closeRequired = output<boolean>();
   
   
 
@@ -71,8 +72,22 @@ readonly gameService = inject(GameService);
 
   
 
+  resetGameForm(): void {
+    this.form.reset({
+      name: '',
+      editor: '',
+      type:'',
+      number_minimal_of_player:1,
+      number_maximal_of_player: 1
+
+    });
+
+  }
 
 
+  close(): void{
+    this.closeRequired.emit(true);
+  }
 
 
  

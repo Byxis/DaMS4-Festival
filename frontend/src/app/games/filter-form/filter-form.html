@@ -1,6 +1,12 @@
  <form [formGroup]="form" (ngSubmit)="submit()"> 
 
 <mat-form-field appearance="outline">
+
+  <mat-label>Editor's name </mat-label>
+  <input matInput type="text" formControlName="editor_name" placeholder="editor's name" />
+</mat-form-field>
+
+<mat-form-field appearance="outline">
   <mat-label>Type</mat-label>
   <input matInput type="text" formControlName="type" placeholder="game's type" />
 </mat-form-field>
@@ -23,7 +29,7 @@
 
   <button mat-button type="button" (click)="reset()">Reset</button>
 
-  <button matFab  (click)="close()">
+  <button matFab  type="button" (click)="close()">
         <mat-icon>close</mat-icon>
     </button>
 </form>

@@ -28,4 +28,9 @@
  <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
     Submit
   </button>
+
+  <button mat-button type="button" (click)="resetGameForm()">Reset</button>
+  <button matFab  type="button" (click)="close()">
+        <mat-icon>close</mat-icon>
+    </button>
 </form>

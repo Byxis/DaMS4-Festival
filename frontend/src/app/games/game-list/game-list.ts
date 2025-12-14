@@ -10,11 +10,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { FilterForm } from '../filter-form/filter-form';
 import { GameDto } from '../game/game-dto';
+import { MatOption, MatOptionModule } from '@angular/material/core';
+import { MatSelect, MatSelectModule } from '@angular/material/select';
+;
 
 
 @Component({
   selector: 'app-game-list',
-  imports: [JsonPipe, GameForm, MatFormFieldModule, MatInputModule, FormsModule, MatInputModule, MatButtonModule, MatIconModule, FilterForm],
+  imports: [JsonPipe, GameForm, MatFormFieldModule,MatIconModule,MatOptionModule, MatOption,MatSelect, MatSelectModule, MatSelectModule, MatInputModule, FormsModule, MatInputModule, MatButtonModule, MatIconModule, FilterForm],
   templateUrl: './game-list.html',
   styleUrl: './game-list.scss'
 })
@@ -28,13 +31,14 @@ export class GameList {
   readonly gameService = inject(GameService)
 
   selectedSignal: WritableSignal<number | null> = signal(null);
-
+  
+  orderSelection = 'name_game_asc';
   /*
     readonly posts = httpResource<PostDto[]>(() => (
        { url: 'https://jsonplaceholder.typicode.com/posts' })
     
     )*/
-
+   
     setShowFormTrue(){
       this.showForm = true;
       this.showFilterForm = false;
@@ -60,6 +64,7 @@ export class GameList {
     this.gameService.searchGameByEditorInDBObservable(editorName).subscribe({
       next: (games) => {
         this.gameService.setGames(games); 
+        this.gameService.sortGames(this.orderSelection);
       },
       error: (err) => {
         console.error('Erreur lors de la recherche', err);
@@ -71,6 +76,7 @@ export class GameList {
     this.gameService.searchGameByNameInDBObservable(gameName).subscribe({
       next: (games) => {
         this.gameService.setGames(games); 
+        this.gameService.sortGames(this.orderSelection);
       },
       error: (err) => {
         console.error('Erreur lors de la recherche', err);
@@ -90,11 +96,21 @@ export class GameList {
 
   }
 
+  changeOrder(order: string): void {
+    this.orderSelection = order;
+    
+    this.gameService.sortGames(order);
+  }
+
 
 
   constructor() {
-  this.gameService.loadAll().subscribe(games => {
-    this.gameService.setGames(games); // Mets à jour le signal avec les jeux reçus
+  this.gameService.loadAll().subscribe({
+    next: games =>{
+      this.gameService.setGames(games);
+     this.gameService.sortGames(this.orderSelection);
+    }
+    
   });
 }
 

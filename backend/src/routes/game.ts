@@ -191,7 +191,7 @@ router.get("/filterByEditor", async (req, res) => {
 
 
 router.get("/filter", async (req, res) => {
-  
+  const editorName = (req.query.editor_name || '').toString().trim();
   const typeDesc   = (req.query.type || '').toString().trim();
   const minPlayers = req.query.min ? Number(req.query.min) : null;
   const maxPlayers = req.query.max ? Number(req.query.max) : null;
@@ -200,7 +200,12 @@ router.get("/filter", async (req, res) => {
     const conditions: string[] = [];
     const params: any[] = [];
 
-    
+     if (editorName !== '') {
+      params.push(`%${editorName}%`);
+      const idx = params.length;
+      conditions.push(`e.name ILIKE $${idx}`);
+    }
+
     if (typeDesc !== '') {
       params.push(`%${typeDesc}%`);
       const idx = params.length;

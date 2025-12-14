@@ -72,14 +72,16 @@ searchGameByEditorInDBObservable(editorName: string): Observable<GameDto[]>{
     });
 }
 
-  makeFilterSearchObservable(filters: {type? :string, 
+  makeFilterSearchObservable(filters: {editor_name?: string,
+    type? :string, 
     number_minimal_of_player? : number|null, 
     number_maximal_of_player? : number|null}): Observable<GameDto[]>{
     const params: any = {};
+    if(filters.editor_name) params.editor_name = filters.editor_name;
     if(filters.type) params.type = filters.type;
-  if (filters.number_minimal_of_player != null) params.min = String(filters.number_minimal_of_player);
-  if (filters.number_maximal_of_player != null) params.max = String(filters.number_maximal_of_player);
-  return this.http.get<GameDto[]>(`${environment.apiUrl}/game/filter`, { params });
+    if (filters.number_minimal_of_player != null) params.min = String(filters.number_minimal_of_player);
+    if (filters.number_maximal_of_player != null) params.max = String(filters.number_maximal_of_player);
+    return this.http.get<GameDto[]>(`${environment.apiUrl}/game/filter`, { params });
 
   }
 
@@ -118,21 +120,52 @@ searchGameByNameInDBObservable(gameName: string): Observable<GameDto[]>{
     return this.http.get<GameDto[]>(`${environment.apiUrl}/game/loadAll`);
   }
   
-  
+  sortGames(order: string): void {
+    this._games.update(list => {
+      const copy = [...list];
+      switch (order) {
+         case 'name_game_asc':
+          copy.sort((a,b) => (a.name || '').localeCompare(b.name || ''));
+          break;
+        case 'name_game_desc':
+          copy.sort((a,b) => (b.name || '').localeCompare(a.name || ''));
+          break;
+        case 'name_editor_asc':
+          copy.sort((a,b) => (a.editor_name || '').localeCompare(b.editor_name || ''));
+          break;
+        case 'name_editor_desc':
+          copy.sort((a,b) => (b.editor_name || '').localeCompare(a.editor_name || ''));
+          break;
+        case 'type_asc':
+          copy.sort((a,b) => (a.type || '').localeCompare(b.type || ''));
+          break;
+        case 'type_desc':
+          copy.sort((a,b) => (b.type || '').localeCompare(a.type || ''));
+          break;
+        case 'min_asc':
+          copy.sort((a,b) => (a.minimum_number_of_player ?? 0) - (b.minimum_number_of_player ?? 0));
+          break;
+        case 'min_desc':
+          copy.sort((a,b) => (b.minimum_number_of_player ?? 0) - (a.minimum_number_of_player ?? 0));
+          break;
+        case 'max_asc':
+          copy.sort((a,b) => (a.maximum_number_of_player ?? 0) - (b.maximum_number_of_player ?? 0));
+          break;
+        case 'max_desc':
+          copy.sort((a,b) => (b.maximum_number_of_player ?? 0) - (a.maximum_number_of_player ?? 0));
+          break;
+        default:
+          break;
+      }
+      return copy;
+    });
+  }
   
   
 
 
  
-  /*
-  addGame(post: GameDto) {
-     
-        this.http.post<GameDto>('https://jsonplaceholder.typicode.com/posts', post).subscribe(newGame => {
-        this._games.update(arr => [...arr, newGame])
-        })
-     }
-        */
-
+ 
 
   findById(id: number): GameDto | undefined {
     return this._games().find(g => g.id===id)
