@@ -1,0 +1,61 @@
+.games-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* vertical separators between columns and subtle horizontal row lines */
+.games-table th,
+.games-table td {
+  padding: 8px 12px;
+  border-right: 1px solid #e0e0e0;   /* ligne entre chaque colonne */
+  border-bottom: 1px solid #f0f0f0;  /* ligne entre chaque ligne */
+  text-align: left;
+}
+
+/* remove right border on last column */
+.games-table th:last-child,
+.games-table td:last-child {
+  border-right: none;
+  border-bottom: none;
+}
+
+/* header styling */
+.games-table thead th {
+  background: #575353;
+  font-weight: 600;
+}
+
+/* optional hover effect */
+.games-table tbody tr:hover td {
+  background: #575353;
+}
+
+/* bouton Add / Filter sur la même ligne */
+.actions-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* petits ajustements visuels */
+.actions-row button {
+  min-width: 140px;
+}
+
+// ...existing code...
+.actions-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 18px; /* espace sous les boutons */
+}
+
+/* espace au dessus du champ de recherche si nécessaire */
+.search-field {
+  margin-top: 8px;
+}
+ 
+/* ...existing code... */

@@ -1,1 +1,29 @@
-<p>filter-form works!</p>
+ <form [formGroup]="form" (ngSubmit)="submit()"> 
+
+<mat-form-field appearance="outline">
+  <mat-label>Type</mat-label>
+  <input matInput type="text" formControlName="type" placeholder="game's type" />
+</mat-form-field>
+
+<mat-form-field appearance="outline">
+  <mat-label>Number minimum of player</mat-label>
+  <input matInput type="number" formControlName="number_minimal_of_player" placeholder="number minimum of player" 
+  min="0" max="99"/>
+</mat-form-field>
+
+<mat-form-field appearance="outline">
+  <mat-label>Number maximum of player</mat-label>
+  <input matInput type="number" formControlName="number_maximal_of_player" placeholder="number maximum of player" 
+  min="0" max="99"/>
+</mat-form-field>
+
+ <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
+    Submit
+  </button>
+
+  <button mat-button type="button" (click)="reset()">Reset</button>
+
+  <button matFab  (click)="close()">
+        <mat-icon>close</mat-icon>
+    </button>
+</form>

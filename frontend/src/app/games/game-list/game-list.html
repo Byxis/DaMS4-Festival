@@ -1,82 +1,97 @@
 <br>
 
-  @if(this.showForm == false){
-  <div class="add_new_game">
-    <button matButton="filled" (click)="setShowFormTrue()">Add New Game</button>
-    
-    
+<div class="actions-row">
+    @if(this.showForm == false){
+    <div class="add_new_game">
+      <button matButton="filled" (click)="setShowFormTrue()">Add New Game</button>
+      
+      
 
-  </div>
+    </div>
+    <br>
+  }
+
+
+
+  @if(this.showForm){
+    <app-game-form
+        (addGame)="this.gameService.createGameFromForm($event)"
+      (submitExecuted)="setShowFormFalse()">
+    </app-game-form>
+        <div class="example-flex-container">
+        <button matFab aria-label="Example icon button with a delete icon" (click)="setShowFormFalse()">
+          <mat-icon>close</mat-icon>
+        </button>
+        </div>
+  }
+
   <br>
-}
-
-<div class="add_new_game">
-    <button matButton="filled" (click)="setShowFormTrue()">Remove All</button>
-    
-    
-
-  </div>
 
 
-@if(this.showForm){
-  <app-game-form
-      (addGame)="this.gameService.createGameFromForm($event)"
-    (submitExecuted)="setShowFormFalse()">
-  </app-game-form>
-      <div class="example-flex-container">
-      <button matFab aria-label="Example icon button with a delete icon" (click)="setShowFormFalse()">
-        <mat-icon>close</mat-icon>
-      </button>
-      </div>
-}
+  @if(this.showFilterForm == false){
+    <button matButton="filled" (click)="setFilterFormTrue()">Filter</button>
+  }
 
-<br>
+</div>
 
 <mat-form-field appearance="outline">
   <mat-label>Search a game</mat-label>
-  <input matInput [(ngModel)]="searchTerm"  placeholder="name of the game">
-  <button mat-icon-button matSuffix aria-label="Chercher" (click)="">
-    <mat-icon>search</mat-icon>
-  </button>
+  <input matInput [(ngModel)]="searchTerm"  placeholder="name of the game" (input)="searchGameByName($event.target.value)">
 </mat-form-field>
 
 
 <br>
 
-@if(this.showFilterForm == false){
-  <button matButton="filled" (click)="setFilterFormTrue()">Filter by editor</button>
-}
 
 
 @if(this.showFilterForm){
-<mat-form-field appearance="outline">
-  <mat-label>editor's name</mat-label>
-  <input matInput type="text" placeholder="editor's name"
-    (input)="searchGameByEditorName($event.target.value)" />
-</mat-form-field>
 
-<button matFab aria-label="Example icon button with a delete icon" (click)="setFilterFormFalse()">
-        <mat-icon>close</mat-icon>
-      </button>
+<app-filter-form
+  (addFilter)="makeFilterSearch($event)"
+  >
+</app-filter-form>
+
 }
+
+
+
+
+
+
+
+
 
 
 
 @if(this.gameService.games(); as g){
-    @for ( game of g; track game.id) {
-        <pre><strong>Name : {{ game.name}}</strong></pre>
-        <pre><strong>Editor : {{game.editor_name}}</strong></pre>
-        <pre><strong>Type : {{ game.type}}</strong></pre>
-
-        <pre><strong>Minimum number of player : {{ game.minimum_number_of_player}}</strong></pre>
-        <pre><strong>Maximum number of player : {{ game.maximum_number_of_player}}</strong></pre>
-        @if(game.id){
-            <button matFab aria-label="Example icon button with a delete icon" (click)="this.gameService.deleteGame(game.id)">
+  <table class="games-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Editor</th>
+        <th>Type</th>
+        <th>Min</th>
+        <th>Max</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for ( game of g; track game.id) {
+        <tr>
+         <td> {{ game.name}}</td>
+          <td>{{ game.editor_name || 'unknown' }}</td>
+          <td>{{ game.type ||  'unknown' }}</td>
+          <td>{{ game.minimum_number_of_player }}</td>
+          <td>{{ game.maximum_number_of_player }}</td>
+          
+           <td>  <button mat-icon-button color="warn"
+                    (click)="this.gameService.deleteGame(game.id!)"
+                    aria-label="Remove game">
               <mat-icon>delete</mat-icon>
             </button>
-            
-        }
-        <p> ----------- </p>
-    }
+          </td>
+        </tr>
+      }
 
+    </tbody>
+  </table>
 }

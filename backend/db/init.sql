@@ -10,7 +10,6 @@ CREATE TABLE IF NOT EXISTS users (
 
 
 
--- <-- remove the INSERT FROM games_tmp block here
 
 CREATE TABLE IF NOT EXISTS editors (
     id SERIAL PRIMARY KEY,

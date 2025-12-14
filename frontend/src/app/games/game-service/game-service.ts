@@ -65,10 +65,6 @@ export class GameService {
   }
 
   
- addGameToDb(game: GameDto): Observable<GameDto> {
-  console.log("jeu ajouté dans la bdd");
-  return this.http.post<GameDto>(`${environment.apiUrl}/game`, game);
-}
 
 searchGameByEditorInDBObservable(editorName: string): Observable<GameDto[]>{
   return this.http.get<GameDto[]>(`${environment.apiUrl}/game/filterByEditor`,{
@@ -76,17 +72,47 @@ searchGameByEditorInDBObservable(editorName: string): Observable<GameDto[]>{
     });
 }
 
+  makeFilterSearchObservable(filters: {type? :string, 
+    number_minimal_of_player? : number|null, 
+    number_maximal_of_player? : number|null}): Observable<GameDto[]>{
+    const params: any = {};
+    if(filters.type) params.type = filters.type;
+  if (filters.number_minimal_of_player != null) params.min = String(filters.number_minimal_of_player);
+  if (filters.number_maximal_of_player != null) params.max = String(filters.number_maximal_of_player);
+  return this.http.get<GameDto[]>(`${environment.apiUrl}/game/filter`, { params });
 
+  }
+
+searchGameByNameInDBObservable(gameName: string): Observable<GameDto[]>{
+  return this.http.get<GameDto[]>(`${environment.apiUrl}/game/search`,{
+      params:{gameName}
+    });
+}
+
+
+   addGameToDb(game: Partial<GameDto>): Observable<GameDto> {
+  console.log("jeu ajouté dans la bdd");
+  return this.http.post<GameDto>(`${environment.apiUrl}/game`, game);
+}
 
 
   
-  add(game: GameDto): void { 
-    game.id = this.lastID+1
+  add(game: Partial<GameDto>): void { 
     this.addGameToDb(game).subscribe()
-    this._games.update(list => [game,...list]) 
     
-    this.lastID +=1
   }
+
+   createGameFromForm(form: { name: string, editor: string, type: string, number_minimal_of_player: number, number_maximal_of_player: number }) {
+  const game: Partial<GameDto> = {
+
+    name: form.name,
+    editor_name: form.editor,
+    type: form.type,
+    minimum_number_of_player: form.number_minimal_of_player,
+    maximum_number_of_player: form.number_maximal_of_player
+  };
+  this.add(game);
+}
 
   loadAll(): Observable<GameDto[]>{
     return this.http.get<GameDto[]>(`${environment.apiUrl}/game/loadAll`);
@@ -114,16 +140,6 @@ searchGameByEditorInDBObservable(editorName: string): Observable<GameDto[]>{
 
 
      
-  createGameFromForm(form: { name: string, editor: string, type: string, number_minimal_of_player: number, number_maximal_of_player: number }) {
-  const game: GameDto = {
-    id: this.lastID + 1,
-    name: form.name,
-    editor_name: form.editor,
-    type: form.type,
-    minimum_number_of_player: form.number_minimal_of_player,
-    maximum_number_of_player: form.number_maximal_of_player
-  };
-  this.add(game);
-}
+ 
 
 }

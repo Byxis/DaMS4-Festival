@@ -8,11 +8,13 @@ import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { FilterForm } from '../filter-form/filter-form';
+import { GameDto } from '../game/game-dto';
 
 
 @Component({
   selector: 'app-game-list',
-  imports: [JsonPipe, GameForm, MatFormFieldModule, MatInputModule, FormsModule, MatInputModule, MatButtonModule, MatIconModule],
+  imports: [JsonPipe, GameForm, MatFormFieldModule, MatInputModule, FormsModule, MatInputModule, MatButtonModule, MatIconModule, FilterForm],
   templateUrl: './game-list.html',
   styleUrl: './game-list.scss'
 })
@@ -35,6 +37,7 @@ export class GameList {
 
     setShowFormTrue(){
       this.showForm = true;
+      this.showFilterForm = false;
     }
 
     setShowFormFalse(){
@@ -43,25 +46,48 @@ export class GameList {
 
     setFilterFormTrue(){
       this.showFilterForm = true;
+      this.showForm = false;
     }
 
     setFilterFormFalse() {
     this.showFilterForm = false;
-    this.gameService.loadAll().subscribe(games => {
-    this.gameService.setGames(games); 
-  });
-}
+    
+  
+  }
 
 
   searchGameByEditorName(editorName: string): void {
     this.gameService.searchGameByEditorInDBObservable(editorName).subscribe({
       next: (games) => {
-        this.gameService.setGames(games); // met à jour la liste affichée
+        this.gameService.setGames(games); 
       },
       error: (err) => {
         console.error('Erreur lors de la recherche', err);
       }
     });
+  }
+
+  searchGameByName(gameName: string): void {
+    this.gameService.searchGameByNameInDBObservable(gameName).subscribe({
+      next: (games) => {
+        this.gameService.setGames(games); 
+      },
+      error: (err) => {
+        console.error('Erreur lors de la recherche', err);
+      }
+    });
+  }
+
+
+  makeFilterSearch(filters: any): void{
+    this.gameService.makeFilterSearchObservable(filters).subscribe({
+      next: (results) => {
+        this.gameService.setGames(results); 
+      },
+      error: (err) => {
+      console.error('Erreur lors de la recherche', err);
+    }});
+
   }
 
 
