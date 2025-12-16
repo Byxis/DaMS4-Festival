@@ -55,10 +55,11 @@
 
 @if(this.showFilterForm){
 
-<app-filter-form
+
+<app-filter-form-editor
   (addFilter)="makeFilterSearch($event)"
   (closeRequired)="setFilterFormFalse()">
-</app-filter-form>
+</app-filter-form-editor>
 
 }
 

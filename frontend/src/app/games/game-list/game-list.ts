@@ -1,4 +1,4 @@
-import { Component, inject, signal, WritableSignal } from '@angular/core';
+import { Component, inject, input, signal, WritableSignal } from '@angular/core';
 import { GameService } from '../game-service/game-service';
 import { HttpClient } from '@angular/common/http';
 import { JsonPipe } from '@angular/common';
@@ -12,12 +12,14 @@ import { FilterForm } from '../filter-form/filter-form';
 import { GameDto } from '../game/game-dto';
 import { MatOption, MatOptionModule } from '@angular/material/core';
 import { MatSelect, MatSelectModule } from '@angular/material/select';
-;
+import { FilterFormEditor } from '../filter-form-editorEditor/filter-form';
+import { ActivatedRoute } from '@angular/router';
+
 
 
 @Component({
   selector: 'app-game-list',
-  imports: [JsonPipe, GameForm, MatFormFieldModule,MatIconModule,MatOptionModule, MatOption,MatSelect, MatSelectModule, MatSelectModule, MatInputModule, FormsModule, MatInputModule, MatButtonModule, MatIconModule, FilterForm],
+  imports: [JsonPipe, GameForm, FilterFormEditor, MatFormFieldModule,MatIconModule,MatOptionModule, MatOption,MatSelect, MatSelectModule, MatSelectModule, MatInputModule, FormsModule, MatInputModule, MatButtonModule, MatIconModule, FilterForm],
   templateUrl: './game-list.html',
   styleUrl: './game-list.scss'
 })
@@ -31,28 +33,31 @@ export class GameList {
   readonly gameService = inject(GameService)
 
   selectedSignal: WritableSignal<number | null> = signal(null);
+
+  readonly route = inject(ActivatedRoute);
   
+  //initial sort
   orderSelection = 'name_game_asc';
-  /*
-    readonly posts = httpResource<PostDto[]>(() => (
-       { url: 'https://jsonplaceholder.typicode.com/posts' })
-    
-    )*/
+  
    
+    // show the newGame form
     setShowFormTrue(){
       this.showForm = true;
       this.showFilterForm = false;
     }
 
+    // hide the newGame form
     setShowFormFalse(){
       this.showForm = false;
     }
 
+    // show the filter form
     setFilterFormTrue(){
       this.showFilterForm = true;
       this.showForm = false;
     }
 
+    // hide the filter form
     setFilterFormFalse() {
     this.showFilterForm = false;
     
@@ -62,6 +67,18 @@ export class GameList {
 
   searchGameByEditorName(editorName: string): void {
     this.gameService.searchGameByEditorInDBObservable(editorName).subscribe({
+      next: (games) => {
+        this.gameService.setGames(games); 
+        this.gameService.sortGames(this.orderSelection);
+      },
+      error: (err) => {
+        console.error('Erreur lors de la recherche', err);
+      }
+    });
+  }
+
+  searchGameByEditorID(editorId: number): void {
+    this.gameService.searchGameByEditorIDInDBObservable(editorId).subscribe({
       next: (games) => {
         this.gameService.setGames(games); 
         this.gameService.sortGames(this.orderSelection);
@@ -85,6 +102,10 @@ export class GameList {
   }
 
 
+  getEditorByID(id : number): string{
+    
+  }
+
   makeFilterSearch(filters: any): void{
     this.gameService.makeFilterSearchObservable(filters).subscribe({
       next: (results) => {
@@ -96,6 +117,9 @@ export class GameList {
 
   }
 
+
+
+  // change the order or the list
   changeOrder(order: string): void {
     this.orderSelection = order;
     
@@ -103,16 +127,30 @@ export class GameList {
   }
 
 
-
+  // load the list of game with all games
+  // initialy : sort games by originalSort
   constructor() {
-  this.gameService.loadAll().subscribe({
-    next: games =>{
-      this.gameService.setGames(games);
-     this.gameService.sortGames(this.orderSelection);
-    }
-    
-  });
-}
+   
+   
+
+    // 2) (optionnel) abonnement si tu veux réagir aux changements de route
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('id');
+      const editorID = Number(id);
+      if (id) {
+        this.searchGameByEditorID(editorID);
+      } else {
+        // pas d'éditeur en param -> charger tous
+        this.gameService.loadAll().subscribe({
+          next: games => {
+            this.gameService.setGames(games);
+            this.gameService.sortGames(this.orderSelection);
+          },
+          error: err => console.error('loadAll failed', err)
+        });
+      }
+    });
+  }
 
        
 

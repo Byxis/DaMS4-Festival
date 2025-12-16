@@ -24,7 +24,7 @@ export class Game {
 
       
        
-
+        // convert a GameDto to a Game
         static fromDto(dto : GameDto) : Game| null{
             if (dto.id === undefined){return null}
 

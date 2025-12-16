@@ -72,6 +72,12 @@ searchGameByEditorInDBObservable(editorName: string): Observable<GameDto[]>{
     });
 }
 
+searchGameByEditorIDInDBObservable(editorID: number): Observable<GameDto[]>{
+   return this.http.get<GameDto[]>(`${environment.apiUrl}/game/filterByEditorID`,{
+      params:{editorID}
+    });
+}
+
   makeFilterSearchObservable(filters: {editor_name?: string,
     type? :string, 
     number_minimal_of_player? : number|null, 
@@ -162,6 +168,9 @@ searchGameByNameInDBObservable(gameName: string): Observable<GameDto[]>{
   }
   
   
+  getEditorByIDObservable(id : number): Observable<GameDto>{
+    return this.http.get<GameDto>(`${environment.apiUrl}/game/getEditorByID`);
+  }
 
 
  

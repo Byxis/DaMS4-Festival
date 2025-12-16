@@ -9,19 +9,16 @@ import { GameService } from '../game-service/game-service';
 
 
 @Component({
-  selector: 'app-filter-form',
+  selector: 'app-filter-form-editor',
   imports: [ReactiveFormsModule, MatFormField, MatInputModule, FormsModule, MatButtonModule, MatIconButton, MatIcon],
-  templateUrl: './filter-form.html',
-  styleUrl: './filter-form.scss'
+  templateUrl: './filter-form-editor.html',
+  styleUrl: './filter-form-editor.scss'
 })
-export class FilterForm {
+export class FilterFormEditor {
 
     readonly form = new FormGroup({
       
-      editor_name: new FormControl('', { 
-      nonNullable: false,
-      validators: [ Validators.pattern('^[A-Za-z0-9 ]+$'), Validators.minLength(1)]
-    }),
+     
   
     type: new FormControl('', { 
       nonNullable: false,

@@ -17,11 +17,11 @@ export class GameForm {
   readonly form = new FormGroup({
   name: new FormControl('', { 
     nonNullable: true,
-    validators: [Validators.required, Validators.pattern('^[A-Za-z0-9 ]+$'), Validators.minLength(2)]
+    validators: [Validators.required, Validators.pattern('^[A-Za-z0-9 ]+$'), Validators.minLength(1)]
    }),
    editor: new FormControl('', { 
     nonNullable: true,
-    validators: [Validators.required, Validators.pattern('^[A-Za-z0-9 ]+$'), Validators.minLength(2)]
+    validators: [Validators.required, Validators.pattern('^[A-Za-z0-9 ]+$'), Validators.minLength(1)]
    }),
    type: new FormControl('', { 
     nonNullable: true,
@@ -51,19 +51,19 @@ readonly gameService = inject(GameService);
   
   addGame = output<any>();
 
-  isSubmitFinished = output<boolean>();
+  
 
   closeRequired = output<boolean>();
+  route: any;
   
   
 
 
+  //send the value of the form to the game-list
+  // reset the value of the form after
   submit(): void {
     const data = this.form.value;
-    
-    
-   
-      console.log("Student creation");
+
        this.addGame.emit(data);
        this.submitExecuted.emit(true);
        this.form.reset();
@@ -71,7 +71,7 @@ readonly gameService = inject(GameService);
   }
 
   
-
+  //reset value of the form
   resetGameForm(): void {
     this.form.reset({
       name: '',
@@ -84,7 +84,7 @@ readonly gameService = inject(GameService);
 
   }
 
-
+  // send the output closeRequired to the gameList
   close(): void{
     this.closeRequired.emit(true);
   }
@@ -92,7 +92,7 @@ readonly gameService = inject(GameService);
 
  
 
-
+  // handle error from form control
   getErrorMessage(control: AbstractControl|null): string|null{
     if(control){
       console.log('Control:', control);
@@ -108,6 +108,26 @@ readonly gameService = inject(GameService);
 
     }
     return null
+  }
+
+
+  constructor() {
+    const idStr = this.route.snapshot.paramMap.get('id');
+    if (idStr) {
+      const idNum = Number(idStr);
+      if (!Number.isNaN(idNum)) {
+        this.gameService.getEditorByID(idNum).subscribe({
+          next: name => {
+            if (name) {
+              // préremplit le champ 'editor'
+              this.form.controls['editor'].setValue(name);
+              // si tu veux empêcher la modification : this.form.controls['editor'].disable();
+            }
+          },
+          error: err => console.error('getEditorNameById failed', err)
+        });
+      }
+    }
   }
   
 }

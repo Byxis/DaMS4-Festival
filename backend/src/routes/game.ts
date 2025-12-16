@@ -188,6 +188,61 @@ router.get("/filterByEditor", async (req, res) => {
   }
 });
 
+router.get("/filterByEditorID", async (req, res) => {
+  const editorID = Number(req.query.editorID);
+  if (Number.isNaN(editorID)) {
+    return res.status(400).json({ error: "editorID invalid" });
+  }
+  try {
+    const q = `
+      SELECT g.id,
+             g.name,
+             g.minimum_number_of_player,
+             g.maximum_number_of_player,
+             g.editor_id,
+             g.type_of_games_id,
+             g.logo,
+             e.name AS editor_name,
+             t.description AS type
+      FROM games g
+      JOIN editors e ON e.id = g.editor_id    
+      LEFT JOIN type_of_games t ON t.id = g.type_of_games_id
+      WHERE g.editor_id = $1
+      ORDER BY g.id;
+    `;
+    const params = [`%${editorID}%`]; 
+    const result = await pool.query(q, params);
+    res.status(200).json(result.rows);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Erreur lors de la recherche par editor" });
+  }
+});
+
+
+router.get("/getEditorByID", async (req, res) => {
+  const editorID = Number(req.query.editorID);
+  if (Number.isNaN(editorID)) {
+    return res.status(400).json({ error: "editorID invalid" });
+  }
+  try {
+    const q = `
+      SELECT e.name
+      FROM editors e
+      WHERE e.id = $1;
+    `;
+    const params = [editorID];
+    const result = await pool.query(q, params);
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Editor not found" });
+    }
+    res.status(200).json({ name: result.rows[0].name });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Erreur lors de la recherche de l'editor" });
+  }
+});
+
 
 
 router.get("/filter", async (req, res) => {
