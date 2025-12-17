@@ -5,6 +5,7 @@ import { MatFormField } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-game-form',
@@ -54,7 +55,7 @@ readonly gameService = inject(GameService);
   
 
   closeRequired = output<boolean>();
-  route: any;
+  readonly route = inject(ActivatedRoute)
   
   
 
@@ -111,24 +112,27 @@ readonly gameService = inject(GameService);
   }
 
 
+  editorName = "";
+
+
   constructor() {
     const idStr = this.route.snapshot.paramMap.get('id');
     if (idStr) {
       const idNum = Number(idStr);
       if (!Number.isNaN(idNum)) {
-        this.gameService.getEditorByID(idNum).subscribe({
+        
+        this.gameService.getEditorNameByID(idNum).subscribe({
           next: name => {
             if (name) {
-              // préremplit le champ 'editor'
+              this.editorName = name;                     
               this.form.controls['editor'].setValue(name);
-              // si tu veux empêcher la modification : this.form.controls['editor'].disable();
             }
           },
           error: err => console.error('getEditorNameById failed', err)
         });
       }
-    }
-  }
+
+    }}
   
 }
 

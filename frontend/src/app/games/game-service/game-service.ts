@@ -2,7 +2,7 @@
   import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { GameDto } from '../game/game-dto';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { environment } from '@env/environment';
 
@@ -168,10 +168,20 @@ searchGameByNameInDBObservable(gameName: string): Observable<GameDto[]>{
   }
   
   
-  getEditorByIDObservable(id : number): Observable<GameDto>{
-    return this.http.get<GameDto>(`${environment.apiUrl}/game/getEditorByID`);
+  getEditorNameByIDObservable(id : number): Observable<GameDto>{
+    return this.http.get<GameDto>(`${environment.apiUrl}/game/getEditorNameByID`);
   }
 
+  getEditorNameByID(id: number): Observable<string> {
+    return this.getEditorNameByIDObservable(id).pipe(
+      map(res => {
+        
+        if (!res) return '';
+        if ((res as any).name !== undefined) return (res as any).name;
+        return (res as any).editor_name ?? '';
+      })
+    );
+  }
 
  
  

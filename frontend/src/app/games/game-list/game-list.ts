@@ -14,6 +14,7 @@ import { MatOption, MatOptionModule } from '@angular/material/core';
 import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { FilterFormEditor } from '../filter-form-editorEditor/filter-form';
 import { ActivatedRoute } from '@angular/router';
+import { map, Observable } from 'rxjs';
 
 
 
@@ -102,9 +103,7 @@ export class GameList {
   }
 
 
-  getEditorByID(id : number): string{
     
-  }
 
   makeFilterSearch(filters: any): void{
     this.gameService.makeFilterSearchObservable(filters).subscribe({

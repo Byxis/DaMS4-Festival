@@ -220,7 +220,7 @@ router.get("/filterByEditorID", async (req, res) => {
 });
 
 
-router.get("/getEditorByID", async (req, res) => {
+router.get("/getEditorNameByID", async (req, res) => {
   const editorID = Number(req.query.editorID);
   if (Number.isNaN(editorID)) {
     return res.status(400).json({ error: "editorID invalid" });
