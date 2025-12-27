@@ -4,11 +4,20 @@ import { HomePage } from './pages/home/home.component';
 import { AdminComponent } from '@admin/admin/admin.component';
 import { authGuard } from '@auth/auth.guard';
 import { adminGuard } from '@admin/admin.guard';
+import { Publisher } from './pages/publisher/publisher';
+import { publisherResolver } from './pages/publisher/publisher.resolver';
+import { NotFoundComponent } from './pages/not-found/not-found.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPage },
   { path: 'home', component: HomePage, canActivate: [authGuard] },
   { path: 'admin', component: AdminComponent, canActivate: [authGuard, adminGuard] },
+  {
+    path: 'publishers/:id',
+    component: Publisher,
+    resolve: { publisher: publisherResolver },
+    canActivate: [authGuard],
+  },
   { path: '', pathMatch: 'full', redirectTo: 'home' },
-  { path: '**', redirectTo: 'home' },
+  { path: '**', component: NotFoundComponent },
 ];
