@@ -12,7 +12,7 @@ import {
 import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '@auth/auth.service';
 
 @Component({
@@ -40,13 +40,15 @@ import { AuthService } from '@auth/auth.service';
 export class Login {
   private readonly svc = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   readonly isLoading = this.svc.isLoading;
   readonly error = this.svc.error;
 
   constructor() {
     effect(() => {
       if (this.svc.isLoggedIn()) {
-        this.router.navigate(['/']);
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+        this.router.navigateByUrl(returnUrl);
       }
     });
   }

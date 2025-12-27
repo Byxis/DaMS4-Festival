@@ -18,6 +18,10 @@ html {
   );
   --delete-bg: #fbe6e5;
   --delete-color: #d44d3d;
+  --primary-blue: #007bff;
+  --primary-blue-hover: #0056b3;
+  --text-dark: #333;
+  --text-medium: #666;
 }
 
 @media (prefers-color-scheme: dark) {

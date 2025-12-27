@@ -2,7 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '@env/environment';
 import { catchError, of } from 'rxjs';
-import { ContactDTO, PublisherDTO } from './publisherDTO';
+import { PublisherDTO } from './publisherDto';
+import { ContactDTO } from './contactDto';
 
 @Injectable({
   providedIn: 'root',
@@ -12,6 +13,13 @@ export class PublisherService {
 
   private publishers = signal<PublisherDTO[]>([]);
   readonly _publishers = this.publishers.asReadonly();
+
+  private isLoadingSignal = signal<boolean>(true);
+  readonly isLoading = this.isLoadingSignal.asReadonly();
+
+  private isErrorSignal = signal<boolean>(false);
+  readonly isError = this.isErrorSignal.asReadonly();
+
   private readonly FORCE_UPDATE: boolean = false;
 
   constructor() {
@@ -31,8 +39,14 @@ export class PublisherService {
               console.log('Loaded logo URL for publisher', publisher.id, publisher.logoUrl);
             }
           }
+          this.isErrorSignal.set(false);
+          this.isLoadingSignal.set(false);
         },
-        error: (err) => console.error('Error loading publishers:', err),
+        error: (err) => {
+          console.error('Error loading publishers:', err);
+          this.isErrorSignal.set(true);
+          this.isLoadingSignal.set(false);
+        },
       });
   }
 
@@ -40,6 +54,29 @@ export class PublisherService {
     return this.http.post<PublisherDTO>(`${environment.apiUrl}/publishers`, publisher, {
       withCredentials: true,
     });
+  }
+
+  update(publisherId: number, publisher: Partial<PublisherDTO>) {
+    return this.http
+      .put<PublisherDTO>(`${environment.apiUrl}/publishers/${publisherId}`, publisher, {
+        withCredentials: true,
+      })
+      .subscribe({
+        next: (response) => {
+          if (this.FORCE_UPDATE) {
+            this.loadAll();
+          } else {
+            this.publishers.update((publishers) => {
+              const index = publishers.findIndex((p) => p.id === publisherId);
+              if (index !== -1) {
+                return publishers.map((p, i) => (i === index ? { ...p, ...response } : p));
+              }
+              return publishers;
+            });
+          }
+        },
+        error: (err) => console.error('Error updating publisher:', err),
+      });
   }
 
   delete(publisherId: number) {
@@ -93,11 +130,43 @@ export class PublisherService {
           this.publishers.update((publishers) => {
             const publisher = publishers.find((p) => p.id === publisherId);
             if (publisher && publisher.contacts) {
-              publisher.contacts = publisher.contacts.filter((contact) => contact.id !== contactId);
+              publisher.contacts = publisher.contacts.filter(
+                (contact: ContactDTO) => contact.id !== contactId
+              );
             }
             return publishers;
           }),
         error: (err) => console.error('Error removing contact:', err),
+      });
+  }
+
+  updateContact(publisherId: number, contact: ContactDTO) {
+    this.http
+      .put<ContactDTO>(
+        `${environment.apiUrl}/publishers/${publisherId}/contacts/${contact.id}`,
+        contact,
+        {
+          withCredentials: true,
+        }
+      )
+      .subscribe({
+        next: (response) => {
+          if (this.FORCE_UPDATE) {
+            this.loadAll();
+          } else {
+            this.publishers.update((publishers) => {
+              const publisher = publishers.find((p) => p.id === publisherId);
+              if (publisher && publisher.contacts) {
+                const index = publisher.contacts.findIndex((c: ContactDTO) => c.id === response.id);
+                if (index !== -1) {
+                  publisher.contacts[index] = response;
+                }
+              }
+              return publishers;
+            });
+          }
+        },
+        error: (err) => console.error('Error updating contact:', err),
       });
   }
 

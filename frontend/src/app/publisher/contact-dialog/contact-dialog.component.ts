@@ -4,7 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/materia
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { ContactDTO } from '../contact-dto';
+import { ContactDTO } from '../contactDto';
 import { ContactValidators } from './contact-validator';
 
 @Component({
@@ -28,7 +28,7 @@ export class ContactDialog {
   form = this.fb.group(
     {
       name: [this.data?.name ?? '', Validators.required],
-      familyName: [this.data?.familyName ?? '', Validators.required],
+      familyName: [this.data?.family_name ?? '', Validators.required],
       role: [this.data?.role ?? ''],
       telephone: [this.data?.telephone ?? '', [ContactValidators.phone]],
       email: [this.data?.email ?? '', [ContactValidators.email]],
@@ -39,7 +39,6 @@ export class ContactDialog {
   save(): void {
     if (this.form.valid) {
       this.dialogRef.close(this.form.value as ContactDTO);
-      //TODO: send to the backend
     }
   }
 }

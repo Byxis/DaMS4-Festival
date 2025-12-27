@@ -1,0 +1,63 @@
+<h2 mat-dialog-title>{{ data ? 'Modifier' : 'Ajouter' }} un éditeur</h2>
+<mat-dialog-content>
+  <form [formGroup]="this.form">
+    <mat-form-field class="form-field">
+      <mat-label>Nom</mat-label>
+      <input matInput formControlName="name" />
+      <mat-error>Nom requis</mat-error>
+    </mat-form-field>
+
+    <div class="logo-section">
+      <h3>Logo actuel</h3>
+
+      @if (currentLogoUrl && !logoToDelete) {
+      <div class="current-logo">
+        <img [src]="currentLogoUrl" alt="Logo actuel" class="logo-preview" />
+        <button mat-raised-button class="delete-logo-btn" type="button" (click)="deleteLogo()">
+          <mat-icon>delete</mat-icon>
+          Supprimer le logo
+        </button>
+      </div>
+      } @else {
+      <p class="no-logo">Aucun logo</p>
+      }
+
+      <h3 class="new-logo-title">
+        {{ newLogoPreview ? 'Nouveau logo' : 'Uploader un nouveau logo' }}
+      </h3>
+
+      @if (newLogoPreview) {
+      <div class="new-logo">
+        <img [src]="newLogoPreview" alt="Aperçu du nouveau logo" class="logo-preview" />
+        <div class="new-logo-info">
+          <span class="file-name">{{ newLogoFile?.name }}</span>
+          <button mat-raised-button class="delete-logo-btn" type="button" (click)="deleteNewLogo()">
+            <mat-icon>delete</mat-icon>
+            Supprimer
+          </button>
+        </div>
+      </div>
+      }
+
+      <div class="upload-section">
+        <input
+          type="file"
+          accept="image/*"
+          (change)="onFileSelected($event)"
+          #fileInput
+          style="display: none"
+        />
+        <button mat-raised-button color="primary" type="button" (click)="fileInput.click()">
+          <mat-icon>upload</mat-icon>
+          {{ newLogoFile ? 'Changer le fichier' : 'Sélectionner un fichier' }}
+        </button>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>Annuler</button>
+  <button mat-raised-button color="primary" (click)="this.save()" [disabled]="form.invalid">
+    Enregistrer
+  </button>
+</mat-dialog-actions>
