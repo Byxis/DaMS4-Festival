@@ -19,9 +19,11 @@ import { requireAdmin } from "../middleware/auth-admin.js";
  *
  * - GET /api/publishers/:id - Retrieve a specific publisher by ID
  * !- DELETE /api/publishers/:id - Delete a specific publisher by ID
+ * !- PUT /api/publishers/:id - Update a specific publisher name by ID
  *
- * !- POST /api/publishers/:id/contacts - Add a contact to a specific publisher
+ * - POST /api/publishers/:id/contacts - Add a contact to a specific publisher
  * !- DELETE /api/publishers/:id/contacts/:contactId - Delete a specific contact from a specific publisher
+ * !- PUT /api/publishers/:id/contacts/:contactId - Update a specific contact of a specific publisher
  *
  * - GET /api/publishers/:id/logo - Retrieve the logo of a specific publisher
  * !- POST /api/publishers/:id/logo - Upload a logo for a specific publisher
@@ -131,6 +133,31 @@ router.delete("/:id", requireAdmin, async (req: Request, res: Response) => {
         console.error(err);
         res.status(500).json({
             error: "Could not delete publisher: " + err.message,
+        });
+    }
+});
+
+//! PUT /api/publishers/:id - Update a specific publisher name by ID
+router.put("/:id", requireAdmin, async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { name } = req.body;
+
+    if (!id && !name) {
+        return res.status(400).json({ error: "ID and Name are required" });
+    }
+    try {
+        const { rows } = await pool.query<Publisher>(
+            "UPDATE publisher SET name = $1 WHERE id = $2 RETURNING *",
+            [name, id]
+        );
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Publisher not found" });
+        }
+        res.json(rows[0]);
+    } catch (err: any) {
+        console.error(err);
+        res.status(500).json({
+            error: "Could not update publisher: " + err.message,
         });
     }
 });
