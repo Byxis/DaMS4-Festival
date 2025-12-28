@@ -1,6 +1,6 @@
 <h2 mat-dialog-title>{{ data ? 'Modifier' : 'Ajouter' }} un éditeur</h2>
 <mat-dialog-content>
-  <form [formGroup]="this.form">
+  <form [formGroup]="this.form" (keydown.enter)="$event.preventDefault(); form.valid && save()">
     <mat-form-field class="form-field">
       <mat-label>Nom</mat-label>
       <input matInput formControlName="name" />
