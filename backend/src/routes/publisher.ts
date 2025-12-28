@@ -222,6 +222,35 @@ router.delete(
     }
 );
 
+//! PUT /api/publishers/:id/contacts/:contactId - Update a specific contact of a specific publisher
+router.put(
+    "/:id/contacts/:contactId",
+    requireAdmin,
+    async (req: Request, res: Response) => {
+        const { contactId } = req.params;
+        const { name, family_name, role, telephone, email } = req.body;
+        if (!contactId) {
+            return res.status(400).json({ error: "Contact ID is required" });
+        }
+
+        try {
+            const { rows } = await pool.query<Contact>(
+                "UPDATE contact SET name = $1, family_name = $2, role = $3, telephone = $4, email = $5 WHERE id = $6 RETURNING *",
+                [name, family_name, role, telephone, email, contactId]
+            );
+            if (rows.length === 0) {
+                return res.status(404).json({ error: "Contact not found" });
+            }
+            res.json(rows[0]);
+        } catch (err: any) {
+            console.error(err);
+            res.status(500).json({
+                error: "Could not update contact: " + err.message,
+            });
+        }
+    }
+);
+
 /* ---------- /api/publishers/:id/logo ----------*/
 
 // GET /api/publishers/:id/logo - Retrieve the logo of a specific publisher
