@@ -22,7 +22,7 @@
 }
 
 .nav a.active {
-  border-bottom: var(--mat-sys-on-primary-container);
+  border-bottom: var(--mat-sys-on-primary-container) 2px solid;
   border-radius: 0;
 }
 
