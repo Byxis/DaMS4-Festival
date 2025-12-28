@@ -1,6 +1,5 @@
 import { Component, inject } from "@angular/core";
 import { MatButtonModule, MatIconButton } from "@angular/material/button";
-import { MatDivider } from "@angular/material/divider";
 import { MatIconModule } from "@angular/material/icon";
 import { MatMenuModule } from "@angular/material/menu";
 import { MatToolbarModule } from "@angular/material/toolbar";

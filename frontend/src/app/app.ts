@@ -1,21 +1,12 @@
 import { Component, effect, inject, signal } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { MatToolbar, MatToolbarRow } from '@angular/material/toolbar';
-import { MatIcon } from '@angular/material/icon';
+import { Router, RouterOutlet } from '@angular/router';
 import { AuthService } from '@auth/auth.service';
-import { MatButton } from '@angular/material/button';
 import { HeaderComponent } from './pages/header/header.component';
 
 @Component({
   selector: 'app-root',
   imports: [
     RouterOutlet,
-    RouterLink,
-    MatToolbar,
-    MatToolbarRow,
-    RouterLinkActive,
-    MatIcon,
-    MatButton,
     HeaderComponent,
   ],
   templateUrl: './app.html',
