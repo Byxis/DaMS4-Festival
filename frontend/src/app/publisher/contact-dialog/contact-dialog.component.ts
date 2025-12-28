@@ -38,7 +38,15 @@ export class ContactDialog {
 
   save(): void {
     if (this.form.valid) {
-      this.dialogRef.close(this.form.value as ContactDTO);
+      const contact: ContactDTO = {
+        id: this.data?.id,
+        name: this.form.value.name!,
+        family_name: this.form.value.familyName!,
+        role: this.form.value.role ?? '',
+        telephone: this.form.value.telephone ?? '',
+        email: this.form.value.email ?? '',
+      };
+      this.dialogRef.close(contact);
     }
   }
 }
