@@ -4,6 +4,7 @@ import { MatToolbar, MatToolbarRow } from '@angular/material/toolbar';
 import { MatIcon } from '@angular/material/icon';
 import { AuthService } from '@auth/auth.service';
 import { MatButton } from '@angular/material/button';
+import { HeaderComponent } from './pages/header/header.component';
 
 @Component({
   selector: 'app-root',
@@ -15,6 +16,7 @@ import { MatButton } from '@angular/material/button';
     RouterLinkActive,
     MatIcon,
     MatButton,
+    HeaderComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss',

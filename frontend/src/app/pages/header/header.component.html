@@ -1,0 +1,58 @@
+<mat-toolbar class="header" color="transparent">
+  <span class="logo">AYAE Festivals</span>
+
+  <span class="spacer"></span>
+
+  @if (authSvc.isLoggedIn()) {
+    <nav class="nav">
+        <a
+        mat-button
+        routerLink="/festivals"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        >
+        Festivals
+        </a>
+
+        <a
+        mat-button
+        routerLink="/editors"
+        routerLinkActive="active"
+        >
+        Editeurs
+        </a>
+
+        @if (authSvc.isAdmin()) {
+        <a
+            mat-button
+            routerLink="/admin"
+            routerLinkActive="active"
+        >
+            Administration
+        </a>
+        }
+    
+    <button
+    mat-icon-button
+    [matMenuTriggerFor]="profileMenu"
+    class="profile-btn">
+    <mat-icon>account_circle</mat-icon>
+    </button>
+
+    <!-- Dropdown menu from Profile picture-->
+    <mat-menu #profileMenu="matMenu">
+    <button mat-menu-item routerLink="/profile">
+        <mat-icon>person</mat-icon>
+        <span>Profile</span>
+    </button>
+
+    <mat-divider></mat-divider>
+
+    <button mat-menu-item (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Logout</span>
+    </button>
+    </mat-menu>
+  </nav>
+  }
+</mat-toolbar>
