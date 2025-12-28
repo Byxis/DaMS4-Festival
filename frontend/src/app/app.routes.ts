@@ -11,7 +11,7 @@ export const routes: Routes = [
   { path: 'home', component: HomePage, canActivate: [authGuard] },
   { path: 'admin', component: AdminComponent, canActivate: [authGuard, adminGuard] },
   { path: 'festivals', component: HomePage, canActivate: [authGuard] },
-  { path: 'editors', component: Publisher , canActivate: [authGuard] },
+  { path: 'editors', component: HomePage, canActivate: [authGuard] },
   { path: '', pathMatch: 'full', redirectTo: 'home' },
   { path: '**', redirectTo: 'home' },
 ];
