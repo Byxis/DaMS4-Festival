@@ -50,13 +50,35 @@ export class PublisherService {
       });
   }
 
-  register(publisher: PublisherDTO) {
-    return this.http.post<PublisherDTO>(`${environment.apiUrl}/publishers`, publisher, {
-      withCredentials: true,
-    });
+  register(publisher: PublisherDTO, logoFile?: File) {
+    this.http
+      .post<PublisherDTO>(`${environment.apiUrl}/publishers`, publisher, {
+        withCredentials: true,
+      })
+      .subscribe({
+        next: (newPublisher) => {
+          this.publishers.update((publishers) => [...publishers, newPublisher]);
+
+          if (logoFile && newPublisher.id) {
+            const formData = new FormData();
+            formData.append('logo', logoFile);
+            this.uploadLogo(newPublisher.id, formData);
+          }
+        },
+        error: (err) => console.error('Error creating publisher:', err),
+      });
   }
 
-  update(publisherId: number, publisher: Partial<PublisherDTO>) {
+  addPublisherToList(publisher: PublisherDTO) {
+    this.publishers.update((publishers) => [...publishers, publisher]);
+  }
+
+  update(
+    publisherId: number,
+    publisher: Partial<PublisherDTO>,
+    logoFile?: File,
+    deleteLogo?: boolean
+  ) {
     return this.http
       .put<PublisherDTO>(`${environment.apiUrl}/publishers/${publisherId}`, publisher, {
         withCredentials: true,
@@ -73,6 +95,16 @@ export class PublisherService {
               }
               return publishers;
             });
+          }
+
+          if (deleteLogo && publisherId) {
+            this.deleteLogo(publisherId);
+          }
+
+          if (logoFile && publisherId) {
+            const formData = new FormData();
+            formData.append('logo', logoFile);
+            this.uploadLogo(publisherId, formData);
           }
         },
         error: (err) => console.error('Error updating publisher:', err),

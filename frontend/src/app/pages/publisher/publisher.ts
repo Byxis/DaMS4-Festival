@@ -86,18 +86,13 @@ export class Publisher {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        if (result.publisher.name !== this.publisher()!.name) {
-          this.publisherService.update(this.publisher()!.id!, { name: result.publisher.name });
-        }
-
-        if (result.deleteLogo && this.publisher()!.logoUrl) {
-          this.publisherService.deleteLogo(this.publisher()!.id!);
-        } else if (result.newLogo) {
-          const formData = new FormData();
-          formData.append('logo', result.newLogo);
-          this.publisherService.uploadLogo(this.publisher()!.id!, formData);
-        }
+      if (result?.publisher) {
+        this.publisherService.update(
+          this.publisher()!.id!,
+          result.publisher,
+          result.newLogo,
+          result.deleteLogo
+        );
       }
     });
   }
