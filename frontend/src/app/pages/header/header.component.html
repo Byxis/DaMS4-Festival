@@ -33,26 +33,39 @@
         }
     
     <button
-    mat-icon-button
-    [matMenuTriggerFor]="profileMenu"
-    class="profile-btn">
-    <mat-icon>account_circle</mat-icon>
+        mat-icon-button
+        [matMenuTriggerFor]="profilePanel"
+        class="profile-btn"
+        [matMenuTriggerRestoreFocus]="false">
+        <mat-icon>account_circle</mat-icon>
     </button>
-
-    <!-- Dropdown menu from Profile picture-->
-    <mat-menu #profileMenu="matMenu">
-    <button mat-menu-item routerLink="/profile">
-        <mat-icon>person</mat-icon>
-        <span>Profile</span>
-    </button>
-
-    <mat-divider></mat-divider>
-
-    <button mat-menu-item (click)="logout()">
-        <mat-icon>logout</mat-icon>
-        <span>Logout</span>
-    </button>
-    </mat-menu>
-  </nav>
-  }
+    </nav>
+    }
 </mat-toolbar>
+
+    <!-- Profile panel -->
+<mat-menu #profilePanel="matMenu" class="profile-menu">
+  @if (authSvc.currentUser(); as user) {
+    <div class="profile-card">
+      <div class="avatar-wrapper">
+        <mat-icon class="avatar">account_circle</mat-icon>
+      </div>
+
+      <div class="name">
+        prénom NOM
+      </div>
+
+      <div class="email">
+        email
+      </div>
+
+      <div class="role">
+        Vous êtes {{ user.role }}
+      </div>
+
+      <button class="logout-btn" (click)="logout()">
+        Déconnexion
+      </button>
+    </div>
+  }
+</mat-menu>

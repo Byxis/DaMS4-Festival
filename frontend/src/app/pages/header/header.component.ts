@@ -15,8 +15,7 @@ import { AuthService } from "@auth/auth.service";
     MatIconModule, 
     RouterModule,
     MatMenuModule,
-    MatIconModule,
-    MatDivider],
+    MatIconModule],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })

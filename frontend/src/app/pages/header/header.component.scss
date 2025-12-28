@@ -29,3 +29,59 @@
 .spacer {
   flex: 1;
 }
+
+.profile-menu {
+  box-shadow: none;         
+  background: transparent;   
+  padding: 0;
+}
+
+.profile-card {
+  width: 240px;
+  padding: 20px;
+  border-radius: 24px;
+  border-color: var(--mat-sys-on-surface);
+  text-align: center;
+  color: var(--mat-sys-on-surface);
+}
+
+.avatar-wrapper {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.avatar {
+  font-size: 80px;
+  width: 80px;
+  height: 80px;
+}
+
+.name {
+  font-weight: 600;
+}
+
+.email {
+  font-size: 13px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.role {
+  font-size: 13px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+
+.logout-btn {
+  margin-top: 16px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 999px;
+  border: none;
+  background: #f26c6c;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+}
+
