@@ -22,7 +22,8 @@
       "@admin/*": ["src/app/admin/*"],
       "@interceptors/*": ["src/app/shared/interceptors/*"],
       "@users/*": ["src/app/users/*"],
-      "@publisher/*": ["src/app/publisher/*"]
+      "@publisher/*": ["src/app/publisher/*"],
+      "@style/*": ["src/app/shared/style/*"]
     }
   },
   "angularCompilerOptions": {
