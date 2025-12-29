@@ -136,9 +136,9 @@ export class GameList {
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       const editorID = Number(id);
-      if (id) {
-        this.searchGameByEditorID(editorID);
-      } else {
+     
+        
+      
         // pas d'éditeur en param -> charger tous
         this.gameService.loadAll().subscribe({
           next: games => {
@@ -147,9 +147,9 @@ export class GameList {
           },
           error: err => console.error('loadAll failed', err)
         });
-      }
-    });
-  }
+      })};
+    
+  
 
        
 

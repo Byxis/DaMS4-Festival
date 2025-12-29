@@ -29,6 +29,7 @@ services:
             FRONTEND_URL: http://localhost:8080
         volumes:
             - ./backend/certs:/app/certs:ro
+            - uploads_data:/app/uploads
         ports:
             - "4000:4000"
         networks:
@@ -59,5 +60,6 @@ services:
             - secure_net
 volumes:
     db_data:
+    uploads_data:
 networks:
     secure_net:

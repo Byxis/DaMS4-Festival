@@ -34,18 +34,12 @@ export class AppModule {}
   styleUrl: './app.scss',
 })
 export class App {
-  protected readonly title = signal('frontend');
+  protected readonly title = signal('AYAE Festivals');
   readonly authSvc = inject(AuthService);
   readonly router = inject(Router);
 
   constructor() {
     this.authSvc.whoami();
-
-    effect(() => {
-      if (!this.authSvc.isLoggedIn()) {
-        this.router.navigate(['login']);
-      }
-    });
   }
 
   logout() {

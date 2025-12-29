@@ -10,6 +10,7 @@ import "dotenv/config";
 import publicRouter from "./routes/public.js";
 import usersRouter from "./routes/users.js";
 import authRouter from "./routes/auth.js";
+import publisherRouter from "./routes/publisher.js";
 import { verifyToken } from "./middleware/token-management.js";
 import { requireAdmin } from "./middleware/auth-admin.js";
 import game from"./routes/game.js";
@@ -60,7 +61,7 @@ app.use("/api/users", verifyToken, usersRouter); // protégé
 app.use("/api/admin", verifyToken, requireAdmin, (req, res) => {
     res.json({ message: "Bienvenue admin" });
 });
-app.use("/api/users", verifyToken, usersRouter);
+app.use("/api/publishers", verifyToken, publisherRouter);
 
 
 app.use('/api/game', game);
