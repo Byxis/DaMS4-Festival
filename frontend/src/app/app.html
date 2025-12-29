@@ -9,6 +9,13 @@
         [routerLinkActiveOptions]="{ exact: true }"
         ><mat-icon>home</mat-icon>Home</a
       >
+      <a
+        class="nav-item"
+        routerLink="publishers"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        ><mat-icon>business</mat-icon>Publishers</a
+      >
       } @if (this.authSvc.isAdmin()) {
       <a
         class="nav-item"
