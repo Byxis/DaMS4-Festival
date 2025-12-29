@@ -18,6 +18,14 @@
         [routerLinkActiveOptions]="{ exact: true }"
         ><mat-icon>admin_panel_settings</mat-icon>Game</a
       >
+
+      <a
+        class="nav-item"
+        routerLink="publisher"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        ><mat-icon>admin_panel_settings</mat-icon>Publisher</a
+      >
       
       } @if (this.authSvc.isAdmin()) {
       <a

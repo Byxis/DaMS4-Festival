@@ -1,16 +1,17 @@
 import { Component, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ContactList } from '@publisher/contact-list/contact-list';
-import { ContactDialog } from '@publisher/contact-dialog/contact-dialog.component';
+import { ContactList } from 'src/app/publisher/contact-list/contact-list';
+import { ContactDialog } from 'src/app/publisher/contact-dialog/contact-dialog.component';
 import { ContactDTO } from 'src/app/publisher/contact-dto';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { routes } from 'src/app/app.routes';
 import { Router } from '@angular/router';
+import { GameList } from 'src/app/games/game-list/game-list';
 
 @Component({
   selector: 'publisher',
-  imports: [ContactList, MatIcon, MatButton],
+  imports: [ContactList, MatIcon, MatButton, GameList],
   templateUrl: './publisher.html',
   styleUrl: './publisher.scss',
 })

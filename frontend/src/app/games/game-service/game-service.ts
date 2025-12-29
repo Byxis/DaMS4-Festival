@@ -4,7 +4,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { GameDto } from '../game/game-dto';
 import { map, Observable } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { environment}
+import { environment } from '@env/environment';
 
 @Injectable({
   providedIn: 'root'
