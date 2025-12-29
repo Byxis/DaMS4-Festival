@@ -35,6 +35,9 @@
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
+            "stylePreprocessorOptions": {
+              "includePaths": ["src/app/shared/styles"]
+            },
             "assets": [
               {
                 "glob": "**/*",
@@ -71,6 +74,7 @@
           "builder": "@angular/build:dev-server",
           "options": {
             "ssl": true,
+            "port": 8080,
             "sslKey": "../certs/localhost-key.pem",
             "sslCert": "../certs/localhost.pem"
           },
