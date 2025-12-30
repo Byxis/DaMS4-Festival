@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { UserDto } from 'src/app/shared/types/user-dto';
 import { environment } from '@env/environment';
 import { catchError, finalize, last, of, tap } from 'rxjs';
+import { Router } from '@angular/router';
 @Injectable({
   providedIn: 'root',
 })
@@ -18,6 +19,7 @@ export class AuthService {
   readonly currentUser = this._currentUser.asReadonly();
   readonly isLoggedIn = computed(() => this._currentUser() != null);
   readonly isAdmin = computed(() => this.currentUser()?.role === 'admin');
+  readonly isGuest = computed(() => this.currentUser()?.role === 'guest');
   readonly isLoading = this._isLoading.asReadonly();
   readonly error = this._error.asReadonly();
 
@@ -142,4 +144,16 @@ export class AuthService {
       )
       .subscribe();
   }
+
+  redirectAfterAuth(router: Router) {
+    const user = this._currentUser();
+    if (!user) return;
+
+    if (this.isGuest()) {
+      router.navigate(['/await-confirmation']);
+    } else {
+      router.navigate(['/']);
+    }
+  }
+
 }

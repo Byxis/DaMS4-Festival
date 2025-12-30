@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent } from '@angular/material/card';
@@ -40,11 +40,11 @@ export class RegisterComponent {
   readonly form = new FormGroup({
     firstName: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.minLength(1), Validators.required],
+      validators: [Validators.minLength(1), Validators.required, Validators.pattern(/^[A-Za-z\- ]+$/)],
     }),
     lastName: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.minLength(1), Validators.required],
+      validators: [Validators.minLength(1), Validators.required, Validators.pattern(/^[A-Za-z\- ]+$/)],
     }),
     email: new FormControl('', {
       nonNullable: true,
@@ -52,7 +52,8 @@ export class RegisterComponent {
     }),
     password: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.minLength(1), Validators.required],
+      validators: [Validators.minLength(1), Validators.required], 
+      //TODO: add Validators.pattern(/^(?=.*[A-Za-z])(?=.*\d).+$/) for minimum one letter and one number and change minLength to 8 or 12
     }),
     confirmPassword: new FormControl('', {
       nonNullable: true,
@@ -62,6 +63,15 @@ export class RegisterComponent {
   },
   {validators: passwordMatchValidator}
 );
+
+  constructor() {
+    effect(() => {
+      const user = this.svc.currentUser();
+      if (!user) return;
+
+      this.svc.redirectAfterAuth(this.router);
+    });
+  }
 
   submit() {
     if (this.form.valid) {
@@ -74,5 +84,4 @@ export class RegisterComponent {
       }
     }
   }
-
 }

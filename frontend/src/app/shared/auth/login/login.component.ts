@@ -44,9 +44,10 @@ export class Login {
 
   constructor() {
     effect(() => {
-      if (this.svc.isLoggedIn()) {
-        this.router.navigate(['/']);
-      }
+      const user = this.svc.currentUser();
+      if (!user) return;
+
+      this.svc.redirectAfterAuth(this.router);
     });
   }
 
