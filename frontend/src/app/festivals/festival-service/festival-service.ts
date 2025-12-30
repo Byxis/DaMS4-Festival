@@ -56,8 +56,6 @@ export class FestivalService {
   remove(id: number): void { this._festivals.update(list => list.filter(f => f.id !== id)) }
 
 
-  removeAll(): void { this._festivals.set([]) }
-
   findById(id: number): FestivalDto | undefined {
     return this._festivals().find(s => s.id === id);
   }
