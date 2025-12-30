@@ -15,3 +15,10 @@ CREATE TABLE IF NOT EXISTS festivals (
     big_table_count INT DEFAULT 0,
     town_table_count INT DEFAULT 0
 ); 
+
+
+INSERT INTO festivals (name, location, start_date, end_date, table_count, big_table_count, town_table_count) VALUES
+    ('Festival du Jeu de Montpellier', 'Montpellier', '2024-08-23', '2024-08-25', 50, 10, 5),
+    ('La gigue du feu du Vigan', 'Vigan(ligne 608)', '2024-07-11', '2024-07-14', 80, 15, 8),
+    ('Ariège Gaming XVI', 'Montjoie En Couserans', '2024-06-20', '2024-06-23', 100, 20, 10)
+ON CONFLICT (name) DO NOTHING;
