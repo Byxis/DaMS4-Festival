@@ -48,6 +48,15 @@ button:hover {
   color: var(--mat-sys-surface);
 }
 
+a {
+  align-self: center;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: medium;
+  color: var(--mat-sys-on-surface);
+  text-decoration: underline;
+}
+
 mat-card-title {
   color: var(--mat-sys-primary);
 }

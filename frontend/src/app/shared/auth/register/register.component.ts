@@ -4,7 +4,7 @@ import { MatButton } from '@angular/material/button';
 import { MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent } from '@angular/material/card';
 import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@auth/auth.service';
 import { passwordMatchValidator } from '../../validators/password-match.validator';
 
@@ -23,6 +23,7 @@ import { passwordMatchValidator } from '../../validators/password-match.validato
     MatCardHeader,
     MatCardTitle,
     MatCardSubtitle,
+    RouterLink,
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',

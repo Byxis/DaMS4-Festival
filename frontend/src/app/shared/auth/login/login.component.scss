@@ -52,9 +52,12 @@ mat-card-title {
 }
 
 a {
+  align-self: center;
   padding: 10px;
+  margin-top: 10px;
+  font-size: medium;
   color: var(--mat-sys-on-surface);
-  text-decoration:underline
+  text-decoration: underline;
 }
 
 :host {
