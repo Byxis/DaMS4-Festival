@@ -41,15 +41,15 @@
             <mat-error align="end">Les mots de passe ne correspondent pas</mat-error>
         }
       </mat-form-field>
-      <br />
+
+      <div class="with-icon">
+        <mat-icon color="warn">error_outline</mat-icon>
+        <span  class="aligned-with-icon" >{{ this.error() }}</span>
+      </div>
 
       <button mat-raised-button color="primary" type="submit" [disabled]="this.form.invalid">
         @if (isLoading()) { Inscription... } @else { Inscription }
       </button>
-
-      @if(error()) {
-        <mat-error>{{ this.error() }}</mat-error>
-      }
 
     <a routerLink="/login">Déjà inscrit ? Connectez-vous</a>
     </form>

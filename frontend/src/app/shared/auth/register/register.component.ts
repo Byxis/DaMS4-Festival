@@ -7,6 +7,7 @@ import { MatInput } from '@angular/material/input';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@auth/auth.service';
 import { passwordMatchValidator } from '../../validators/password-match.validator';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'register',
@@ -17,6 +18,7 @@ import { passwordMatchValidator } from '../../validators/password-match.validato
     MatLabel,
     MatError,
     MatCardContent,
+    MatIcon,
     MatInput,
     MatButton,
     ReactiveFormsModule,

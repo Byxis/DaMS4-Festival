@@ -18,7 +18,12 @@
         <input matInput formControlName="password" type="password" />
         <mat-error align="end">Obligatoire</mat-error>
       </mat-form-field>
-      <br />
+
+      <div class="with-icon">
+        <mat-icon color="warn">error_outline</mat-icon>
+        <span  class="aligned-with-icon" >{{ this.error() }}</span>
+      </div>
+
 
       <button mat-raised-button color="primary" type="submit" [disabled]="this.form.invalid">
         @if (isLoading()) { Connexion... } @else { Connexion }
@@ -26,9 +31,4 @@
       <a routerLink="/register">Pas encore inscrit?</a>
     </form>
   </mat-card-content>
-  <mat-card-footer>
-    @if (this.error()) {
-    <mat-error>Erreur: {{ this.error() }}</mat-error>
-    }
-  </mat-card-footer>
 </mat-card>
