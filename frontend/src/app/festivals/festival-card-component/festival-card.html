@@ -1,35 +1,23 @@
-<!-- <mat-card 
-  class="festival-card" 
-  appearance="outlined"
-  [style.background]="getFestivalHighlight()"
-  [style.color] ="getFestivalHighlightColor()"> -->
 
 <mat-card 
   class="festival-card" 
-  appearance="outlined">
+  appearance="outlined"
+  (mouseenter)="isHovered = true"
+  (mouseleave)="isHovered = false"
+  >
   <mat-card-header>
     <!-- <div mat-card-avatar class="example-header-image"></div> -->
     <mat-card-title>{{this.festival().name}}</mat-card-title>
     <mat-card-subtitle></mat-card-subtitle>
   </mat-card-header>
   
-  <mat-card-content>
+  @if(isHovered){
+ <mat-card-content>
     <p>
       Lieu : {{this.festival().location}} <br>
       Début : {{this.festival().start_date | date : "shortDate"}} <br>
       Fin : {{this.festival().end_date | date : "shortDate"}} <br>
 
-<!-- 
-      @if (this.festival().currentlyGoing){
-        <p>Festival en cours!</p>
-      }@else{
-         @if (this.festival().start_date > getCurrentDate()){
-          <p> Festival à venir !</p>
-         }@else{
-          <p> Festival passé!</p>
-         }
-      }
-    </p> -->
 
     <p>Tables disponibles :
       {{this.festival().table_count}}</p> <br>
@@ -38,9 +26,16 @@
     <p>Tables de mairie disponibles : 
       {{this.festival().town_table_count}}</p> <br>
   </mat-card-content>
-<!-- 
-  <mat-card-actions>
-    <button matButton (click)="remove.emit(this.festival().id)">Supprimer</button>
-  </mat-card-actions> -->
+  }
+  @else{
+ <mat-card-content>
+    <p>
+      Lieu : {{this.festival().location}} <br>
+      Début : {{this.festival().start_date | date : "shortDate"}} <br>
+
+  </mat-card-content>
+  }
+ 
+
 
 </mat-card>

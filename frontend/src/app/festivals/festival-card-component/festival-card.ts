@@ -15,23 +15,7 @@ import { FestivalDto } from '../festival-dto';
 export class FestivalCard {
   festival = input.required<FestivalDto>();
   remove = output<number>();
-
-  // getCurrentDate() : Date {
-  //   return new Date();
-  // }
-
-  // getFestivalHighlight(): string {
-  //   if (this.festival().currentlyGoing) {
-  //     return 'rgba(0, 0, 0, 0.32)';
-  //   }
-  //   return '0 4px 15px rgba(0,0,0,0.1)'; 
-  //   }
-  // getFestivalHighlightColor(): string {
-  //    if (this.festival().currentlyGoing) {
-  //     return 'rgba(255, 255, 255, 1)';
-  //   }
-  // return 'black'; 
-  //   }
-
+  isHovered = false;
+  
 
   }
