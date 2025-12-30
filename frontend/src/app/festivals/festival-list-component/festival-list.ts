@@ -6,9 +6,11 @@ import { MatFormField, MatHint, MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { FestivalNewFormComponent } from "../festival-new-form-component/festival-new-form-component";
+import { MatButtonModule } from "@angular/material/button";
+import { MatCard } from "@angular/material/card";
 @Component({
   selector: 'app-festival-list',
-  imports: [FestivalCard, FestivalNewFormComponent],
+  imports: [FestivalCard, FestivalNewFormComponent, MatButtonModule, MatIcon],
   templateUrl: './festival-list.html',
   styleUrl: './festival-list.scss'
 })
@@ -19,6 +21,23 @@ export class FestivalList {
     effect(() => {this.svc.loadFestivalsFromServer()});
   }
   readonly svc = inject(FestivalService);
+
+
+  showForm = false;
+
+  //Change the state of showForm to show form
+  toggleForm() {
+    this.showForm = true;
+  }
+  closeForm() {
+        this.showForm = false;
+    }
+
+  onFestivalCreated() {
+        this.showForm = false; // Ferme le formulaire
+        this.svc.loadFestivalsFromServer(); // Actualise la liste
+    }
+
 
   remove(id: number): void { this.svc.remove(id) }
 

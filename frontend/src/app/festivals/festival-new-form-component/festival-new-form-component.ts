@@ -1,19 +1,23 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, output } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatFormField, MatLabel, MatHint, MatError } from "@angular/material/form-field";
 import { MatInput } from '@angular/material/input';
 import { FestivalDto } from '../festival-dto';
 import { FestivalService } from '../festival-service/festival-service';
+import { MatCard } from "@angular/material/card";
 
 @Component({
   selector: 'app-festival-new-form-component',
-  imports: [ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatButton, MatError, MatHint],
+  imports: [ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatButton, MatError, MatHint, MatCard],
   templateUrl: './festival-new-form-component.html',
   styleUrl: './festival-new-form-component.scss'
 })
 export class FestivalNewFormComponent {
   festivalService = inject(FestivalService);
+
+  //On créé un output pour notifier la création d'un festival
+  readonly festivalCreated = output<void>();
 
   readonly form = new FormGroup({
     name: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
@@ -54,6 +58,8 @@ export class FestivalNewFormComponent {
     } else {
       console.error("Formulaire invalide");
     } 
+
+    this.festivalCreated.emit();
   }
   
 }
