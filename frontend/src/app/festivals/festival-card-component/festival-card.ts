@@ -16,6 +16,4 @@ export class FestivalCard {
   festival = input.required<FestivalDto>();
   remove = output<number>();
   isHovered = false;
-  
-
   }

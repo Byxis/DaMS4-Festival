@@ -5,20 +5,14 @@
     </button>
 
 </div>
-
     @if (showForm) {
     <app-festival-new-form-component (festivalCreated)="onFestivalCreated()">
-
     </app-festival-new-form-component>
 
-    
     }
 
 <div class="festivals-container">
-    
-
-
-    @for(festival of this.svc.festivals_back(); track festival.id; let i =$index){
+    @for(festival of this.svc._festivals(); track festival.id; let i =$index){
     <app-festival-card [festival]="festival" (remove)="remove($event)">
     </app-festival-card>
     }

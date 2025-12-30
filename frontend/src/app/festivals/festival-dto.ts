@@ -8,7 +8,8 @@ export interface FestivalDto {
     location : string
     startDate : Date
     endDate : Date
-    PricingZones : dictionnary {name of the zone : (ZoneTarifDTO}
+    //TODO  :  PricingZones : dictionnary {name of the zone : (ZoneTarifDTO}
+    //TODO : logo : string (url of the logo)
     */
     id? : number, 
     name : string

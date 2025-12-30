@@ -32,34 +32,34 @@ export class FestivalNewFormComponent {
 
   submit(): void {
     if (this.form.valid) {
-      const newFestival = { 
-        name : this.form.value.name,
-        location : this.form.value.location,
-        start_date : this.form.value.start_date,
-        end_date : this.form.value.end_date,
-        table_count : this.form.value.table_count,
+      const newFestival = {
+        name: this.form.value.name,
+        location: this.form.value.location,
+        start_date: this.form.value.start_date,
+        end_date: this.form.value.end_date,
+        table_count: this.form.value.table_count,
         big_table_count: this.form.value.big_table_count,
         town_table_count: this.form.value.town_table_count
       };
       this.festivalService.addFestival(newFestival as Omit<FestivalDto, 'id'>);
-      
+
 
 
       // Log the added festival details
-      console.log( "Festival ajouté en frontEnd",
+      console.log("Festival ajouté en frontEnd",
         {
-        name: newFestival.name,
-        location: newFestival.location,
-        start_date: newFestival.start_date,
-        end_date: newFestival.end_date,
-        table_count: newFestival.table_count
-      });
+          name: newFestival.name,
+          location: newFestival.location,
+          start_date: newFestival.start_date,
+          end_date: newFestival.end_date,
+          table_count: newFestival.table_count
+        });
       this.form.reset();
     } else {
       console.error("Formulaire invalide");
-    } 
+    }
 
     this.festivalCreated.emit();
   }
-  
+
 }

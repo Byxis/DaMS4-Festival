@@ -18,10 +18,10 @@ export class FestivalList {
 
 
   constructor() {
-    effect(() => {this.svc.loadFestivalsFromServer()});
+    effect(() => { this.svc.loadFestivalsFromServer() });
   }
-  readonly svc = inject(FestivalService);
 
+  readonly svc = inject(FestivalService);
 
   showForm = false;
 
@@ -30,22 +30,17 @@ export class FestivalList {
     this.showForm = true;
   }
   closeForm() {
-        this.showForm = false;
-    }
+    this.showForm = false;
+  }
 
   onFestivalCreated() {
-        this.showForm = false; // Ferme le formulaire
-        this.svc.loadFestivalsFromServer(); // Actualise la liste
-    }
+    this.closeForm() // Ferme le formulaire
+    this.svc.loadFestivalsFromServer(); // Actualise la liste
+  }
 
 
   remove(id: number): void { this.svc.remove(id) }
 
   removeAll(): void { this.svc.removeAll() }
-
-  activeFestivals = computed(() => {
-    return this.svc.festivals().filter(f => f.currentlyGoing).length;
-  });
-
 
 }
