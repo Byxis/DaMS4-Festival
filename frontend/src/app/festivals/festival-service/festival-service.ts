@@ -63,9 +63,17 @@ export class FestivalService {
     ).subscribe();
   }
 
-
-  findById(id: number): FestivalDto | undefined {
-    return this._festivals().find(s => s.id === id);
+ // Si vous voulez charger depuis le serveur :
+  loadFestivalById(id: number): void {
+    this.http.get<FestivalDto>(`${environment.apiUrl}/festivals/${id}`, { withCredentials: true }).pipe(
+      tap(response => {
+        console.log(`👍 Festival chargé avec l'ID : ${id}`, response);
+        // Vous pouvez ajouter le festival à la liste ou le retourner
+      }),
+      catchError(err => {
+        console.error('👎 Erreur HTTP lors du chargement du festival', err);
+        return of(null);
+      })
+    ).subscribe();
   }
-
 }
