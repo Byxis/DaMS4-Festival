@@ -19,12 +19,13 @@
         <mat-error align="end">Obligatoire</mat-error>
       </mat-form-field>
 
-      <div class="with-icon">
-        <mat-icon color="warn">error_outline</mat-icon>
-        <span  class="aligned-with-icon" >{{ this.error() }}</span>
-      </div>
-
-
+      @if (this.error()) {
+        <div class="with-icon">
+          <mat-icon color="warn">error_outline</mat-icon>
+          <span  class="aligned-with-icon" >{{ this.error() }}</span>
+        </div>
+      }
+      
       <button mat-raised-button color="primary" type="submit" [disabled]="this.form.invalid">
         @if (isLoading()) { Connexion... } @else { Connexion }
       </button>
