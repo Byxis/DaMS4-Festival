@@ -114,8 +114,8 @@ export class PublishersList {
   }
 
   getGameCount(publisher: PublisherDTO): number {
-    // TODO: Implement when game data is available
-    return 0;
+    
+    return publisher.games?.length ?? 0;
   }
 
   getFestivalCount(publisher: PublisherDTO): number {

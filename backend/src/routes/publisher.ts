@@ -104,6 +104,9 @@ router.post("/", requireAdmin, async (req: Request, res: Response) => {
 
 /* ---------- /api/publishers/:id ----------*/
 
+
+
+
 // GET /api/publishers/:id - Retrieve a specific publisher by ID
 router.get("/:id", async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -116,6 +119,9 @@ router.get("/:id", async (req: Request, res: Response) => {
     }
     res.json(rows[0]);
 });
+
+
+
 
 //! DELETE /api/publishers/:id - Delete a specific publisher by ID
 router.delete("/:id", requireAdmin, async (req: Request, res: Response) => {

@@ -1,4 +1,4 @@
-import { Component, inject, input, signal, WritableSignal } from '@angular/core';
+import { Component, effect, inject, input, signal, WritableSignal } from '@angular/core';
 import { GameService } from '../game-service/game-service';
 import { HttpClient } from '@angular/common/http';
 import { JsonPipe } from '@angular/common';
@@ -15,19 +15,22 @@ import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { FilterFormEditor } from '../filter-form-editorEditor/filter-form';
 import { ActivatedRoute } from '@angular/router';
 import { map, Observable } from 'rxjs';
+import { MatCardTitle } from '@angular/material/card';
 
 
 
 @Component({
   selector: 'app-game-list',
-  imports: [JsonPipe, GameForm, FilterFormEditor, MatFormFieldModule,MatIconModule,MatOptionModule, MatOption,MatSelect, MatSelectModule, MatSelectModule, MatInputModule, FormsModule, MatInputModule, MatButtonModule, MatIconModule, FilterForm],
+  imports: [JsonPipe, GameForm, FilterFormEditor, MatFormFieldModule,MatIconModule,MatOptionModule, MatOption,MatSelect, MatSelectModule, MatSelectModule, MatInputModule, FormsModule, MatInputModule, MatButtonModule, MatIconModule, FilterForm, MatCardTitle],
   templateUrl: './game-list.html',
   styleUrl: './game-list.scss'
 })
 export class GameList {
 
   showForm = false;
-  showFilterForm = false;
+  
+  showCreateForm = false;  
+  showSelectForm = false;
   searchTerm = '';
   
   readonly http = inject(HttpClient)
@@ -36,6 +39,17 @@ export class GameList {
   selectedSignal: WritableSignal<number | null> = signal(null);
 
   readonly route = inject(ActivatedRoute);
+
+   isGameListForPublisher = input<boolean>(false);
+
+   listOfGameFromPublisher = input<GameDto[]>([]);
+
+   publisherId = input<number>();
+   publisherName = input<string | undefined>(undefined);
+
+   
+
+  
   
   //initial sort
   orderSelection = 'name_game_asc';
@@ -44,7 +58,7 @@ export class GameList {
     // show the newGame form
     setShowFormTrue(){
       this.showForm = true;
-      this.showFilterForm = false;
+     
     }
 
     // hide the newGame form
@@ -54,15 +68,19 @@ export class GameList {
 
     // show the filter form
     setFilterFormTrue(){
-      this.showFilterForm = true;
+      
       this.showForm = false;
     }
 
-    // hide the filter form
-    setFilterFormFalse() {
-    this.showFilterForm = false;
     
-  
+
+  onFormClose(closeRequested: boolean): void {
+    if (closeRequested) {
+      
+       this.showCreateForm = false;
+      console.log('Form requested close');
+    }
+
   }
 
 
@@ -78,8 +96,9 @@ export class GameList {
     });
   }
 
-  searchGameByEditorID(editorId: number): void {
-    this.gameService.searchGameByEditorIDInDBObservable(editorId).subscribe({
+
+  searchGameByPublisherID(publisherId: number): void {
+    this.gameService.searchGameByPublisherIDInDBObservable(publisherId).subscribe({
       next: (games) => {
         this.gameService.setGames(games); 
         this.gameService.sortGames(this.orderSelection);
@@ -101,6 +120,26 @@ export class GameList {
       }
     });
   }
+
+   createGameFromForm(form: { name: string, editor: string, type: string, number_minimal_of_player: number, number_maximal_of_player: number }) {
+    const game: Partial<GameDto> = {
+  
+      name: form.name,
+      publisher_id: this.publisherId(),
+      editor_name: form.editor,
+      type: form.type,
+      minimum_number_of_player: form.number_minimal_of_player,
+      maximum_number_of_player: form.number_maximal_of_player
+    };
+    this.gameService.add(game);
+     setTimeout(() => {
+     if (this.isGameListForPublisher() && this.publisherId()) {
+      this.searchGameByPublisherID(this.publisherId()!);
+    }
+    }, 500);
+    this.setShowFormFalse();
+  }
+  
 
 
     
@@ -125,21 +164,22 @@ export class GameList {
     this.gameService.sortGames(order);
   }
 
+  constructor() {
+    // ✅ Surveille publisherId et recharge quand il change
+    effect(() => {
+      if (this.isGameListForPublisher() && this.publisherId()) {
+        this.searchGameByPublisherID(this.publisherId()!);
+      }
+    });
+  }
+
 
   // load the list of game with all games
   // initialy : sort games by originalSort
-  constructor() {
+  ngOnInit():void {
    
-   
+    if(!this.isGameListForPublisher()){
 
-    // 2) (optionnel) abonnement si tu veux réagir aux changements de route
-    this.route.paramMap.subscribe(params => {
-      const id = params.get('id');
-      const editorID = Number(id);
-     
-        
-      
-        // pas d'éditeur en param -> charger tous
         this.gameService.loadAll().subscribe({
           next: games => {
             this.gameService.setGames(games);
@@ -147,7 +187,17 @@ export class GameList {
           },
           error: err => console.error('loadAll failed', err)
         });
-      })};
+      
+      } else {
+      if(this.listOfGameFromPublisher){
+        this.gameService.setGames(this.listOfGameFromPublisher());
+      }
+    }
+       
+    
+  };
+
+  
     
   
 

@@ -1,93 +1,371 @@
-.games-table {
+@use 'skeleton';
+@use 'basic';
+
+// --- Mixins & Variables ---
+$grid-desktop: 1fr 1fr 2fr 1fr 1fr 1fr 1fr 1fr;
+$grid-tablet: 1fr 2fr 1fr 1fr 1fr 1fr;
+$grid-mobile: 2fr 1fr 1fr 1fr 80px;
+
+@mixin icon-size($size) {
+  font-size: $size;
+  width: $size;
+  height: $size;
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// --- Styles adapted from publishers-list.scss, full file ---
+.game-list-container {
+  padding: 16px;
+  max-width: 100%;
+  margin: 0;
   width: 100%;
-  border-collapse: collapse;
-  border-spacing: 0;
-}
 
-/* vertical separators between columns and subtle horizontal row lines */
-.games-table th,
-.games-table td {
-  padding: 8px 12px;
-  border-right: 1px solid #e0e0e0;   /* ligne entre chaque colonne */
-  border-bottom: 1px solid #f0f0f0;  /* ligne entre chaque ligne */
-  text-align: left;
-}
+  .header {
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: space-between;  // ✅ Espace entre les éléments
 
-/* remove right border on last column */
-.games-table th:last-child,
-.games-table td:last-child {
-  border-right: none;
-  border-bottom: none;
-}
+    mat-card-title,
+    h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: var(--mat-sys-on-surface);
+    }
 
-/* header styling */
-.games-table thead th {
-  background: #575353;
-  font-weight: 600;
-}
+    .search-field {
+      flex: 1;
+      min-width: 250px;
+      max-width: 480px;
+    }
 
-/* optional hover effect */
-.games-table tbody tr:hover td {
-  background: #575353;
-}
+    .add-button {
+      flex-shrink: 0;
+      box-shadow: 0 2px 4px #0003;
+      background: transparent;
+      &:hover {
+        box-shadow: 0 4px 8px #0004;
+      }
 
-/* bouton Add / Filter sur la même ligne */
-.actions-row {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-/* petits ajustements visuels */
-.actions-row button {
-  min-width: 140px;
-}
-
-
-/* espace au dessus du champ de recherche si nécessaire */
-.search-field {
-  margin-top: 8px;
-}
- 
-
-.actions-row {
-  display: flex;
-  justify-content: space-between; /* left block + right block */
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 18px;
-}
-
-/* left group keeps buttons together */
-.actions-left {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-/* right group stays glued to the right */
-.actions-right {
-  display: flex;
-  align-items: center;
-}
-
-/* ensure mat-form-field doesn't grow too much on small screens */
-.actions-right mat-form-field {
-  min-width: 220px;
-  max-width: 360px;
-  width: 100%;
-}
-
-/* responsive: stack on narrow screens */
-@media (max-width: 680px) {
-  .actions-row {
-    flex-direction: column;
-    align-items: stretch;
+      button {
+        @include icon-size(40px);
+        @include flex-center;
+        border-radius: 8px;
+        padding: 8px 12px;
+      }
+    }
   }
-  .actions-right {
-    margin-top: 8px;
-    justify-content: flex-start;
+
+  // ✅ Menu pour ajouter un jeu (aligné à droite)
+  .add-game-menu {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;  // ✅ Aligné à droite
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+
+    button {
+      white-space: nowrap;
+      box-shadow: 0 2px 4px #0003;
+
+      &:hover {
+        box-shadow: 0 4px 8px #0004;
+      }
+    }
+  }
+
+  .error-container,
+  .empty-container {
+    @include flex-center;
+    flex-direction: column;
+    padding: 4rem 2rem;
+    text-align: center;
+
+    mat-icon {
+      @include icon-size(4rem);
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: var(--mat-sys-on-surface-variant);
+      margin: 0.5rem 0 0;
+    }
+  }
+
+  .error-container mat-icon {
+    color: var(--mat-sys-error);
+  }
+  .empty-container mat-icon {
+    color: var(--mat-sys-outline);
+  }
+
+  .game-table {
+    background-color: var(--mat-sys-surface);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px #0001, 0 1px 2px #0003;
+
+    /* allow horizontal scroll on small viewports while keeping full-width look */
+    overflow-x: auto;
+    width: 100%;
+
+    .table-header,
+    .table-row {
+      display: grid;
+      grid-template-columns: $grid-desktop;
+      /* ensure columns keep spacing similar to publisher list and produce horizontal scroll on narrow screens */
+      min-width: 1200px;
+      align-items: center;
+      gap: 0; /* ✅ Pas d'espace entre colonnes */
+    }
+
+    .table-header {
+      background-color: var(--mat-sys-surface-container-high);
+      border-bottom: 1px solid var(--mat-sys-outline-variant);
+      font-weight: 500;
+      color: var(--mat-sys-on-surface-variant);
+      font-size: 0.875rem;
+      padding-right: 16px;
+      border-right: 1px solid transparent;
+
+      .header-cell {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start; /* ✅ Aligne à gauche comme les cellules */
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        gap: 0.5rem;
+        min-width: 100px;
+        padding: 1rem; /* ✅ Même padding que .cell */
+      }
+
+      /* ensure the actions header cell (8th column) centers the add button */
+      > .header-cell.actions-cell {
+        justify-content: center;
+        padding: 1rem; /* ✅ Cohérent avec autres header-cell */
+
+        /* bouton : fond transparent, icône en couleur primaire, légère ombre */
+        button {
+          border-radius: 8px;
+          padding: 6px 10px;
+          background-color: transparent !important;
+          color: var(--mat-sys-primary) !important;
+          box-shadow: 0 2px 4px #0003;
+          &:hover { box-shadow: 0 4px 8px #0004; opacity: 0.95; }
+          mat-icon { @include icon-size(1.25rem); }
+        }
+
+        /* supprimer overlay ripple / focus color */
+        button .mat-ripple-element,
+        button .mat-button-focus-overlay,
+        button::after {
+          background-color: transparent !important;
+        }
+
+        /* si c'est un mat-icon-button spécifiquement */
+        button.mat-icon-button {
+          background-color: transparent !important;
+          color: var(--mat-sys-primary) !important;
+        }
+      }
+    }
+
+    .table-viewport {
+      height: calc(100vh - 220px);
+      min-height: 300px;
+      max-height: 1200px;
+      overflow-y: auto;
+      overflow-x: hidden; /* horizontal scroll handled by .game-table */
+    }
+
+    .table-row {
+      border-bottom: 1px solid var(--mat-sys-outline-variant);
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--mat-sys-on-surface);
+      height: 73px;
+
+      &:hover:not(.skeleton-row) {
+        background-color: var(--mat-sys-surface-container-highest);
+        box-shadow: 0 1px 3px #0001;
+        transform: translateX(2px);
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &.skeleton-row {
+        cursor: default;
+        pointer-events: none;
+      }
+
+      .cell {
+        padding: 1rem; /* ✅ Cohérent avec header */
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        min-width: 0; /* ✅ Permet le text-overflow */
+
+        &.center {
+          justify-content: center;
+        }
+
+        &.id-cell .id-badge {
+          background-color: var(--mat-sys-primary-container);
+          color: var(--mat-sys-on-primary-container);
+          padding: 0.25rem 0.75rem;
+          border-radius: 12px;
+          font-weight: 500;
+          font-size: 0.875rem;
+        }
+
+        &.logo-cell {
+          .game-logo, .publisher-logo {
+            @include icon-size(50px);
+            object-fit: contain;
+            border-radius: 4px;
+          }
+          .logo-placeholder {
+            @include icon-size(50px);
+            background-color: var(--mat-sys-surface-container-high);
+            border-radius: 4px;
+            @include flex-center;
+            mat-icon {
+              @include icon-size(1.5rem);
+              color: var(--mat-sys-outline);
+            }
+          }
+        }
+
+        &.name-cell .game-name {
+          font-weight: 500;
+          font-size: 1rem;
+        }
+
+        &.first-contact-cell .cell-content span {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .cell-content {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          .cell-icon {
+            @include icon-size(1.25rem);
+            color: var(--mat-sys-on-surface-variant);
+            flex-shrink: 0;
+          }
+        }
+
+        &.actions-cell {
+          @include flex-center;
+          gap: 0.25rem;
+
+          button {
+            @include icon-size(40px);
+            @include flex-center;
+            border-radius: 50%;
+            padding: 0;
+            mat-icon {
+              @include icon-size(1.25rem);
+            }
+          }
+        }
+      }
+    }
+
+    // --- Media Queries ---
+    @media (max-width: 1200px) {
+      .table-header {
+        font-size: 0.75rem;
+      }
+
+      .table-row {
+        height: 65px;
+        .cell {
+          padding: 0.75rem 0.5rem;
+        }
+        &.center {
+          justify-content: initial;
+        }
+
+        .cell.actions-cell button {
+          @include icon-size(36px);
+          mat-icon {
+            @include icon-size(1.125rem);
+          }
+        }
+      }
+
+      .table-header,
+      .table-row {
+        grid-template-columns: $grid-tablet;
+        min-width: 900px;
+
+        .header-cell,
+        .cell {
+          &.id-cell,
+          &.first-contact-cell {
+            display: none;
+          }
+        }
+      }
+    }
+
+    @media (max-width: 768px) {
+      .table-header,
+      .table-row {
+        grid-template-columns: $grid-mobile;
+        font-size: 0.7rem;
+        min-width: 600px;
+
+        .header-cell,
+        .cell {
+          &.logo-cell {
+            display: none;
+          }
+        }
+      }
+
+      .table-row {
+        height: 60px;
+
+        .cell-content {
+          gap: 0.25rem;
+          font-size: 0.875rem;
+          .cell-icon {
+            display: none;
+          }
+        }
+
+        .cell.actions-cell {
+          gap: 4px;
+          padding: 0 4px;
+
+          button {
+            flex-shrink: 0;
+            @include icon-size(32px);
+            @include flex-center;
+            padding: 0;
+
+            mat-icon {
+              @include icon-size(18px);
+            }
+          }
+        }
+      }
+    }
   }
 }

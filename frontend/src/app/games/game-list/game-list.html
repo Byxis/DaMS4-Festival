@@ -1,115 +1,114 @@
-<br>
+<div class="game-list-container">
+  <div class="header">
+    <mat-card-title>Liste des jeux présentés</mat-card-title>
 
-
- 
-
-
-
-  
-  <br>
-
-
-  
-
-<div class="actions-row">
-  <div class="actions-left">
-    <div class="add_new_game">
-      <button matButton="filled" (click)="setShowFormTrue()">Add New Game</button>
-      
-
-        
-        
-    </div>
-
-    
-  </div>
-
-  <div class="actions-right">
-    <mat-form-field>
-      <mat-label>Sort by</mat-label>
-      <mat-select [(value)]="orderSelection" (selectionChange)="changeOrder($event.value)">
-        <mat-option value="name_game_asc">Game's Name ⬇️</mat-option>
-        <mat-option value="name_game_desc">Game's Name ⬆️</mat-option>
-        <mat-option value="name_editor_asc">Editor's Name ⬇️</mat-option>
-        <mat-option value="name_editor_desc">Editor's Name ⬆️</mat-option>
-        <mat-option value="type_asc">Type ⬇️</mat-option>
-        <mat-option value="type_desc">Type ⬆️</mat-option>
-        <mat-option value="min_asc">Minimum number ⬇️</mat-option>
-        <mat-option value="min_desc">Minimum number ⬆️</mat-option>
-        <mat-option value="max_asc">Maximum number ⬇️</mat-option>
-        <mat-option value="max_desc">Maximum number ⬆️</mat-option>
-      </mat-select>
+    <mat-form-field class="search-field" appearance="outline">
+      <mat-label>Search a game</mat-label>
+      <input matInput [(ngModel)]="searchTerm" placeholder="name of the game" (input)="searchGameByName($event.target.value)" />
     </mat-form-field>
   </div>
-</div>
 
-<mat-form-field appearance="outline">
-  <mat-label>Search a game</mat-label>
-  <input matInput [(ngModel)]="searchTerm"  placeholder="name of the game" (input)="searchGameByName($event.target.value)">
-</mat-form-field>
+  
+  @if(showForm) {
+    <div class="add-game-menu">
+      <button mat-raised-button color="primary" (click)="showCreateForm = true; showForm = false">
+        <mat-icon>add</mat-icon>
+        Créer un nouveau jeu
+      </button>
+      <button mat-raised-button color="accent" (click)="showSelectForm = true; showForm = false">
+        <mat-icon>library_add</mat-icon>
+        Ajouter un jeu existant
+      </button>
+       
+          <button matFab  type="button" (click)="showForm = false">
+        <mat-icon>close</mat-icon>
+    </button>
+    </div>
+  }
 
+  <!-- ✅ Formulaire de création -->
+  @if(showCreateForm) {
+    <app-game-form 
+      (closeRequired)="onFormClose($event)"
+      [isForPublisher]="isGameListForPublisher()"
+      [publisherName]="publisherName()"
+      (addGame)="createGameFromForm($event)">
+    </app-game-form>
+  }
 
-<br>
+  <!-- ✅ Formulaire de sélection (à implémenter plus tard) -->
+  @if(showSelectForm) {
+    <!-- TODO: Implémenter le composant de sélection de jeu existant -->
+  }
 
+  <!-- ✅ Tableau des jeux -->
+  <div class="game-table">
+    <div class="table-header">
+      <div class="header-cell id-cell">ID</div>
+      <div class="header-cell logo-cell">Logo</div>
+      <div class="header-cell name-cell">Name</div>
+      <div class="header-cell first-contact-cell">Editor</div>
+      <div class="header-cell">Type</div>
+      <div class="header-cell">Min</div>
+      <div class="header-cell">Max</div>
+      <div class="header-cell actions-cell">
+        <button
+          mat-icon-button
+          (click)="setShowFormTrue()"
+          aria-label="Ajouter un jeu">
+          <mat-icon>add_circle_outline</mat-icon>
+        </button>
+      </div>
+    </div>
 
+    <div class="table-viewport">
+      @for (game of gameService.games(); track game.id) {
+        <div class="table-row">
+          <div class="cell id-cell">
+            <div class="id-badge">{{ game.id }}</div>
+          </div>
 
-@if(this.showFilterForm){
+          <div class="cell logo-cell">
+            @if (game.logoUrl) {
+              <img class="game-logo" [src]="game.logoUrl" alt="logo" />
+            } @else {
+              <div class="logo-placeholder">
+                <mat-icon>business</mat-icon>
+              </div>
+            }
+          </div>
 
+          <div class="cell name-cell">
+            <div class="game-name">{{ game.name }}</div>
+          </div>
 
-<app-filter-form-editor
-  (addFilter)="makeFilterSearch($event)"
-  (closeRequired)="setFilterFormFalse()">
-</app-filter-form-editor>
+          <div class="cell first-contact-cell">
+            <div class="cell-content">
+              <span>{{ game.editor_name || 'unknown' }}</span>
+            </div>
+          </div>
 
-}
+          <div class="cell">
+            <div class="cell-content">
+              <span>{{ game.type || 'N/A' }}</span>
+            </div>
+          </div>
 
-@if(this.showForm){
-        <app-game-form
-            (addGame)="this.gameService.createGameFromForm($event)"
-            (closeRequired)="setShowFormFalse()"
-          (submitExecuted)="setShowFormFalse()">
-        </app-game-form>
-      }
+          <div class="cell center">
+            <span>{{ game.minimum_number_of_player }}</span>
+          </div>
 
+          <div class="cell center">
+            <span>{{ game.maximum_number_of_player }}</span>
+          </div>
 
-
-
-
-
-
-
-
-
-
-@if(this.gameService.games(); as g){
-  <table class="games-table">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Editor</th>
-        <th>Type</th>
-        <th>Min</th>
-        <th>Max</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for ( game of g; track game.id) {
-        <tr>
-         <td> {{ game.name}}</td>
-          <td>{{ game.editor_name || 'unknown' }}</td>
-          <td>{{ game.type ||  'unknown' }}</td>
-          <td>{{ game.minimum_number_of_player }}</td>
-          <td>{{ game.maximum_number_of_player }}</td>
-          
-           <td>  <button mat-icon-button color="warn"
-                    (click)="this.gameService.deleteGame(game.id!)"
-                    aria-label="Remove game">
+          <div class="cell actions-cell">
+            <button mat-icon-button color="warn"  aria-label="Remove game">
               <mat-icon>delete</mat-icon>
             </button>
-          </td>
-        </tr>
+          </div>
+        </div>
       }
-
-    </tbody>
-  </table>
-}
+    </div>
+  </div>
+</div>

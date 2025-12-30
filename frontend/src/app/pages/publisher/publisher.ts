@@ -10,6 +10,7 @@ import { PublisherService } from 'src/app/publisher/publisher.service';
 import { PublisherEditDialog } from 'src/app/publisher/publisher-edit-dialog/publisher-edit-dialog.component';
 import { PublisherDTO } from 'src/app/publisher/publisherDto';
 import { GameList } from 'src/app/games/game-list/game-list';
+import { GameService } from 'src/app/games/game-service/game-service';
 
 @Component({
   selector: 'publisher',
@@ -20,6 +21,7 @@ import { GameList } from 'src/app/games/game-list/game-list';
 export class Publisher {
   private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
+  private readonly gameService = inject(GameService);
   private readonly publisherService = inject(PublisherService);
 
   readonly publisherId = input.required<number>({ alias: 'publisher' });
@@ -32,6 +34,10 @@ export class Publisher {
   readonly isLoading = computed(() => this.publisherService.isLoading());
 
   readonly contacts = computed(() => this.publisher().contacts ?? []);
+
+  readonly games = computed(() => this.gameService.games() ?? []);
+
+
 
   openContactAddDialog(): void {
     const dialogRef = this.dialog.open(ContactDialog, {
@@ -96,5 +102,9 @@ export class Publisher {
         );
       }
     });
+  }
+
+  constructor(){
+    this.games = this.gameService.games;
   }
 }

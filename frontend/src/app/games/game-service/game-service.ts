@@ -72,9 +72,9 @@ searchGameByEditorInDBObservable(editorName: string): Observable<GameDto[]>{
     });
 }
 
-searchGameByEditorIDInDBObservable(editorID: number): Observable<GameDto[]>{
-   return this.http.get<GameDto[]>(`${environment.apiUrl}/game/filterByEditorID`,{
-      params:{editorID}
+searchGameByPublisherIDInDBObservable(publisherID: number): Observable<GameDto[]>{
+   return this.http.get<GameDto[]>(`${environment.apiUrl}/game/filterByPublisherID`,{
+      params:{publisherID}
     });
 }
 
@@ -103,25 +103,19 @@ searchGameByNameInDBObservable(gameName: string): Observable<GameDto[]>{
   return this.http.post<GameDto>(`${environment.apiUrl}/game`, game);
 }
 
+addGameToPublisherDb(game: Partial<GameDto>): Observable<GameDto> {
+  console.log("jeu ajouté dans la bdd");
+  return this.http.post<GameDto>(`${environment.apiUrl}/game/addGameToPublisher`, game);
+}
+
 
   
   add(game: Partial<GameDto>): void { 
-    this.addGameToDb(game).subscribe()
+    this.addGameToPublisherDb(game).subscribe()
     
   }
 
-   createGameFromForm(form: { name: string, editor: string, type: string, number_minimal_of_player: number, number_maximal_of_player: number }) {
-  const game: Partial<GameDto> = {
-
-    name: form.name,
-    editor_name: form.editor,
-    type: form.type,
-    minimum_number_of_player: form.number_minimal_of_player,
-    maximum_number_of_player: form.number_maximal_of_player
-  };
-  this.add(game);
-}
-
+  
   loadAll(): Observable<GameDto[]>{
     return this.http.get<GameDto[]>(`${environment.apiUrl}/game/loadAll`);
   }

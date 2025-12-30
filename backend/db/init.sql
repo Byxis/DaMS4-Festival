@@ -70,5 +70,17 @@ CREATE TABLE IF NOT EXISTS contact (
     email TEXT
 );
 
+CREATE TABLE IF NOT EXISTS games_publisher (
+    id SERIAL PRIMARY KEY,
+    publisher_id INTEGER REFERENCES publisher(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    type TEXT DEFAULT 'other',
+    minimum_number_of_player INTEGER,
+    maximum_number_of_player INTEGER,
+    logo TEXT,
+    type_of_games_id INTEGER REFERENCES type_of_games(id)
+); 
+
+
 
 

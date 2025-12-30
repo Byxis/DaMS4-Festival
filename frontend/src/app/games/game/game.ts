@@ -6,31 +6,29 @@ import {JsonPipe} from '@angular/common'
 import { GameService } from '../game-service/game-service';
 import { GameDto } from './game-dto';
 
-
 export class Game {
+  constructor(
+    public readonly id: number,
+    public name: string,
+    public editor_name: string | undefined,  // ✅ Accepte undefined
+    public type: string,
+    public minimum_number_of_player: number,
+    public maximum_number_of_player: number
+  ) {}
 
+  // convert a GameDto to a Game
+  static fromDto(dto: GameDto): Game | null {
+    if (dto.id === undefined) { return null }
 
-
-   
-        constructor(
-        public readonly id: number ,
-        public name: string,
-        public editor_name: string,
-        public type: string,
-        public minimum_number_of_player: number,
-        public maximum_number_of_player: number,
-        
-        ) {}
-
-      
-       
-        // convert a GameDto to a Game
-        static fromDto(dto : GameDto) : Game| null{
-            if (dto.id === undefined){return null}
-
-            return new Game(dto.id, dto.name, dto.editor_name, dto.type, dto.minimum_number_of_player, dto.maximum_number_of_player)
-        }
-        
+    return new Game(
+      dto.id, 
+      dto.name, 
+      dto.editor_name,  
+      dto.type, 
+      dto.minimum_number_of_player, 
+      dto.maximum_number_of_player
+    )
+  }
 
 }
 

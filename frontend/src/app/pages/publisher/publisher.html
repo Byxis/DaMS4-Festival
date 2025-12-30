@@ -41,14 +41,17 @@
     (deleteContact)="this.deleteContact($event)"
   >
   </contact-list>
+ 
+  
+  <app-game-list
+  [isGameListForPublisher]="true"
+  [listOfGameFromPublisher]="this.games()"
+  [publisherId]="this.publisher().id"
+  [publisherName]="this.publisher().name"
+    ></app-game-list>
+  
 
-  <!-- TODO: List of games related to this publisher -->
-
-  <!-- TODO: List of festivals related to this publisher -->
   }
 </div>
 
-<app-game-list>
 
-
-</app-game-list>
