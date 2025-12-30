@@ -76,8 +76,8 @@ router.post("/register", async (req, res) => {
     const hashed = await bcrypt.hash(password, 10);
     try {
         const { rows } = await pool.query(
-            `INSERT INTO users (login, password_hash, role)
-            VALUES ($1, $2, 'user')
+            `INSERT INTO users (login, password_hash)
+            VALUES ($1, $2)
             RETURNING id, login, role`,
             [login, hashed]
         );
