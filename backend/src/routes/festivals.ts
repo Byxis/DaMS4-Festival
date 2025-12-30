@@ -27,6 +27,24 @@ router.get("/:id", async (req, res) => {
     res.json(rows[0]);
 });
 
+
+//Deleting a festival by id. Requires admin rights.
+router.delete("/:id", requireAdmin,  async (req, res) => {
+    const { id } = req.params;
+    try {
+        const { rowCount } = await pool.query(
+            "DELETE FROM festivals WHERE id = $1",
+            [id]
+        );
+        if (rowCount === 0) {
+            return res.status(404).json({ error: "Festival non trouvé" });
+        }
+        res.json({ message: "Festival supprimé" });
+    } catch (error) {
+        res.status(500).json({ error: "Erreur lors de la suppression du festival" });
+    }
+});
+
 //Creation of a festival. Requires admin rights, and a verify token also on server.ts route
 router.post("/", requireAdmin, async (req, res) => {
     console.log("Creating a festival...");

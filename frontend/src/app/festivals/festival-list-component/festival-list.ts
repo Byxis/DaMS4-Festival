@@ -39,6 +39,6 @@ export class FestivalList {
   }
 
 
-  remove(id: number): void { this.svc.remove(id) }
+  removeFestival(id: number): void { this.svc.removeFestival(id) }
 
 }

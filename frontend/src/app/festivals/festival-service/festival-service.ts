@@ -31,11 +31,8 @@ export class FestivalService {
   }
 
 
-  addFestival(festivalData: Omit<FestivalDto, 'id'>): void {
-    this.sendFestivalToServer(festivalData);
-  }
 
-  sendFestivalToServer(festivalData: Omit<FestivalDto, "id">): void {
+  addFestival(festivalData: Omit<FestivalDto, "id">): void {
     this.http.post<FestivalDto>(`${environment.apiUrl}/festivals`, festivalData, { withCredentials: true }).pipe(
       tap(response => {
         if (response?.id) {
@@ -53,7 +50,18 @@ export class FestivalService {
   }
 
 
-  remove(id: number): void { this._festivals.update(list => list.filter(f => f.id !== id)) }
+  removeFestival(id: number): void {
+    this.http.delete<void>(`${environment.apiUrl}/festivals/${id}`, { withCredentials: true }).pipe(
+      tap(response => {
+        console.log(`👍 Festival supprimé avec l'ID : ${id}`);
+        this.loadFestivalsFromServer();
+      }),
+      catchError(err => {
+        console.error('👎 Erreur HTTP lors de la suppression du festival', err);
+        return of(null)
+      })
+    ).subscribe();
+  }
 
 
   findById(id: number): FestivalDto | undefined {

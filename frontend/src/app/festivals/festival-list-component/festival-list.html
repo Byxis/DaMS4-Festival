@@ -13,7 +13,7 @@
 
 <div class="festivals-container">
     @for(festival of this.svc._festivals(); track festival.id; let i =$index){
-    <app-festival-card [festival]="festival" (remove)="remove($event)">
+    <app-festival-card [festival]="festival" (remove)="removeFestival($event)">
     </app-festival-card>
     }
 </div>
