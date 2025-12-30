@@ -47,18 +47,7 @@ export class FestivalService {
   }
 
   addFestival(festivalData: Omit<FestivalDto, 'id'>): void {
-    // const nextId = this.getNextId();
-    // const festival = new Festival(
-    //   nextId,
-    //   festivalData.name,
-    //   festivalData.location,
-    //   festivalData.start_date,
-    //   festivalData.end_date,
-    //   festivalData.table_count,
-    //   festivalData.big_table_count,
-    //   festivalData.town_table_count
-    // );
-    // this._festivals.update(list => [...list, festival]);
+
     this.sendFestivalToServer(festivalData);
   }
 
@@ -71,6 +60,7 @@ export class FestivalService {
       tap(response => {
         if (response?.id) {
           console.log(`👍 Festival créé avec l'ID : ${response.id}`);
+          this.loadFestivalsFromServer();
         } else {
           console.error('👎 Réponse inattendue du serveur lors de la création du festival');
         }
