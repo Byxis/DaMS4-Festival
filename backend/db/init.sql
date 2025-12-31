@@ -5,15 +5,20 @@ CREATE TABLE IF NOT EXISTS users (
     role TEXT DEFAULT 'guest'
 );
 
-CREATE TABLE IF NOT EXISTS publisher (
+CREATE TABLE IF NOT EXISTS entities (
     id SERIAL PRIMARY KEY,
+    entity_type TEXT NOT NULL CHECK (entity_type IN ('publisher')),
+    name TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS publisher (
+    id SERIAL PRIMARY KEY REFERENCES entities(id) ON DELETE CASCADE,
     name TEXT NOT NULL
 ); 
 
 CREATE TABLE IF NOT EXISTS contact (
-    id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY REFERENCES entities(id) ON DELETE CASCADE,
     publisher_id INTEGER REFERENCES publisher(id) ON DELETE CASCADE,
-    name TEXT NOT NULL,
     family_name TEXT NOT NULL,
     role TEXT,
     telephone TEXT,
@@ -31,6 +36,16 @@ CREATE TABLE IF NOT EXISTS festivals (
     town_table_count INT DEFAULT 0
 ); 
 
+CREATE TABLE IF NOT EXISTS reservations (
+    id SERIAL PRIMARY KEY,
+    festival_id INTEGER REFERENCES festivals(id) ON DELETE CASCADE,
+    entity_id INTEGER REFERENCES entities(id) ON DELETE CASCADE,
+    presented_by_them BOOLEAN DEFAULT FALSE,
+    table_count INT DEFAULT 0,
+    big_table_count INT DEFAULT 0,
+    town_table_count INT DEFAULT 0,
+    status TEXT DEFAULT 'TO_BE_CONTACTED' CHECK (status IN ('TO_BE_CONTACTED', 'CONTACTED', 'IN_DISCUSSION', 'FACTURED', 'AWAITING_PAYMENT', 'CONFIRMED', 'CANCELLED'))
+);
 
 
 SELECT setval('publisher_id_seq', (SELECT MAX(id) FROM publisher) + 1);
