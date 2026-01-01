@@ -1,19 +1,19 @@
-<div class="header">
-    <h1>Festivals : </h1>
-    <button matFab aria-label="Add a festival button" (click)="toggleForm()">
-        <mat-icon>add</mat-icon>
-    </button>
+<div class="main-container">
+    <div class="header">
+        <h1>Festivals : </h1>
+        <button matFab aria-label="Add a festival button" (click)="toggleForm()">
+            <mat-icon>add</mat-icon>
+        </button>
+    </div>
 
-</div>
     @if (showForm) {
-    <app-festival-new-form-component (festivalCreated)="onFestivalCreated()">
-    </app-festival-new-form-component>
-
+    <app-festival-new-form-component (festivalCreated)="onFestivalCreated()" />
     }
 
-<div class="festivals-container">
-    @for(festival of this.svc._festivals(); track festival.id; let i =$index){
-    <app-festival-card [festival]="festival" (remove)="removeFestival($event)">
-    </app-festival-card>
-    }
+    <div class="festivals-container">
+        @for(festival of this.svc._festivals(); track festival.id; let i =$index){
+        <app-festival-card [festival]="festival" (remove)="removeFestival($event)">
+        </app-festival-card>
+        }
+    </div>
 </div>
