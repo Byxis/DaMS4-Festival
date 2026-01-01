@@ -50,6 +50,15 @@ html {
       density: 0,
     )
   );
+  --delete-bg: #fbe6e5;
+  --delete-color: #d44d3d;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    --delete-bg: #4a1f1a;
+    --delete-color: #ff8a80;
+  }
 }
 
 body {
