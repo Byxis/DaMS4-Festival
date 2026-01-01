@@ -17,6 +17,7 @@ import { ActivatedRoute } from '@angular/router';
 import { map, Observable } from 'rxjs';
 import { MatCardTitle } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
+import { GameSelectForm } from '../game-select-form/game-select-form';
 
 
 
@@ -113,16 +114,18 @@ export class GameList {
   }
 
   searchGameByName(gameName: string): void {
-    this.gameService.searchGameByNameInDBObservable(gameName).subscribe({
-      next: (games) => {
+  if (this.publisherId()) {
+    this.gameService.searchGameByName(gameName, this.publisherId()!).subscribe({
+      next: (games: GameDto[]) => {
         this.gameService.setGames(games); 
         this.gameService.sortGames(this.orderSelection);
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Erreur lors de la recherche', err);
       }
     });
   }
+}
 
   createGameFromForm(form: { 
   name: string, 
@@ -228,6 +231,46 @@ export class GameList {
       }
     });
   }
+
+
+  openGameSelectDialog(): void {
+    this.dialog.open(GameSelectForm, {
+      width: '500px',
+      data: {
+        publisherId: this.publisherId()
+      }
+    }).afterClosed().subscribe(result => {
+      this.addExistingGamesToPublisher(result.games);
+    });
+  }
+
+  addExistingGamesToPublisher(games: any[]): void {
+  if (!games || games.length === 0) return;
+
+  games.forEach(game => {
+    // ✅ Prépare les données avec logo en tant que string URL
+    const gameData = {
+      name: game.name,
+      publisher_id: this.publisherId(),
+      type: game.type,
+      minimum_number_of_player: game.minimum_number_of_player,
+      maximum_number_of_player: game.maximum_number_of_player,
+      logo: game.logo || null  // ✅ Logo est une URL string
+    };
+
+    console.log('Game data to add:', gameData);  // ✅ Debug
+    this.gameService.add(gameData);
+  });
+
+  // ✅ Un seul setTimeout
+  setTimeout(() => {
+    if (this.publisherId()) {
+      this.searchGameByPublisherID(this.publisherId()!);
+    }
+  }, 1000);  // ✅ Augmente le délai
+}
+
+
 
   
     

@@ -1,14 +1,14 @@
 <div class="game-list-container">
   <div class="header">
     <mat-card-title>Liste des jeux présentés</mat-card-title>
-    <!---
+
     <mat-form-field class="search-field" appearance="outline">
       <mat-label>Search a game</mat-label>
       <input matInput [(ngModel)]="searchTerm" placeholder="name of the game" (input)="searchGameByName($event.target.value)" />
     </mat-form-field>
   </div>
 
-  -->
+  
 
   
   @if(showForm) {
@@ -19,7 +19,7 @@
       </button>
 
       @if(hasGames){
-   <button mat-raised-button color="primary" (click)="showSelectForm = true; showForm=false">
+   <button mat-raised-button color="primary" (click)="openGameSelectDialog(); showForm=false">
         <mat-icon>library_add</mat-icon>
         Ajouter un jeu existant
       </button>
@@ -68,18 +68,32 @@
           </div>
 
           <div class="cell logo-cell">
-             
-           @if (game.logo) {
+          
+      @if (game.logo) {
+          
+          @if (typeof game.logo === 'string' && game.logo.startsWith('http')) {
+            <img [src]="game.logo" 
+                [alt]="game.name + ' logo'"
+                class="game-logo">
+          } @else if (typeof game.logo === 'string') {
+            
             <img [src]="'https://localhost:4000/api/game/' + game.id + '/logo'" 
-                alt="Logo"
+                [alt]="game.name + ' logo'"
                 crossorigin="anonymous"
-                  class="game-logo">
+                class="game-logo">
           } @else {
+            
             <div class="logo-placeholder">
-              <mat-icon>business</mat-icon>
+              <mat-icon>videogame_asset</mat-icon>
             </div>
           }
-                    </div>
+        } @else {
+          <!-- ✅ Pas de logo -->
+          <div class="logo-placeholder">
+            <mat-icon>business</mat-icon>
+          </div>
+        }
+      </div>
 
           <div class="cell name-cell">
             <div class="game-name">{{ game.name }}</div>

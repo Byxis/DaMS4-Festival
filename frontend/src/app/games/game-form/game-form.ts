@@ -1,6 +1,6 @@
 import { Component, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, AsyncValidatorFn, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -8,6 +8,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatOptionModule } from '@angular/material/core';
+import { map, Observable } from 'rxjs';
+import { GameService } from '../game-service/game-service';
 
 @Component({
   selector: 'app-game-form',
@@ -27,6 +29,7 @@ import { MatOptionModule } from '@angular/material/core';
   styleUrl: './game-form.scss',
 })
 export class GameForm {
+   private gameService = inject(GameService);  
   private dialogRef = inject(MatDialogRef<GameForm>);
   data = inject<{ publisherId: number | null; publisherName: string | null }>(MAT_DIALOG_DATA);
 
@@ -46,7 +49,8 @@ export class GameForm {
   readonly form = new FormGroup({
     name: new FormControl('', { 
       nonNullable: true,
-      validators: [Validators.required, Validators.pattern('^[A-Za-z0-9 ]+$'), Validators.minLength(1)]
+      validators: [Validators.required, Validators.pattern('^[A-Za-z0-9 ]+$'), Validators.minLength(1)],
+      asyncValidators: [this.gameNameValidator()] 
     }),
     editor: new FormControl('', { 
       nonNullable: true,
@@ -67,7 +71,7 @@ export class GameForm {
   });
 
   constructor() {
-    // ✅ Remplis le champ editor si c'est pour un publisher
+    
     effect(() => {
       if (this.data?.publisherId && this.data?.publisherName) {
         this.form.get('editor')?.setValue(this.data.publisherName);
@@ -78,7 +82,6 @@ export class GameForm {
     });
   }
 
-  // ✅ Gestion du logo
   onLogoSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
@@ -90,6 +93,30 @@ export class GameForm {
       reader.readAsDataURL(this.newLogoFile);
     }
   }
+
+  private gameNameValidator(): AsyncValidatorFn {
+  return (control: AbstractControl): Observable<ValidationErrors | null> => {
+    if (!control.value) {
+      return new Observable(obs => {
+        obs.next(null);
+        obs.complete();
+      });
+    }
+
+    const publisherId = this.data?.publisherId;
+    
+    if (!publisherId) {
+      return new Observable(obs => {
+        obs.next(null);
+        obs.complete();
+      });
+    }
+
+    return this.gameService.checkGameNameExists(control.value, publisherId).pipe(
+      map(exists => exists ? { gameNameExists: true } : null)
+    );
+  };
+}
 
   removeLogo(): void {
     this.newLogoFile = null;
@@ -120,6 +147,7 @@ export class GameForm {
         if (control.errors['required']) return 'Enter a value';
         if (control.errors['minlength']) return 'Value is too short';
         if (control.errors['pattern']) return 'Invalid format';
+         if (control.errors['gameNameExists']) return 'Ce jeu existe déjà'; 
       }
     }
     return null;

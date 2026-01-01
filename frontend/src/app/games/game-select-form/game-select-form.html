@@ -1,1 +1,29 @@
-<p>game-select-form works!</p>
+<h2 mat-dialog-title>Ajouter des jeux existants</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Sélectionnez les jeux</mat-label>
+      <mat-select formControlName="games" multiple>
+        @for (game of availableGames(); track game.id) {
+          <mat-option [value]="game.id">
+            {{ game.name }}
+            @if (game.type) {
+              <span class="game-type">({{ game.type }})</span>
+            }
+          </mat-option>
+        }
+      </mat-select>
+      @if (form.get('games')?.hasError('required')) {
+        <mat-error>Sélectionnez au moins un jeu</mat-error>
+      }
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Annuler</button>
+  <button mat-raised-button color="primary" (click)="submit()" [disabled]="!form.valid">
+    Ajouter
+  </button>
+</mat-dialog-actions>

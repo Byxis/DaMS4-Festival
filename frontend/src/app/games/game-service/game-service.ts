@@ -92,10 +92,13 @@ searchGameByPublisherIDInDBObservable(publisherID: number): Observable<GameDto[]
 
   }
 
-searchGameByNameInDBObservable(gameName: string): Observable<GameDto[]>{
-  return this.http.get<GameDto[]>(`${environment.apiUrl}/game/search`,{
-      params:{gameName}
-    });
+searchGameByName(gameName: string, publisherId: number): Observable<GameDto[]> {
+  return this.http.get<GameDto[]>(`${environment.apiUrl}/game/search`, {
+    params: {
+      gameName,
+      publisherId: publisherId.toString()
+    }
+  });
 }
 
 
@@ -117,14 +120,18 @@ searchGameByNameInDBObservable(gameName: string): Observable<GameDto[]>{
     maximum_number_of_player: data.maximum_number_of_player,
   };
 
+  // ✅ Gère les deux cas : logoFile (File) ou logo (URL string)
+  const logo = data.logoFile || data.logo;
+
   this.http.post<GameDto>(
     `${environment.apiUrl}/game/addGameToPublisher`,
-    gameData,
+    { ...gameData, logo },
     { withCredentials: true }
   ).subscribe({
     next: (newGame) => {
       console.log('✅ Jeu ajouté');
-      // ✅ Si tu as un logo, upload-le après
+      
+      // ✅ Seulement upload si c'est un File (pas une URL)
       if (data.logoFile && newGame.id) {
         this.uploadLogo(newGame.id, data.logoFile);
       }
@@ -133,12 +140,15 @@ searchGameByNameInDBObservable(gameName: string): Observable<GameDto[]>{
     error: (err) => console.error('❌ Erreur', err)
   });
 }
+
+
+
 private uploadLogo(gameId: number, logoFile: File): void {
   const formData = new FormData();
-  formData.append('logo', logoFile);  // ✅ Vérifie que le fichier est bien ici
+  formData.append('logo', logoFile);  
 
-  console.log('📤 FormData avant envoi:', formData);  // ✅ Debug
-  console.log('📄 Fichier:', logoFile.name, logoFile.size);  // ✅ Debug
+  console.log('📤 FormData avant envoi:', formData);  
+  console.log('📄 Fichier:', logoFile.name, logoFile.size);  
 
   this.http.post(
     `${environment.apiUrl}/game/${gameId}/logo`,
@@ -148,7 +158,7 @@ private uploadLogo(gameId: number, logoFile: File): void {
     next: () => console.log('✅ Logo uploadé'),
     error: (err) => {
       console.error('❌ Erreur logo:', err);
-      console.error('Message:', err.error?.error);  // ✅ Affiche le message du backend
+      console.error('Message:', err.error?.error);  
     }
   });
 }
@@ -161,13 +171,37 @@ checkPublisherGames(publisherId: number) {
   );
 }
 
+checkGameNameExists(gameName: string, publisherId: number): Observable<boolean> {
+  return this.http.get<{ exists: boolean }>(
+    `${environment.apiUrl}/game/checkIfNameExists`,
+    {
+      params: {
+        name: gameName,
+        publisherId: publisherId.toString()
+      }
+    }
+  ).pipe(
+    map(response => response.exists)
+  );
+}
+
+
+filterByEditorID(publisherId: number) {
+  
+  return this.http.get<GameDto[]>(
+    `${environment.apiUrl}/game/gamesByEditorID/${publisherId}`
+  );
+}
+
+
+
 getGameCountByPublisher(publisherId: number): Observable<number> {
   return this.http.get<{ gameCount: number }>(
     `${environment.apiUrl}/game/numberOfPresentedGame/${publisherId}`
   ).pipe(
     map(response => {
-      console.log('📊 Response from backend:', response);  // Debug
-      console.log('📍 GameCount value:', response.gameCount);  // Debug
+      console.log('📊 Response from backend:', response);  
+      console.log('📍 GameCount value:', response.gameCount); 
       return response.gameCount;
     })
   );

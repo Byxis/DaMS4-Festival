@@ -13,22 +13,33 @@ import path from "path";
 const router = Router();
 
 
-
 router.get("/search", async (req, res) => {
   const gameName = (req.query.gameName || '').toString().trim();
+  const publisherId = req.query.publisherId ? Number(req.query.publisherId) : null;
+
+  // ✅ Vérifie que publisherId est fourni
+  if (!publisherId || Number.isNaN(publisherId)) {
+    return res.status(400).json({ error: "publisherId is required" });
+  }
+
   try {
     const q = `
-      SELECT g.id, g.name, g.minimum_number_of_player, g.maximum_number_of_player,
-             g.editor_id, g.type_of_games_id, g.logo,
-             e.name AS editor_name,
+      SELECT g.id,
+             g.name,
+             g.minimum_number_of_player,
+             g.maximum_number_of_player,
+             g.type_of_games_id,
+             g.logo,
+             p.name AS editor_name,
              t.description AS type
-      FROM games g
-      LEFT JOIN editors e ON e.id = g.editor_id
+      FROM games_publisher g
+      LEFT JOIN publisher p ON p.id = g.publisher_id
       LEFT JOIN type_of_games t ON t.id = g.type_of_games_id
-      WHERE g.name ILIKE $1
+      WHERE g.publisher_id = $1
+      AND g.name ILIKE $2
       ORDER BY g.id;
     `;
-    const params = [`%${gameName}%`];
+    const params = [publisherId, `%${gameName}%`];
     const result = await pool.query(q, params);
     res.status(200).json(result.rows);
   } catch (e) {
@@ -147,14 +158,8 @@ router.post("/addGameToPublisher", async (req, res) => {
         "SELECT id FROM type_of_games WHERE LOWER(description) = LOWER($1) LIMIT 1",
         [type]
       );
-      if (r.rowCount) {
+       if (r.rowCount) {
         finalTypeOfGameID = r.rows[0].id;
-      } else {
-        const ins = await client.query(
-          "INSERT INTO type_of_games(description) VALUES($1) RETURNING id",
-          [type]
-        );
-        finalTypeOfGameID = ins.rows[0].id;
       }
     }
 
@@ -186,7 +191,26 @@ router.post("/addGameToPublisher", async (req, res) => {
 });
 
 
+router.get("/checkIfNameExists", async (req: Request, res: Response) => {
+  const { name, publisherId } = req.query;
 
+  if (!name) {
+    return res.status(400).json({ error: "Name is required" });
+  }
+
+  try {
+    const result = await pool.query(
+      `SELECT id FROM games_publisher 
+       WHERE LOWER(name) = LOWER($1) AND publisher_id = $2`,
+      [name, publisherId || null]
+    );
+
+    res.status(200).json({ exists: result.rowCount! > 0 });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Erreur lors de la vérification" });
+  }
+});
   
 router.get("/numberOfGameExisting/:publisherId", async (req: Request, res: Response) => {
   const { publisherId } = req.params;
@@ -298,6 +322,58 @@ router.get("/loadAll", async (req, res) => {
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: "Erreur lors de l'ajout du jeu" });
+  }
+});
+
+
+
+
+router.get("/gamesByEditorID/:publisherId", async (req: Request, res: Response) => {
+  const { publisherId } = req.params;
+
+  if (!publisherId || !/^\d+$/.test(publisherId)) {
+    return res.status(400).json({ error: "Invalid publisher ID" });
+  }
+  try {
+    const publisherResult = await pool.query(
+      `SELECT name FROM publisher WHERE id = $1`,
+      [publisherId]
+    );
+
+    if (!publisherResult.rowCount || publisherResult.rowCount === 0) {
+      return res.status(404).json({ error: "Publisher not found" });
+    }
+
+    const publisherName = publisherResult.rows[0].name;
+
+     const result = await pool.query(
+     `
+      SELECT g.id,
+             g.name,
+             g.minimum_number_of_player,
+             g.maximum_number_of_player,
+             g.editor_id,
+             g.type_of_games_id,
+             g.logo,
+             e.name AS editor_name,
+             t.description AS type
+      FROM games g
+      INNER JOIN editors e ON e.id = g.editor_id
+      LEFT JOIN type_of_games t ON g.type_of_games_id = t.id
+      WHERE LOWER(e.name) = LOWER($1)
+     AND LOWER(g.name) NOT IN (
+        SELECT LOWER(name) FROM games_publisher 
+        WHERE publisher_id = $2
+      )
+      ORDER BY g.name;
+      `,
+      [publisherName, publisherId]
+    );
+
+    res.status(200).json(result.rows);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Erreur lors de la récupération des jeux" });
   }
 });
 
@@ -469,7 +545,7 @@ router.get("/filterByPublisherID", async (req, res) => {
     const params = [publisherID];  
     const result = await pool.query(q, params);
     
-    // ✅ Utilise le même pattern que publisher
+    
     const rows = result.rows.map(row => ({
       ...row,
       logoUrl: row.logo ? `/games/${row.id}/logo` : null

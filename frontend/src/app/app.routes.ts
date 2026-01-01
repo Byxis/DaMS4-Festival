@@ -16,7 +16,6 @@ export const routes: Routes = [
   { path: 'login', component: LoginPage },
   { path: 'home', component: HomePage, canActivate: [authGuard] },
   { path: 'admin', component: AdminComponent, canActivate: [authGuard, adminGuard] },
-  { path: 'game', component: GameList },
   { path: 'publishers', component: PublishersList, canActivate: [authGuard] },
   {
     path: 'publishers/:id',

@@ -88,12 +88,35 @@ router.post("/", requireAdmin, async (req: Request, res: Response) => {
     if (!name) {
         return res.status(400).json({ error: "Name is required" });
     }
+
+     const client = await pool.connect();
+
     try {
-        const { rows } = await pool.query<Publisher>(
-            "INSERT INTO publisher (name) VALUES ($1) RETURNING *",
-            [name]
-        );
-        res.status(201).json(rows[0]);
+        const publisherResult = await client.query<Publisher>(
+      "INSERT INTO publisher (name) VALUES ($1) RETURNING *",
+      [name]
+    );
+
+
+
+         const publisher = publisherResult.rows[0];
+
+    // ✅ 2. Vérifie si l'éditeur existe déjà
+    const editorCheck = await client.query(
+      "SELECT id FROM editors WHERE LOWER(name) = LOWER($1)",
+      [name]
+    );
+
+    // ✅ 3. Si l'éditeur n'existe pas, le crée
+    if (editorCheck.rowCount === 0) {
+      await client.query(
+        "INSERT INTO editors (name) VALUES ($1)",
+        [name]
+      );
+      console.log(`✅ Editor "${name}" créé automatiquement`);
+    }
+
+        res.status(201).json(publisher);
     } catch (err: any) {
         console.error(err);
         res.status(500).json({
