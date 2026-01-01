@@ -128,7 +128,7 @@ router.post("/addGameToPublisher", async (req, res) => {
     logo
   } = req.body;
 
-  // ✅ Valide publisher_id
+ 
   if (!publisher_id || Number.isNaN(Number(publisher_id))) {
     return res.status(400).json({ error: "publisher_id is required and must be a number" });
   }
@@ -142,8 +142,6 @@ router.post("/addGameToPublisher", async (req, res) => {
 
   try {
     await client.query("BEGIN");
-
-    
     if (type && type.toString().trim() !== "") {
       const r = await client.query(
         "SELECT id FROM type_of_games WHERE LOWER(description) = LOWER($1) LIMIT 1",
@@ -188,6 +186,94 @@ router.post("/addGameToPublisher", async (req, res) => {
 });
 
 
+
+  
+router.get("/numberOfGameExisting/:publisherId", async (req: Request, res: Response) => {
+  const { publisherId } = req.params;
+
+  if (!publisherId || !/^\d+$/.test(publisherId)) {
+    return res.status(400).json({ error: "Invalid publisher ID" });
+  }
+
+  try {
+    
+     const publisherResult = await pool.query(
+      `SELECT id, name FROM publisher WHERE id = $1`,
+      [publisherId]
+    );
+
+     if (!publisherResult.rowCount || publisherResult.rowCount === 0) {
+      return res.status(200).json({ hasGames: false });
+    }
+
+    const publisherName = publisherResult.rows[0].name;
+
+     const editorResult = await pool.query(
+      `SELECT id FROM editors WHERE LOWER(name) = LOWER($1)`,
+      [publisherName]
+    );
+
+    if (!editorResult.rowCount || editorResult.rowCount === 0) {
+      return res.status(200).json({ hasGames: false });
+    }
+
+    const editorExists = editorResult.rowCount > 0;
+
+    let gameCount = 0;
+    if (editorExists) {
+      const editorId = editorResult.rows[0].id;
+      const gamesResult = await pool.query(
+        `SELECT COUNT(*) as count FROM games WHERE editor_id = $1`,
+        [editorId]
+      );
+      gameCount = parseInt(gamesResult.rows[0].count, 10);
+    }
+    console.log("hasGames :", gameCount > 0);
+     res.status(200).json({
+      hasGames: gameCount > 0
+    });
+
+    
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    res.status(500).json({ error: errorMessage });
+  }
+});
+
+
+
+
+router.get("/numberOfPresentedGame/:publisherId", async (req: Request, res: Response) => {
+  const { publisherId } = req.params;
+
+  if (!publisherId || !/^\d+$/.test(publisherId)) {
+    return res.status(400).json({ error: "Invalid publisher ID" });
+  }
+
+  try {
+    
+    const numberOfGame = await pool.query(
+      `SELECT COUNT(*) as count FROM games_publisher WHERE publisher_id = $1`,
+      [publisherId]
+    );
+
+    const gameCount = parseInt(numberOfGame.rows[0].count, 10);
+   console.log("gameCount : ", gameCount);
+    res.status(200).json({
+      gameCount: gameCount, 
+      
+    });
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    res.status(500).json({ error: errorMessage });
+  }
+});
+
+
+
+
 router.get("/loadAll", async (req, res) => {
   console.log("loadAll /api/game", req.body);
   
@@ -230,6 +316,21 @@ router.delete("/delete", async (req, res) => {
   }
 });
 
+router.delete("/delete", async (req, res) => {
+  console.log("delete", req.body);
+   const { id } = req.body;
+  try {
+    const result = await pool.query(
+      `DELETE FROM games WHERE id=$1 RETURNING*`,
+      [id]
+    );
+    res.status(200).json(result.rows);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Erreur lors de la suppression" });
+  }
+});
+
 
 router.post("/:id/logo", async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -244,17 +345,16 @@ router.post("/:id/logo", async (req: Request, res: Response) => {
     }
 
     const uploadDir = "./uploads/logos";
-    // ✅ Ajoute || "jpg" comme valeur par défaut
+   
     const ext = req.file.originalname.split('.').pop() || "jpg";
     const filename = `game-${id}.${ext}`;
     const fullPath = path.join(uploadDir, filename);
 
-    // ✅ Crée le dossier
+
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
 
-    // ✅ Déplace le fichier
     fs.renameSync(req.file.path, fullPath);
     
     console.log('✅ Fichier sauvegardé:', fullPath);
@@ -270,11 +370,14 @@ router.post("/:id/logo", async (req: Request, res: Response) => {
     res.status(200).json({ logoUrl: fullPath });
     } catch (e) {
     console.error('❌ Erreur:', e);
-    // ✅ Type-cast en Error
+    
     const errorMessage = e instanceof Error ? e.message : String(e);
     res.status(500).json({ error: errorMessage });
   }
 });
+
+
+
 router.get("/:id/logo", async (req: Request, res: Response) => {
   const { id } = req.params;
 

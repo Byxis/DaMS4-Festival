@@ -1,4 +1,4 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ContactList } from 'src/app/publisher/contact-list/contact-list';
 import { ContactDialog } from 'src/app/publisher/contact-dialog/contact-dialog.component';
@@ -35,9 +35,9 @@ export class Publisher {
 
   readonly contacts = computed(() => this.publisher().contacts ?? []);
 
-  readonly games = computed(() => this.gameService.games() ?? []);
+   readonly numberOfGames = signal<number>(0);
 
-
+   
 
   openContactAddDialog(): void {
     const dialogRef = this.dialog.open(ContactDialog, {
@@ -104,7 +104,5 @@ export class Publisher {
     });
   }
 
-  constructor(){
-    this.games = this.gameService.games;
-  }
+  
 }

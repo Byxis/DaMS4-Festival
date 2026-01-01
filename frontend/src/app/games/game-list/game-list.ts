@@ -33,6 +33,8 @@ export class GameList {
   showCreateForm = false;  
   showSelectForm = false;
   searchTerm = '';
+
+  hasGames = false;
   
   readonly http = inject(HttpClient)
   readonly gameService = inject(GameService)
@@ -128,7 +130,7 @@ export class GameList {
   type: string, 
   number_minimal_of_player: number, 
   number_maximal_of_player: number, 
-  logoFile?: File  // ✅ Le File directement
+  logoFile?: File  
 }) {
   const gameData: Partial<GameDto> & { logoFile?: File } = {
     name: form.name,
@@ -137,7 +139,7 @@ export class GameList {
     type: form.type,
     minimum_number_of_player: form.number_minimal_of_player,
     maximum_number_of_player: form.number_maximal_of_player,
-    logoFile: form.logoFile  // ✅ Passe le File ici
+    logoFile: form.logoFile  
   };
 
   this.gameService.add(gameData);
@@ -166,6 +168,18 @@ export class GameList {
 
   }
 
+  checkIfPublisherHasGames() {
+    const publisherId = this.publisherId();
+    if (!publisherId) return;
+
+    this.gameService.checkPublisherGames(publisherId).subscribe({
+      next: (data) => {
+        this.hasGames = data.hasGames;
+        
+      },
+      error: (err) => console.error(err)
+    });
+  }
 
 
   // change the order or the list
@@ -176,21 +190,14 @@ export class GameList {
   }
 
   constructor() {
-    // ✅ Surveille publisherId et recharge quand il change
+   
     effect(() => {
       if (this.isGameListForPublisher() && this.publisherId()) {
+        // Cas 1: C'est une liste pour un publisher
         this.searchGameByPublisherID(this.publisherId()!);
-      }
-    });
-  }
-
-
-  // load the list of game with all games
-  // initialy : sort games by originalSort
-  ngOnInit():void {
-   
-    if(!this.isGameListForPublisher()){
-
+        this.checkIfPublisherHasGames();
+      } else if (!this.isGameListForPublisher()) {
+        
         this.gameService.loadAll().subscribe({
           next: games => {
             this.gameService.setGames(games);
@@ -198,15 +205,12 @@ export class GameList {
           },
           error: err => console.error('loadAll failed', err)
         });
-      
-      } else {
-      if(this.listOfGameFromPublisher){
-        this.gameService.setGames(this.listOfGameFromPublisher());
       }
-    }
-       
-    
-  };
+    });
+  }
+
+
+ 
 
 
 

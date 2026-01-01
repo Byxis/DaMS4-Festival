@@ -7,4 +7,5 @@ export interface PublisherDTO {
   contacts?: ContactDTO[];
   games?: GameDto[],
   logoUrl?: string;
+  numberOfGames:number;
 }

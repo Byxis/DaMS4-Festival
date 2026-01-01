@@ -153,6 +153,27 @@ private uploadLogo(gameId: number, logoFile: File): void {
   });
 }
   
+
+checkPublisherGames(publisherId: number) {
+  
+  return this.http.get<{ hasGames: boolean; gameCount: number }>(
+    `${environment.apiUrl}/game/numberOfGameExisting/${publisherId}`
+  );
+}
+
+getGameCountByPublisher(publisherId: number): Observable<number> {
+  return this.http.get<{ gameCount: number }>(
+    `${environment.apiUrl}/game/numberOfPresentedGame/${publisherId}`
+  ).pipe(
+    map(response => {
+      console.log('📊 Response from backend:', response);  // Debug
+      console.log('📍 GameCount value:', response.gameCount);  // Debug
+      return response.gameCount;
+    })
+  );
+}
+
+
   loadAll(): Observable<GameDto[]>{
     return this.http.get<GameDto[]>(`${environment.apiUrl}/game/loadAll`);
   }

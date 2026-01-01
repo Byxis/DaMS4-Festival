@@ -1,24 +1,30 @@
 <div class="game-list-container">
   <div class="header">
     <mat-card-title>Liste des jeux présentés</mat-card-title>
-
+    <!---
     <mat-form-field class="search-field" appearance="outline">
       <mat-label>Search a game</mat-label>
       <input matInput [(ngModel)]="searchTerm" placeholder="name of the game" (input)="searchGameByName($event.target.value)" />
     </mat-form-field>
   </div>
 
+  -->
+
   
   @if(showForm) {
     <div class="add-game-menu">
-       <button mat-raised-button color="primary" (click)="openGameFormDialog(); showForm = false">
+       <button mat-raised-button color="primary" (click)="openGameFormDialog(); showForm = false; showSelectForm=false">
         <mat-icon>add</mat-icon>
         Créer un nouveau jeu
       </button>
-   <button mat-raised-button color="primary" >
+
+      @if(hasGames){
+   <button mat-raised-button color="primary" (click)="showSelectForm = true; showForm=false">
         <mat-icon>library_add</mat-icon>
         Ajouter un jeu existant
       </button>
+
+      }
        
        
           <button matFab  type="button" (click)="showForm = false">
@@ -31,14 +37,14 @@
 
   <!-- ✅ Formulaire de sélection (à implémenter plus tard) -->
   @if(showSelectForm) {
-    <!-- TODO: Implémenter le composant de sélection de jeu existant -->
+    affiche le form pour ajouter jeu existant
   }
 
   <!-- ✅ Tableau des jeux -->
   <div class="game-table">
     <div class="table-header">
       <div class="header-cell id-cell">ID</div>
-      <div class="header-cell logo-cell"></div>
+      <div class="header-cell logo-cell">Logo</div>
       <div class="header-cell name-cell">Name</div>
       <div class="header-cell first-contact-cell">Editor</div>
       <div class="header-cell">Type</div>
@@ -99,11 +105,8 @@
             <span>{{ game.maximum_number_of_player }}</span>
           </div>
 
-          <div class="cell actions-cell">
-            <button mat-icon-button color="warn"  aria-label="Remove game">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
+        
+         
         </div>
       }
     </div>
