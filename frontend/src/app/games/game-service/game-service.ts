@@ -5,6 +5,7 @@ import { GameDto } from '../game/game-dto';
 import { map, Observable } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { environment } from '@env/environment';
+import { Form } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root'
@@ -98,23 +99,59 @@ searchGameByNameInDBObservable(gameName: string): Observable<GameDto[]>{
 }
 
 
-   addGameToDb(game: Partial<GameDto>): Observable<GameDto> {
-  console.log("jeu ajouté dans la bdd");
-  return this.http.post<GameDto>(`${environment.apiUrl}/game`, game);
-}
+ 
 
-addGameToPublisherDb(game: Partial<GameDto>): Observable<GameDto> {
-  console.log("jeu ajouté dans la bdd");
-  return this.http.post<GameDto>(`${environment.apiUrl}/game/addGameToPublisher`, game);
-}
+
+
+ 
 
 
   
-  add(game: Partial<GameDto>): void { 
-    this.addGameToPublisherDb(game).subscribe()
-    
-  }
+  add(data: Partial<GameDto> & { logoFile?: File }): void { 
+  // ✅ Crée l'objet sans logoFile
+  const gameData: Partial<GameDto> = {
+    name: data.name,
+    publisher_id: data.publisher_id,
+    type: data.type,
+    minimum_number_of_player: data.minimum_number_of_player,
+    maximum_number_of_player: data.maximum_number_of_player,
+  };
 
+  this.http.post<GameDto>(
+    `${environment.apiUrl}/game/addGameToPublisher`,
+    gameData,
+    { withCredentials: true }
+  ).subscribe({
+    next: (newGame) => {
+      console.log('✅ Jeu ajouté');
+      // ✅ Si tu as un logo, upload-le après
+      if (data.logoFile && newGame.id) {
+        this.uploadLogo(newGame.id, data.logoFile);
+      }
+      this._games.update(games => [...games, newGame]);
+    },
+    error: (err) => console.error('❌ Erreur', err)
+  });
+}
+private uploadLogo(gameId: number, logoFile: File): void {
+  const formData = new FormData();
+  formData.append('logo', logoFile);  // ✅ Vérifie que le fichier est bien ici
+
+  console.log('📤 FormData avant envoi:', formData);  // ✅ Debug
+  console.log('📄 Fichier:', logoFile.name, logoFile.size);  // ✅ Debug
+
+  this.http.post(
+    `${environment.apiUrl}/game/${gameId}/logo`,
+    formData,
+    { withCredentials: true }
+  ).subscribe({
+    next: () => console.log('✅ Logo uploadé'),
+    error: (err) => {
+      console.error('❌ Erreur logo:', err);
+      console.error('Message:', err.error?.error);  // ✅ Affiche le message du backend
+    }
+  });
+}
   
   loadAll(): Observable<GameDto[]>{
     return this.http.get<GameDto[]>(`${environment.apiUrl}/game/loadAll`);

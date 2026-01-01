@@ -1,9 +1,13 @@
 import { Router } from "express";
+import type { Request, Response } from "express";
 import pool from "../db/database.js";
 import bcrypt from "bcryptjs";
 import { requireAdmin } from "../middleware/auth-admin.js";
 import fetch from "node-fetch";
 import { DOMParser } from 'xmldom';
+
+import fs from "fs";  
+import path from "path";
 
 
 const router = Router();
@@ -114,9 +118,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-
-
-
 router.post("/addGameToPublisher", async (req, res) => {
   const {
     name,
@@ -187,8 +188,6 @@ router.post("/addGameToPublisher", async (req, res) => {
 });
 
 
-
-
 router.get("/loadAll", async (req, res) => {
   console.log("loadAll /api/game", req.body);
   
@@ -228,6 +227,87 @@ router.delete("/delete", async (req, res) => {
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: "Erreur lors de la suppression" });
+  }
+});
+
+
+router.post("/:id/logo", async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  if (!id || !/^\d+$/.test(id)) {
+    return res.status(400).json({ error: "Invalid ID" });
+  }
+
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No logo file provided" });
+    }
+
+    const uploadDir = "./uploads/logos";
+    // ✅ Ajoute || "jpg" comme valeur par défaut
+    const ext = req.file.originalname.split('.').pop() || "jpg";
+    const filename = `game-${id}.${ext}`;
+    const fullPath = path.join(uploadDir, filename);
+
+    // ✅ Crée le dossier
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    // ✅ Déplace le fichier
+    fs.renameSync(req.file.path, fullPath);
+    
+    console.log('✅ Fichier sauvegardé:', fullPath);
+    console.log('📄 Existe?', fs.existsSync(fullPath));
+    console.log('📊 Taille:', fs.statSync(fullPath).size);
+
+    // ✅ Update BD
+    await pool.query(
+      `UPDATE games_publisher SET logo = $1 WHERE id = $2`,
+      [fullPath, id]  
+    );
+
+    res.status(200).json({ logoUrl: fullPath });
+    } catch (e) {
+    console.error('❌ Erreur:', e);
+    // ✅ Type-cast en Error
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    res.status(500).json({ error: errorMessage });
+  }
+});
+router.get("/:id/logo", async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  if (!id || !/^\d+$/.test(id)) {
+    return res.status(400).json({ error: "Invalid ID" });
+  }
+
+  try {
+    const uploadDir = path.resolve("./uploads/logos");
+    
+    if (!fs.existsSync(uploadDir)) {
+      return res.status(404).json({ error: "Upload directory not found" });
+    }
+
+    const files = fs
+      .readdirSync(uploadDir)
+      .filter((f: string) => f.startsWith(`game-${id}.`));
+
+    console.log('🔍 Cherche:', `game-${id}.*`);
+    console.log('📁 Fichiers trouvés:', files);
+
+    if (files.length === 0) {
+      return res.status(404).json({ error: "Logo not found" });
+    }
+
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    // ✅ Type-cast avec "as string" (garanti d'exister ici)
+    const filePath = path.resolve(uploadDir, files[0] as string);
+    res.sendFile(filePath);
+  } catch (e) {
+    console.error('❌ Erreur GET logo:', e);
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    res.status(500).json({ error: errorMessage });
   }
 });
 
@@ -285,12 +365,20 @@ router.get("/filterByPublisherID", async (req, res) => {
     `;
     const params = [publisherID];  
     const result = await pool.query(q, params);
-    res.status(200).json(result.rows);
+    
+    // ✅ Utilise le même pattern que publisher
+    const rows = result.rows.map(row => ({
+      ...row,
+      logoUrl: row.logo ? `/games/${row.id}/logo` : null
+    }));
+    
+    res.status(200).json(rows);
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: "Erreur lors de la recherche par publisher" });
   }
 });
+
 
 
 router.get("/getEditorNameByID", async (req, res) => {

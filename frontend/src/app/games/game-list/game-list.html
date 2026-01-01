@@ -11,14 +11,15 @@
   
   @if(showForm) {
     <div class="add-game-menu">
-      <button mat-raised-button color="primary" (click)="showCreateForm = true; showForm = false">
+       <button mat-raised-button color="primary" (click)="openGameFormDialog(); showForm = false">
         <mat-icon>add</mat-icon>
         Créer un nouveau jeu
       </button>
-      <button mat-raised-button color="accent" (click)="showSelectForm = true; showForm = false">
+   <button mat-raised-button color="primary" >
         <mat-icon>library_add</mat-icon>
         Ajouter un jeu existant
       </button>
+       
        
           <button matFab  type="button" (click)="showForm = false">
         <mat-icon>close</mat-icon>
@@ -26,15 +27,7 @@
     </div>
   }
 
-  <!-- ✅ Formulaire de création -->
-  @if(showCreateForm) {
-    <app-game-form 
-      (closeRequired)="onFormClose($event)"
-      [isForPublisher]="isGameListForPublisher()"
-      [publisherName]="publisherName()"
-      (addGame)="createGameFromForm($event)">
-    </app-game-form>
-  }
+  
 
   <!-- ✅ Formulaire de sélection (à implémenter plus tard) -->
   @if(showSelectForm) {
@@ -45,7 +38,7 @@
   <div class="game-table">
     <div class="table-header">
       <div class="header-cell id-cell">ID</div>
-      <div class="header-cell logo-cell">Logo</div>
+      <div class="header-cell logo-cell"></div>
       <div class="header-cell name-cell">Name</div>
       <div class="header-cell first-contact-cell">Editor</div>
       <div class="header-cell">Type</div>
@@ -69,14 +62,18 @@
           </div>
 
           <div class="cell logo-cell">
-            @if (game.logoUrl) {
-              <img class="game-logo" [src]="game.logoUrl" alt="logo" />
-            } @else {
-              <div class="logo-placeholder">
-                <mat-icon>business</mat-icon>
-              </div>
-            }
-          </div>
+             
+           @if (game.logo) {
+            <img [src]="'https://localhost:4000/api/game/' + game.id + '/logo'" 
+                alt="Logo"
+                crossorigin="anonymous"
+                  class="game-logo">
+          } @else {
+            <div class="logo-placeholder">
+              <mat-icon>business</mat-icon>
+            </div>
+          }
+                    </div>
 
           <div class="cell name-cell">
             <div class="game-name">{{ game.name }}</div>

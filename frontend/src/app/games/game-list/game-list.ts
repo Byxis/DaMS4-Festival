@@ -16,6 +16,7 @@ import { FilterFormEditor } from '../filter-form-editorEditor/filter-form';
 import { ActivatedRoute } from '@angular/router';
 import { map, Observable } from 'rxjs';
 import { MatCardTitle } from '@angular/material/card';
+import { MatDialog } from '@angular/material/dialog';
 
 
 
@@ -26,7 +27,7 @@ import { MatCardTitle } from '@angular/material/card';
   styleUrl: './game-list.scss'
 })
 export class GameList {
-
+  private dialog = inject(MatDialog);
   showForm = false;
   
   showCreateForm = false;  
@@ -121,24 +122,34 @@ export class GameList {
     });
   }
 
-   createGameFromForm(form: { name: string, editor: string, type: string, number_minimal_of_player: number, number_maximal_of_player: number }) {
-    const game: Partial<GameDto> = {
+  createGameFromForm(form: { 
+  name: string, 
+  editor: string, 
+  type: string, 
+  number_minimal_of_player: number, 
+  number_maximal_of_player: number, 
+  logoFile?: File  // ✅ Le File directement
+}) {
+  const gameData: Partial<GameDto> & { logoFile?: File } = {
+    name: form.name,
+    publisher_id: this.publisherId(),
+    editor_name: form.editor,
+    type: form.type,
+    minimum_number_of_player: form.number_minimal_of_player,
+    maximum_number_of_player: form.number_maximal_of_player,
+    logoFile: form.logoFile  // ✅ Passe le File ici
+  };
+
+  this.gameService.add(gameData);
   
-      name: form.name,
-      publisher_id: this.publisherId(),
-      editor_name: form.editor,
-      type: form.type,
-      minimum_number_of_player: form.number_minimal_of_player,
-      maximum_number_of_player: form.number_maximal_of_player
-    };
-    this.gameService.add(game);
-     setTimeout(() => {
-     if (this.isGameListForPublisher() && this.publisherId()) {
+  setTimeout(() => {
+    if (this.isGameListForPublisher() && this.publisherId()) {
       this.searchGameByPublisherID(this.publisherId()!);
     }
-    }, 500);
-    this.setShowFormFalse();
-  }
+  }, 500);
+  
+  this.setShowFormFalse();
+}
   
 
 
@@ -196,6 +207,23 @@ export class GameList {
        
     
   };
+
+
+
+  openGameFormDialog(): void {
+    this.dialog.open(GameForm, {
+      width: '600px',
+      data: {
+        game: null,
+        publisherId: this.publisherId(),
+        publisherName: this.publisherName()
+      }
+    }).afterClosed().subscribe(result => {
+      if (result) {
+        this.createGameFromForm(result);
+      }
+    });
+  }
 
   
     

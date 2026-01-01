@@ -4,7 +4,7 @@ import { inject } from "@angular/core"
 export interface GameDto {
   id: number | undefined;
   logoUrl?: string;
-  logo?: string;  // ✅ Aussi accepter 'logo' du backend
+  logo?: string | File; 
   name: string;
   editor_name?: string;  // ✅ Optionnel (peut être undefined)
   publisher_id?: number;  // ✅ Ajoute publisher_id

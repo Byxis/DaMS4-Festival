@@ -1,21 +1,34 @@
-import { Component, effect, inject, input, output, WritableSignal } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { GameService } from '../game-service/game-service';
-import { MatFormField } from '@angular/material/form-field';
+import { Component, effect, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIcon } from '@angular/material/icon';
-import { ActivatedRoute } from '@angular/router';
-import { MatOption } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
+import { MatIconModule } from '@angular/material/icon';
+import { MatOptionModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-game-form',
-  imports: [ReactiveFormsModule, MatFormField, MatSelectModule,MatInputModule, FormsModule, MatButtonModule, MatInputModule, MatIcon, MatOption],
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatSelectModule,
+    MatIconModule,
+    MatOptionModule,
+  ],
   templateUrl: './game-form.html',
-  styleUrl: './game-form.scss'
+  styleUrl: './game-form.scss',
 })
 export class GameForm {
+  private dialogRef = inject(MatDialogRef<GameForm>);
+  data = inject<{ publisherId: number | null; publisherName: string | null }>(MAT_DIALOG_DATA);
 
   gameTypes = [
     'Tout Public',
@@ -27,121 +40,88 @@ export class GameForm {
     'Jeu de rôle'
   ];
 
+  currentLogoUrl: string | null = null;
+  newLogoFile: File | null = null;
+
   readonly form = new FormGroup({
-  name: new FormControl('', { 
-    nonNullable: true,
-    validators: [Validators.required, Validators.pattern('^[A-Za-z0-9 ]+$'), Validators.minLength(1)]
-   }),
-   editor: new FormControl('', { 
-    nonNullable: true,
-    validators: [Validators.required, Validators.pattern('^[A-Za-z0-9 ]+$'), Validators.minLength(1)]
-   }),
-   type: new FormControl('', { 
+    name: new FormControl('', { 
       nonNullable: true,
-      validators: [Validators.required] 
+      validators: [Validators.required, Validators.pattern('^[A-Za-z0-9 ]+$'), Validators.minLength(1)]
     }),
-   number_minimal_of_player: new FormControl(1, { 
-    nonNullable: true,
-    validators: [Validators.required, Validators.min(1), Validators.max(99)]
-   }),
+    editor: new FormControl('', { 
+      nonNullable: true,
+      validators: [Validators.required, Validators.pattern('^[A-Za-z0-9 ]+$'), Validators.minLength(1)]
+    }),
+    type: new FormControl('', { 
+      nonNullable: true,
+      validators: [Validators.required]
+    }),
+    number_minimal_of_player: new FormControl(1, { 
+      nonNullable: true,
+      validators: [Validators.required, Validators.min(1), Validators.max(99)]
+    }),
+    number_maximal_of_player: new FormControl(1, { 
+      nonNullable: true,
+      validators: [Validators.required, Validators.min(1), Validators.max(99)]
+    }),
+  });
 
-   number_maximal_of_player: new FormControl(1, { 
-    nonNullable: true,
-    validators: [Validators.required, Validators.min(1), Validators.max(99)]
-   }),
-
-  
-
-});
-
-
- 
-readonly gameService = inject(GameService);
-
-  
-  
-  submitExecuted = output<boolean>();
-  
-  addGame = output<any>();
-
-  publisherName = input<string | undefined>(undefined);
-  isForPublisher = input<boolean>(false);
-
-  
-
-  closeRequired = output<boolean>();
-  readonly route = inject(ActivatedRoute)
-  
-  
-
-
-  //send the value of the form to the game-list
-  // reset the value of the form after
-  submit(): void {
-    const data = this.form.value;
-
-       this.addGame.emit(data);
-       this.submitExecuted.emit(true);
-       this.form.reset();
-       
-  }
-
-  
-  //reset value of the form
-  resetGameForm(): void {
-    this.form.reset({
-      name: '',
-      editor: '',
-      type:'',
-      number_minimal_of_player:1,
-      number_maximal_of_player: 1
-
-    });
-
-  }
-
-  // send the output closeRequired to the gameList
-  close(): void{
-    this.closeRequired.emit(true);
-  }
-
-
- 
-
-  // handle error from form control
-  getErrorMessage(control: AbstractControl|null): string|null{
-    if(control){
-      console.log('Control:', control);
-    console.log('Errors:', control.errors);
-      if(control.errors){
-      if (control.errors['required']) return 'Enter a value';
-      if (control.errors['minlength']) return 'Value is too short';
-      if (control.errors['maxlength']) return 'Value is too long';
-      if (control.errors['pattern']) return 'Invalid format';
-        
-
-      }
-
-    }
-    return null
-  }
-
-
-  editorName = "";
-
- constructor() {
+  constructor() {
     // ✅ Remplis le champ editor si c'est pour un publisher
     effect(() => {
-      if (this.isForPublisher() && this.publisherName()) {
-        this.form.get('editor')?.setValue(this.publisherName()!);
-        this.form.get('editor')?.disable();  
+      if (this.data?.publisherId && this.data?.publisherName) {
+        this.form.get('editor')?.setValue(this.data.publisherName);
+        this.form.get('editor')?.disable();
       } else {
-        this.form.get('editor')?.enable();  
+        this.form.get('editor')?.enable();
       }
     });
   }
 
-  
+  // ✅ Gestion du logo
+  onLogoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.newLogoFile = input.files[0];
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.currentLogoUrl = e.target?.result as string;
+      };
+      reader.readAsDataURL(this.newLogoFile);
+    }
+  }
+
+  removeLogo(): void {
+    this.newLogoFile = null;
+    this.currentLogoUrl = null;
+  }
+
+  // ✅ Envoie les données au parent
+  submit(): void {
+    if (this.form.valid) {
+      const data = this.form.getRawValue();
+      
+      const gameData = {
+        ...data,
+        logoFile: this.newLogoFile
+      };
+
+      this.dialogRef.close(gameData);
+    }
+  }
+
+  cancel(): void {
+    this.dialogRef.close(null);
+  }
+
+  getErrorMessage(control: any): string | null {
+    if (control) {
+      if (control.errors) {
+        if (control.errors['required']) return 'Enter a value';
+        if (control.errors['minlength']) return 'Value is too short';
+        if (control.errors['pattern']) return 'Invalid format';
+      }
+    }
+    return null;
+  }
 }
-
-

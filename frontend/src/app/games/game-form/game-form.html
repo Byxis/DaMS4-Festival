@@ -1,45 +1,72 @@
-<form [formGroup]="form" (ngSubmit)="submit()">
+<h2 mat-dialog-title>Créer un nouveau jeu</h2>
 
-<mat-form-field appearance="outline">
-  <mat-label>Name</mat-label>
-  <input matInput type="text" formControlName="name" placeholder="game's name" />
-</mat-form-field>
+<mat-dialog-content>
+  <form [formGroup]="form">
+    <!-- ✅ Formulaire d'abord -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" />
+      @if (getErrorMessage(form.get('name'))) {
+        <mat-error>{{ getErrorMessage(form.get('name')) }}</mat-error>
+      }
+    </mat-form-field>
 
-<mat-form-field appearance="outline">
-  <mat-label>Editor</mat-label>
-  <input matInput type="text" formControlName="editor" placeholder="game's editor" />
-</mat-form-field>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Editor</mat-label>
+      <input matInput formControlName="editor" />
+      @if (getErrorMessage(form.get('editor'))) {
+        <mat-error>{{ getErrorMessage(form.get('editor')) }}</mat-error>
+      }
+    </mat-form-field>
 
-<mat-form-field>
-  <mat-label>Type de jeu</mat-label>
-  <mat-select formControlName="type">
-    <mat-option value="Tout Public">Tout Public</mat-option>
-    <mat-option value="Ambiance">Ambiance</mat-option>
-    <mat-option value="Experts">Experts</mat-option>
-    <mat-option value="Enfants">Enfants</mat-option>
-    <mat-option value="Classiques">Classiques</mat-option>
-    <mat-option value="Initiés">Initiés</mat-option>
-    <mat-option value="Jeu de rôle">Jeu de rôle</mat-option>
-  </mat-select>
-</mat-form-field>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Type de jeu</mat-label>
+      <mat-select formControlName="type">
+        <mat-option *ngFor="let type of gameTypes" [value]="type">
+          {{ type }}
+        </mat-option>
+      </mat-select>
+      @if (getErrorMessage(form.get('type'))) {
+        <mat-error>{{ getErrorMessage(form.get('type')) }}</mat-error>
+      }
+    </mat-form-field>
 
+    <div class="row">
+      <mat-form-field appearance="outline">
+        <mat-label>Min players</mat-label>
+        <input matInput type="number" formControlName="number_minimal_of_player" />
+      </mat-form-field>
 
-<mat-form-field appearance="outline">
-  <mat-label>Number minimum of player</mat-label>
-  <input matInput type="number" formControlName="number_minimal_of_player" placeholder="number minimum of player" />
-</mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Max players</mat-label>
+        <input matInput type="number" formControlName="number_maximal_of_player" />
+      </mat-form-field>
+    </div>
 
-<mat-form-field appearance="outline">
-  <mat-label>Number maximum of player</mat-label>
-  <input matInput type="number" formControlName="number_maximal_of_player" placeholder="number maximum of player" />
-</mat-form-field>
+    <!-- ✅ Logo Upload en bas -->
+    <div class="logo-section">
+      <h3>Logo</h3>
+      @if (currentLogoUrl) {
+        <img [src]="currentLogoUrl" alt="Game logo" class="logo-preview">
+        <button mat-button type="button" (click)="removeLogo()" color="warn">
+          <mat-icon>delete</mat-icon>
+          Supprimer
+        </button>
+      } @else {
+        <div class="no-logo">Aucun logo sélectionné</div>
+      }
+      <input type="file" #logoInput hidden accept="image/*" (change)="onLogoSelected($event)">
+      <button mat-button type="button" (click)="logoInput.click()">
+        <mat-icon>upload</mat-icon>
+        Upload logo
+      </button>
+    </div>
+  </form>
+</mat-dialog-content>
 
- <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
-    Submit
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Annuler</button>
+  <button mat-raised-button color="primary" (click)="submit()" [disabled]="!form.valid">
+    Créer
   </button>
-
-  <button mat-button type="button" (click)="resetGameForm()">Reset</button>
-  <button matFab  type="button" (click)="close()">
-        <mat-icon>close</mat-icon>
-    </button>
-</form>
+</mat-dialog-actions>
