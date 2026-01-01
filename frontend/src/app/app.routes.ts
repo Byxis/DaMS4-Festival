@@ -9,7 +9,6 @@ import { FestivalList } from './festivals/festival-list-component/festival-list'
 export const routes: Routes = [
   { path: 'login', component: LoginPage },
 
-  { path: 'festivals', component: FestivalList},
   { path: 'home', component: HomePage, canActivate: [authGuard] },
   { path: 'festivals', component: FestivalList, canActivate: [authGuard] },
   { path: 'admin', component: AdminComponent, canActivate: [authGuard, adminGuard] },
