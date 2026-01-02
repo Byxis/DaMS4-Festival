@@ -1,7 +1,7 @@
 @use 'skeleton';
 @use 'basic';
 
-// --- Mixins & Variables ---
+
 $grid-desktop: 1fr 1fr 2fr 1fr 1fr 1fr 1fr 1fr;
 $grid-tablet: 1fr 2fr 1fr 1fr 1fr 1fr;
 $grid-mobile: 2fr 1fr 1fr 1fr 80px;
@@ -18,7 +18,7 @@ $grid-mobile: 2fr 1fr 1fr 1fr 80px;
   justify-content: center;
 }
 
-// --- Styles adapted from publishers-list.scss, full file ---
+
 .game-list-container {
   padding: 16px;
   max-width: 100%;
@@ -31,7 +31,7 @@ $grid-mobile: 2fr 1fr 1fr 1fr 80px;
     align-items: center;
     gap: 1rem;
     flex-wrap: wrap;
-    justify-content: space-between;  // ✅ Espace entre les éléments
+    justify-content: space-between;  
 
     mat-card-title,
     h1 {
@@ -64,11 +64,10 @@ $grid-mobile: 2fr 1fr 1fr 1fr 80px;
     }
   }
 
-  // ✅ Menu pour ajouter un jeu (aligné à droite)
   .add-game-menu {
     display: flex;
     gap: 0.5rem;
-    justify-content: flex-end;  // ✅ Aligné à droite
+    justify-content: flex-end;  
     margin-bottom: 1.5rem;
     flex-wrap: wrap;
 
@@ -114,7 +113,7 @@ $grid-mobile: 2fr 1fr 1fr 1fr 80px;
     overflow: hidden;
     box-shadow: 0 1px 3px #0001, 0 1px 2px #0003;
 
-    /* allow horizontal scroll on small viewports while keeping full-width look */
+   
     overflow-x: auto;
     width: 100%;
 
@@ -122,10 +121,10 @@ $grid-mobile: 2fr 1fr 1fr 1fr 80px;
     .table-row {
       display: grid;
       grid-template-columns: $grid-desktop;
-      /* ensure columns keep spacing similar to publisher list and produce horizontal scroll on narrow screens */
+     
       min-width: 1200px;
       align-items: center;
-      gap: 0; /* ✅ Pas d'espace entre colonnes */
+      gap: 0; 
     }
 
     .table-header {
@@ -140,20 +139,19 @@ $grid-mobile: 2fr 1fr 1fr 1fr 80px;
       .header-cell {
         display: flex;
         align-items: center;
-        justify-content: flex-start; /* ✅ Aligne à gauche comme les cellules */
+        justify-content: flex-start; 
         text-transform: uppercase;
         letter-spacing: 0.5px;
         gap: 0.5rem;
         min-width: 100px;
-        padding: 1rem; /* ✅ Même padding que .cell */
+        padding: 1rem; 
       }
 
-      /* ensure the actions header cell (8th column) centers the add button */
+     
       > .header-cell.actions-cell {
         justify-content: center;
-        padding: 1rem; /* ✅ Cohérent avec autres header-cell */
+        padding: 1rem; 
 
-        /* bouton : fond transparent, icône en couleur primaire, légère ombre */
         button {
           border-radius: 8px;
           padding: 6px 10px;
@@ -164,14 +162,14 @@ $grid-mobile: 2fr 1fr 1fr 1fr 80px;
           mat-icon { @include icon-size(1.25rem); }
         }
 
-        /* supprimer overlay ripple / focus color */
+    
         button .mat-ripple-element,
         button .mat-button-focus-overlay,
         button::after {
           background-color: transparent !important;
         }
 
-        /* si c'est un mat-icon-button spécifiquement */
+       
         button.mat-icon-button {
           background-color: transparent !important;
           color: var(--mat-sys-primary) !important;
@@ -184,7 +182,7 @@ $grid-mobile: 2fr 1fr 1fr 1fr 80px;
       min-height: 300px;
       max-height: 1200px;
       overflow-y: auto;
-      overflow-x: hidden; /* horizontal scroll handled by .game-table */
+      overflow-x: hidden; 
     }
 
     .table-row {
@@ -210,11 +208,11 @@ $grid-mobile: 2fr 1fr 1fr 1fr 80px;
       }
 
       .cell {
-        padding: 1rem; /* ✅ Cohérent avec header */
+        padding: 1rem; 
         display: flex;
         align-items: center;
         overflow: hidden;
-        min-width: 0; /* ✅ Permet le text-overflow */
+        min-width: 0; 
 
         &.center {
           justify-content: center;
@@ -383,7 +381,7 @@ $grid-mobile: 2fr 1fr 1fr 1fr 80px;
     height: 50px;
     object-fit: cover;
     border-radius: 4px;
-    display: block;  // ✅ Important
+    display: block;  
   }
 
   .logo-placeholder {
@@ -404,7 +402,7 @@ $grid-mobile: 2fr 1fr 1fr 1fr 80px;
   }
 }
 
-// ✅ Supprime les anciennes règles
+
 .game-table .table-header .header-cell.logo-cell {
   font-size: 0;
   overflow: hidden;

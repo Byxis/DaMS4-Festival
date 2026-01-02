@@ -21,57 +21,29 @@ export class GameService {
   private readonly _games = signal<GameDto[]>([])
   readonly games = this._games.asReadonly()
 
-  lastID = this.games().length;
-
-  /*
-  loadAll() : void {
-    ///faire try catch
-    this.http.get<GameDto[]>(this.base).subscribe(data => this._games.set(data))
-  }
-    */
 
   setGames(games: GameDto[]): void {
   this._games.set(games);
 }
 
-  deleteGame(id: number): void{
-    this.removeObservable(id).subscribe({
-      next: () => {
-        this._games.update(list => list.filter(s => s.id !== id))
-      }
-      
-    });
-  }
+  
 
-
-  removeObservable(id: number): Observable<GameDto> {
-    console.log("remove game from db")
-    return this.http.delete<GameDto>(`${environment.apiUrl}/game/delete`,{
-      body:{id}
-    });
-    
-  }
 
   
 
-  removeAll(): void { 
-    this._games.set([]) 
-  }
+  
+
+  
 
   update(partial: Partial<GameDto> & { id: number }): void {
     this._games.update(list =>
     list.map(g => (g.id === partial.id ? { ...g, ...partial } : g))
     )
-    console.log("aaa");
+   
   }
 
   
 
-searchGameByEditorInDBObservable(editorName: string): Observable<GameDto[]>{
-  return this.http.get<GameDto[]>(`${environment.apiUrl}/game/filterByEditor`,{
-      params:{editorName}
-    });
-}
 
 searchGameByPublisherIDInDBObservable(publisherID: number): Observable<GameDto[]>{
    return this.http.get<GameDto[]>(`${environment.apiUrl}/game/filterByPublisherID`,{
@@ -111,7 +83,7 @@ searchGameByName(gameName: string, publisherId: number): Observable<GameDto[]> {
 
   
   add(data: Partial<GameDto> & { logoFile?: File }): void { 
-  // ✅ Crée l'objet sans logoFile
+  
   const gameData: Partial<GameDto> = {
     name: data.name,
     publisher_id: data.publisher_id,
@@ -120,7 +92,7 @@ searchGameByName(gameName: string, publisherId: number): Observable<GameDto[]> {
     maximum_number_of_player: data.maximum_number_of_player,
   };
 
-  // ✅ Gère les deux cas : logoFile (File) ou logo (URL string)
+  
   const logo = data.logoFile || data.logo;
 
   this.http.post<GameDto>(
@@ -130,8 +102,7 @@ searchGameByName(gameName: string, publisherId: number): Observable<GameDto[]> {
   ).subscribe({
     next: (newGame) => {
       console.log('✅ Jeu ajouté');
-      
-      // ✅ Seulement upload si c'est un File (pas une URL)
+  
       if (data.logoFile && newGame.id) {
         this.uploadLogo(newGame.id, data.logoFile);
       }
@@ -147,22 +118,20 @@ private uploadLogo(gameId: number, logoFile: File): void {
   const formData = new FormData();
   formData.append('logo', logoFile);  
 
-  console.log('📤 FormData avant envoi:', formData);  
-  console.log('📄 Fichier:', logoFile.name, logoFile.size);  
-
   this.http.post(
     `${environment.apiUrl}/game/${gameId}/logo`,
     formData,
     { withCredentials: true }
   ).subscribe({
-    next: () => console.log('✅ Logo uploadé'),
+    next: () => console.log(' Logo uploadé'),
     error: (err) => {
-      console.error('❌ Erreur logo:', err);
+     
       console.error('Message:', err.error?.error);  
     }
   });
 }
   
+
 
 checkPublisherGames(publisherId: number) {
   
@@ -208,9 +177,7 @@ getGameCountByPublisher(publisherId: number): Observable<number> {
 }
 
 
-  loadAll(): Observable<GameDto[]>{
-    return this.http.get<GameDto[]>(`${environment.apiUrl}/game/loadAll`);
-  }
+  
   
   sortGames(order: string): void {
     this._games.update(list => {
@@ -254,23 +221,6 @@ getGameCountByPublisher(publisherId: number): Observable<number> {
   }
   
   
-  getEditorNameByIDObservable(id : number): Observable<GameDto>{
-    return this.http.get<GameDto>(`${environment.apiUrl}/game/getEditorNameByID`);
-  }
-
-  getEditorNameByID(id: number): Observable<string> {
-    return this.getEditorNameByIDObservable(id).pipe(
-      map(res => {
-        
-        if (!res) return '';
-        if ((res as any).name !== undefined) return (res as any).name;
-        return (res as any).editor_name ?? '';
-      })
-    );
-  }
-
- 
- 
 
   findById(id: number): GameDto | undefined {
     return this._games().find(g => g.id===id)

@@ -71,7 +71,6 @@ export class GameForm {
   });
 
   constructor() {
-    
     effect(() => {
       if (this.data?.publisherId && this.data?.publisherName) {
         this.form.get('editor')?.setValue(this.data.publisherName);
@@ -93,6 +92,7 @@ export class GameForm {
       reader.readAsDataURL(this.newLogoFile);
     }
   }
+  
 
   private gameNameValidator(): AsyncValidatorFn {
   return (control: AbstractControl): Observable<ValidationErrors | null> => {
@@ -123,7 +123,7 @@ export class GameForm {
     this.currentLogoUrl = null;
   }
 
-  // ✅ Envoie les données au parent
+ 
   submit(): void {
     if (this.form.valid) {
       const data = this.form.getRawValue();
@@ -144,9 +144,9 @@ export class GameForm {
   getErrorMessage(control: any): string | null {
     if (control) {
       if (control.errors) {
-        if (control.errors['required']) return 'Enter a value';
-        if (control.errors['minlength']) return 'Value is too short';
-        if (control.errors['pattern']) return 'Invalid format';
+        if (control.errors['required']) return 'Entrer une valeur';
+        if (control.errors['minlength']) return 'La valeur entrée est trop courte';
+        if (control.errors['pattern']) return 'Format invalide';
          if (control.errors['gameNameExists']) return 'Ce jeu existe déjà'; 
       }
     }

@@ -3,7 +3,7 @@
     <mat-card-title>Liste des jeux présentés</mat-card-title>
 
     <mat-form-field class="search-field" appearance="outline">
-      <mat-label>Search a game</mat-label>
+      <mat-label>Chercher un jeu</mat-label>
       <input matInput [(ngModel)]="searchTerm" placeholder="name of the game" (input)="searchGameByName($event.target.value)" />
     </mat-form-field>
   </div>
@@ -26,7 +26,6 @@
 
       }
        
-       
           <button matFab  type="button" (click)="showForm = false">
         <mat-icon>close</mat-icon>
     </button>
@@ -35,12 +34,7 @@
 
   
 
-  <!-- ✅ Formulaire de sélection (à implémenter plus tard) -->
-  @if(showSelectForm) {
-    affiche le form pour ajouter jeu existant
-  }
-
-  <!-- ✅ Tableau des jeux -->
+  
   <div class="game-table">
     <div class="table-header">
       <div class="header-cell id-cell">ID</div>

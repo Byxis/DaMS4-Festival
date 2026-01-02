@@ -8,13 +8,10 @@ import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { FilterForm } from '../filter-form/filter-form';
 import { GameDto } from '../game/game-dto';
 import { MatOption, MatOptionModule } from '@angular/material/core';
 import { MatSelect, MatSelectModule } from '@angular/material/select';
-import { FilterFormEditor } from '../filter-form-editorEditor/filter-form';
 import { ActivatedRoute } from '@angular/router';
-import { map, Observable } from 'rxjs';
 import { MatCardTitle } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
 import { GameSelectForm } from '../game-select-form/game-select-form';
@@ -23,7 +20,7 @@ import { GameSelectForm } from '../game-select-form/game-select-form';
 
 @Component({
   selector: 'app-game-list',
-  imports: [JsonPipe, GameForm, FilterFormEditor, MatFormFieldModule,MatIconModule,MatOptionModule, MatOption,MatSelect, MatSelectModule, MatSelectModule, MatInputModule, FormsModule, MatInputModule, MatButtonModule, MatIconModule, FilterForm, MatCardTitle],
+  imports: [JsonPipe, GameForm,  MatFormFieldModule,MatIconModule,MatOptionModule, MatOption,MatSelect, MatSelectModule, MatSelectModule, MatInputModule, FormsModule, MatInputModule, MatButtonModule, MatIconModule, MatCardTitle],
   templateUrl: './game-list.html',
   styleUrl: './game-list.scss'
 })
@@ -36,13 +33,16 @@ export class GameList {
   searchTerm = '';
 
   hasGames = false;
+
+
   
   readonly http = inject(HttpClient)
   readonly gameService = inject(GameService)
+   readonly route = inject(ActivatedRoute);
 
-  selectedSignal: WritableSignal<number | null> = signal(null);
 
-  readonly route = inject(ActivatedRoute);
+
+ 
 
    isGameListForPublisher = input<boolean>(false);
 
@@ -65,7 +65,7 @@ export class GameList {
      
     }
 
-    // hide the newGame form
+    // hide the createNewGame form
     setShowFormFalse(){
       this.showForm = false;
     }
@@ -88,17 +88,7 @@ export class GameList {
   }
 
 
-  searchGameByEditorName(editorName: string): void {
-    this.gameService.searchGameByEditorInDBObservable(editorName).subscribe({
-      next: (games) => {
-        this.gameService.setGames(games); 
-        this.gameService.sortGames(this.orderSelection);
-      },
-      error: (err) => {
-        console.error('Erreur lors de la recherche', err);
-      }
-    });
-  }
+  
 
 
   searchGameByPublisherID(publisherId: number): void {
@@ -127,34 +117,7 @@ export class GameList {
   }
 }
 
-  createGameFromForm(form: { 
-  name: string, 
-  editor: string, 
-  type: string, 
-  number_minimal_of_player: number, 
-  number_maximal_of_player: number, 
-  logoFile?: File  
-}) {
-  const gameData: Partial<GameDto> & { logoFile?: File } = {
-    name: form.name,
-    publisher_id: this.publisherId(),
-    editor_name: form.editor,
-    type: form.type,
-    minimum_number_of_player: form.number_minimal_of_player,
-    maximum_number_of_player: form.number_maximal_of_player,
-    logoFile: form.logoFile  
-  };
-
-  this.gameService.add(gameData);
   
-  setTimeout(() => {
-    if (this.isGameListForPublisher() && this.publisherId()) {
-      this.searchGameByPublisherID(this.publisherId()!);
-    }
-  }, 500);
-  
-  this.setShowFormFalse();
-}
   
 
 
@@ -185,7 +148,7 @@ export class GameList {
   }
 
 
-  // change the order or the list
+  
   changeOrder(order: string): void {
     this.orderSelection = order;
     
@@ -196,19 +159,10 @@ export class GameList {
    
     effect(() => {
       if (this.isGameListForPublisher() && this.publisherId()) {
-        // Cas 1: C'est une liste pour un publisher
+        
         this.searchGameByPublisherID(this.publisherId()!);
         this.checkIfPublisherHasGames();
-      } else if (!this.isGameListForPublisher()) {
-        
-        this.gameService.loadAll().subscribe({
-          next: games => {
-            this.gameService.setGames(games);
-            this.gameService.sortGames(this.orderSelection);
-          },
-          error: err => console.error('loadAll failed', err)
-        });
-      }
+      } 
     });
   }
 
@@ -244,32 +198,62 @@ export class GameList {
     });
   }
 
+
   addExistingGamesToPublisher(games: any[]): void {
   if (!games || games.length === 0) return;
 
   games.forEach(game => {
-    // ✅ Prépare les données avec logo en tant que string URL
+   
     const gameData = {
       name: game.name,
       publisher_id: this.publisherId(),
       type: game.type,
       minimum_number_of_player: game.minimum_number_of_player,
       maximum_number_of_player: game.maximum_number_of_player,
-      logo: game.logo || null  // ✅ Logo est une URL string
+      logo: game.logo || null  
     };
 
-    console.log('Game data to add:', gameData);  // ✅ Debug
+    console.log('Game data to add:', gameData);  
     this.gameService.add(gameData);
   });
 
-  // ✅ Un seul setTimeout
+ 
   setTimeout(() => {
     if (this.publisherId()) {
       this.searchGameByPublisherID(this.publisherId()!);
     }
-  }, 1000);  // ✅ Augmente le délai
+  }, 1000);  
 }
 
+
+createGameFromForm(form: { 
+  name: string, 
+  editor: string, 
+  type: string, 
+  number_minimal_of_player: number, 
+  number_maximal_of_player: number, 
+  logoFile?: File  
+}) {
+  const gameData: Partial<GameDto> & { logoFile?: File } = {
+    name: form.name,
+    publisher_id: this.publisherId(),
+    editor_name: form.editor,
+    type: form.type,
+    minimum_number_of_player: form.number_minimal_of_player,
+    maximum_number_of_player: form.number_maximal_of_player,
+    logoFile: form.logoFile  
+  };
+
+  this.gameService.add(gameData);
+  
+  setTimeout(() => {
+    if (this.isGameListForPublisher() && this.publisherId()) {
+      this.searchGameByPublisherID(this.publisherId()!);
+    }
+  }, 1000);
+  
+  this.setShowFormFalse();
+}
 
 
   

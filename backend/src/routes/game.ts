@@ -17,7 +17,7 @@ router.get("/search", async (req, res) => {
   const gameName = (req.query.gameName || '').toString().trim();
   const publisherId = req.query.publisherId ? Number(req.query.publisherId) : null;
 
-  // ✅ Vérifie que publisherId est fourni
+  
   if (!publisherId || Number.isNaN(publisherId)) {
     return res.status(400).json({ error: "publisherId is required" });
   }
@@ -129,6 +129,8 @@ router.post("/", async (req, res) => {
   }
 });
 
+
+
 router.post("/addGameToPublisher", async (req, res) => {
   const {
     name,
@@ -164,7 +166,6 @@ router.post("/addGameToPublisher", async (req, res) => {
     }
 
     
-  
     const result = await client.query(
       `INSERT INTO games_publisher (name, publisher_id, minimum_number_of_player, maximum_number_of_player, logo, type_of_games_id)
        VALUES ($1, $2, $3, $4, $5, $6) 
@@ -191,6 +192,7 @@ router.post("/addGameToPublisher", async (req, res) => {
 });
 
 
+
 router.get("/checkIfNameExists", async (req: Request, res: Response) => {
   const { name, publisherId } = req.query;
 
@@ -212,6 +214,7 @@ router.get("/checkIfNameExists", async (req: Request, res: Response) => {
   }
 });
   
+
 router.get("/numberOfGameExisting/:publisherId", async (req: Request, res: Response) => {
   const { publisherId } = req.params;
 
@@ -298,32 +301,7 @@ router.get("/numberOfPresentedGame/:publisherId", async (req: Request, res: Resp
 
 
 
-router.get("/loadAll", async (req, res) => {
-  console.log("loadAll /api/game", req.body);
-  
-  try {
-    const result = await pool.query(
-      `
-      SELECT g.id,
-             g.name,
-             g.minimum_number_of_player,
-             g.maximum_number_of_player,
-             g.editor_id,
-             g.type_of_games_id,
-             g.logo,
-             e.name AS editor_name,
-             t.description AS type
-      FROM games g
-      LEFT JOIN editors e ON e.id = g.editor_id
-      LEFT JOIN type_of_games t ON g.type_of_games_id = t.id
-      ORDER BY g.id;
-    `);
-    res.status(200).json(result.rows);
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Erreur lors de l'ajout du jeu" });
-  }
-});
+
 
 
 
@@ -377,35 +355,6 @@ router.get("/gamesByEditorID/:publisherId", async (req: Request, res: Response) 
   }
 });
 
-router.delete("/delete", async (req, res) => {
-  console.log("delete", req.body);
-   const { id } = req.body;
-  try {
-    const result = await pool.query(
-      `DELETE FROM games WHERE id=$1 RETURNING*`,
-      [id]
-    );
-    res.status(200).json(result.rows);
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Erreur lors de la suppression" });
-  }
-});
-
-router.delete("/delete", async (req, res) => {
-  console.log("delete", req.body);
-   const { id } = req.body;
-  try {
-    const result = await pool.query(
-      `DELETE FROM games WHERE id=$1 RETURNING*`,
-      [id]
-    );
-    res.status(200).json(result.rows);
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Erreur lors de la suppression" });
-  }
-});
 
 
 router.post("/:id/logo", async (req: Request, res: Response) => {
@@ -433,11 +382,9 @@ router.post("/:id/logo", async (req: Request, res: Response) => {
 
     fs.renameSync(req.file.path, fullPath);
     
-    console.log('✅ Fichier sauvegardé:', fullPath);
-    console.log('📄 Existe?', fs.existsSync(fullPath));
-    console.log('📊 Taille:', fs.statSync(fullPath).size);
+    
 
-    // ✅ Update BD
+    
     await pool.query(
       `UPDATE games_publisher SET logo = $1 WHERE id = $2`,
       [fullPath, id]  
@@ -445,7 +392,7 @@ router.post("/:id/logo", async (req: Request, res: Response) => {
 
     res.status(200).json({ logoUrl: fullPath });
     } catch (e) {
-    console.error('❌ Erreur:', e);
+    
     
     const errorMessage = e instanceof Error ? e.message : String(e);
     res.status(500).json({ error: errorMessage });
@@ -480,11 +427,11 @@ router.get("/:id/logo", async (req: Request, res: Response) => {
     }
 
     res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
-    // ✅ Type-cast avec "as string" (garanti d'exister ici)
+    
     const filePath = path.resolve(uploadDir, files[0] as string);
     res.sendFile(filePath);
   } catch (e) {
-    console.error('❌ Erreur GET logo:', e);
+    
     const errorMessage = e instanceof Error ? e.message : String(e);
     res.status(500).json({ error: errorMessage });
   }
@@ -560,85 +507,7 @@ router.get("/filterByPublisherID", async (req, res) => {
 
 
 
-router.get("/getEditorNameByID", async (req, res) => {
-  const editorID = Number(req.query.editorID);
-  if (Number.isNaN(editorID)) {
-    return res.status(400).json({ error: "editorID invalid" });
-  }
-  try {
-    const q = `
-      SELECT e.name
-      FROM editors e
-      WHERE e.id = $1;
-    `;
-    const params = [editorID];
-    const result = await pool.query(q, params);
-    if (result.rowCount === 0) {
-      return res.status(404).json({ error: "Editor not found" });
-    }
-    res.status(200).json({ name: result.rows[0].name });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Erreur lors de la recherche de l'editor" });
-  }
-});
 
-
-
-router.get("/filter", async (req, res) => {
-  const editorName = (req.query.editor_name || '').toString().trim();
-  const typeDesc   = (req.query.type || '').toString().trim();
-  const minPlayers = req.query.min ? Number(req.query.min) : null;
-  const maxPlayers = req.query.max ? Number(req.query.max) : null;
-  
-   try {
-    const conditions: string[] = [];
-    const params: any[] = [];
-
-     if (editorName !== '') {
-      params.push(`%${editorName}%`);
-      const idx = params.length;
-      conditions.push(`e.name ILIKE $${idx}`);
-    }
-
-    if (typeDesc !== '') {
-      params.push(`%${typeDesc}%`);
-      const idx = params.length;
-      conditions.push(`t.description ILIKE $${idx}`);
-    }
-   
-    if (minPlayers !== null && !Number.isNaN(minPlayers)) {
-      params.push(minPlayers);
-      const idx = params.length;
-      conditions.push(`g.minimum_number_of_player >= $${idx}`);
-    }
-    if (maxPlayers !== null && !Number.isNaN(maxPlayers)) {
-      params.push(maxPlayers);
-      const idx = params.length;
-      conditions.push(`g.maximum_number_of_player <= $${idx}`);
-    }
-
-    const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
-
-    const q = `
-      SELECT g.id, g.name, g.minimum_number_of_player, g.maximum_number_of_player,
-             g.editor_id, g.type_of_games_id, g.logo,
-             e.name AS editor_name,
-             t.description AS type
-      FROM games g
-      LEFT JOIN editors e ON e.id = g.editor_id
-      LEFT JOIN type_of_games t ON t.id = g.type_of_games_id
-      ${where}
-      
-    `;
-
-    const result = await pool.query(q, params);
-    res.status(200).json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Erreur lors du filtrage des jeux" });
-  }
-});
 
 
 
