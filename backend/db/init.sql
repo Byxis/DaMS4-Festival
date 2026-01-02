@@ -19,3 +19,7 @@ CREATE TABLE IF NOT EXISTS contact (
     telephone TEXT,
     email TEXT
 );
+
+SELECT setval('publisher_id_seq', (SELECT MAX(id) FROM publisher) + 1);
+SELECT setval('contact_id_seq', (SELECT MAX(id) FROM contact) + 1);
+SELECT setval('users_id_seq', (SELECT MAX(id) FROM users) + 1);

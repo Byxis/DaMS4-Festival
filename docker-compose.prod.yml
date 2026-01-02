@@ -12,6 +12,11 @@ services:
             - ./backend/db/init.sql:/docker-entrypoint-initdb.d/init.sql
         networks:
             - secure_net
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U secureapp -d secureapp"]
+            interval: 1s
+            timeout: 10s
+            retries: 15
     backend:
         build:
             context: ./backend
@@ -19,7 +24,8 @@ services:
         container_name: secureapp_backend_prod
         restart: unless-stopped
         depends_on:
-            - db
+            db:
+                condition: service_healthy
         environment:
             NODE_ENV: production
             DATABASE_URL: postgresql://secureapp:secureapp@db:5432/secureapp
@@ -51,7 +57,8 @@ services:
         container_name: secureapp_adminer_prod
         restart: unless-stopped
         depends_on:
-            - db
+            db:
+                condition: service_healthy
         ports:
             - "8081:8080"
         environment:
