@@ -1,13 +1,3 @@
-.main-container{
-  padding: 30px;
-}
-.header{
-  display: flex;
-  align-items: center;
-  gap:20px;
-  padding: 10px;
-}
-
 
 
 // Container for festival cards
@@ -51,14 +41,6 @@
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  .counter-festival {
-    padding: 15px;
-    margin-bottom: 20px;
-
-    p {
-      font-size: 1rem;
-    }
-  }
 }
 
 @keyframes fadeInUp {
@@ -73,3 +55,5 @@
   }
 
 }
+
+
