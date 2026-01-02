@@ -5,12 +5,15 @@ import { MatFormField, MatLabel, MatHint, MatError } from "@angular/material/for
 import { MatInput } from '@angular/material/input';
 import { FestivalDto } from '../festival-dto';
 import { FestivalService } from '../festival-service/festival-service';
-import { MatCard } from "@angular/material/card";
+import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from "@angular/material/card";
 import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-festival-new-form-component',
-  imports: [ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatButton, MatError, MatHint, MatCard],
+  imports: [ReactiveFormsModule, 
+    MatFormField, MatLabel, MatInput, 
+    MatButton, MatError, MatHint, MatCard, 
+    MatCardContent, MatCardTitle, MatCardHeader],
   templateUrl: './festival-new-form-component.html',
   styleUrl: './festival-new-form-component.scss'
 })

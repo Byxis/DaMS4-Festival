@@ -1,0 +1,72 @@
+mat-card {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+}
+
+mat-card-header {
+
+
+  margin: 1rem ;
+  padding: 1rem;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+// Section pour les informations générales
+.form-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+
+  &.full-width {
+    grid-template-columns: 1fr;
+  }
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+// Section pour les tables (3 colonnes)
+.tables-section {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Actions du formulaire
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+// Style pour les boutons
+button[type="submit"] {
+  margin-left: auto;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  mat-card {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+
+  .form-section {
+    grid-template-columns: 1fr;
+  }
+}
