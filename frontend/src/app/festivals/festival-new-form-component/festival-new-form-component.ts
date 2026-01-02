@@ -6,6 +6,7 @@ import { MatInput } from '@angular/material/input';
 import { FestivalDto } from '../festival-dto';
 import { FestivalService } from '../festival-service/festival-service';
 import { MatCard } from "@angular/material/card";
+import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-festival-new-form-component',
@@ -15,6 +16,7 @@ import { MatCard } from "@angular/material/card";
 })
 export class FestivalNewFormComponent {
   festivalService = inject(FestivalService);
+  private readonly dialogRef = inject(MatDialogRef<FestivalNewFormComponent>);
 
   //On créé un output pour notifier la création d'un festival
   readonly festivalCreated = output<void>();
@@ -43,23 +45,13 @@ export class FestivalNewFormComponent {
       };
       this.festivalService.addFestival(newFestival as Omit<FestivalDto, 'id'>);
 
+      this.dialogRef.close(true);
+    } 
 
+  }
 
-      // Log the added festival details
-      console.log("Festival ajouté en frontEnd",
-        {
-          name: newFestival.name,
-          location: newFestival.location,
-          start_date: newFestival.start_date,
-          end_date: newFestival.end_date,
-          table_count: newFestival.table_count
-        });
-      this.form.reset();
-    } else {
-      console.error("Formulaire invalide");
-    }
-
-    this.festivalCreated.emit();
+  cancel(): void {
+    this.dialogRef.close(false);
   }
 
 }

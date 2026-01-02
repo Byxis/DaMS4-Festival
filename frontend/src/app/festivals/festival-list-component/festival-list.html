@@ -1,14 +1,12 @@
 <div class="main-container">
     <div class="header">
         <h1>Festivals : </h1>
-        <button matFab aria-label="Add a festival button" (click)="toggleForm()">
+        <button matFab aria-label="Add a festival button" (click)="openFormDialog()">
             <mat-icon>add</mat-icon>
         </button>
     </div>
 
-    @if (showForm) {
-    <app-festival-new-form-component (festivalCreated)="onFestivalCreated()" />
-    }
+
 
     <div class="festivals-container">
         @for(festival of this.svc._festivals(); track festival.id; let i =$index){
