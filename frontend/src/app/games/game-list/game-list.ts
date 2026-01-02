@@ -164,6 +164,13 @@ export class GameList {
         this.checkIfPublisherHasGames();
       } 
     });
+
+    effect(() => {
+    this.gameService.games(); 
+    if (this.isGameListForPublisher() && this.publisherId()) {
+      this.searchGameByPublisherID(this.publisherId()!);
+    }
+  });
   }
 
 
