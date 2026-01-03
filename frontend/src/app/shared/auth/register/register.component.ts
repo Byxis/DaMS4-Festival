@@ -52,6 +52,7 @@ export class RegisterComponent {
     email: new FormControl('', {
       nonNullable: true,
       validators: [Validators.email, Validators.required],
+      //TODO: add better email validator 
     }),
     password: new FormControl('', {
       nonNullable: true,
