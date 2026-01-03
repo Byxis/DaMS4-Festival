@@ -1,15 +1,9 @@
-
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     login TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
     role TEXT DEFAULT 'user'
 ); 
-
-
-
-
-
 
 CREATE TABLE IF NOT EXISTS editors (
     id SERIAL PRIMARY KEY,
@@ -22,7 +16,6 @@ CREATE TABLE IF NOT EXISTS type_of_games (
     description TEXT UNIQUE NOT NULL
 ); 
 
-
 CREATE TABLE IF NOT EXISTS games (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
@@ -34,22 +27,16 @@ CREATE TABLE IF NOT EXISTS games (
     type_of_games_id INTEGER REFERENCES type_of_games(id)
 ); 
 
-
-
-
-
 COPY editors(id, name, logo)
 FROM '/Data/editorsData.csv'
 DELIMITER ','
 CSV HEADER;
 
--- Pour les types de jeux
 COPY type_of_games(id, description)
 FROM '/Data/typesOfGamesData.csv'
 DELIMITER ','
 CSV HEADER;
 
--- Pour les jeux
 COPY games(id, name, minimum_number_of_player, maximum_number_of_player, editor_id, type_of_games_id, logo)
 FROM '/Data/GamesDATA.csv'
 DELIMITER ','

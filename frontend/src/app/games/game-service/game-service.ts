@@ -12,44 +12,27 @@ import { Form } from '@angular/forms';
 })
 export class GameService {
 
-
-
-
   private readonly http = inject(HttpClient);
-  
 
   private readonly _games = signal<GameDto[]>([])
   readonly games = this._games.asReadonly()
 
 
   setGames(games: GameDto[]): void {
-  this._games.set(games);
+    this._games.set(games);
 }
-
-  
-
-
-  
-
-  
-
-  
 
   update(partial: Partial<GameDto> & { id: number }): void {
     this._games.update(list =>
     list.map(g => (g.id === partial.id ? { ...g, ...partial } : g))
     )
-   
   }
 
-  
-
-
-searchGameByPublisherIDInDBObservable(publisherID: number): Observable<GameDto[]>{
+  searchGameByPublisherIDInDBObservable(publisherID: number): Observable<GameDto[]>{
    return this.http.get<GameDto[]>(`${environment.apiUrl}/game/filterByPublisherID`,{
       params:{publisherID}
     });
-}
+  }
 
   makeFilterSearchObservable(filters: {editor_name?: string,
     type? :string, 
@@ -61,7 +44,6 @@ searchGameByPublisherIDInDBObservable(publisherID: number): Observable<GameDto[]
     if (filters.number_minimal_of_player != null) params.min = String(filters.number_minimal_of_player);
     if (filters.number_maximal_of_player != null) params.max = String(filters.number_maximal_of_player);
     return this.http.get<GameDto[]>(`${environment.apiUrl}/game/filter`, { params });
-
   }
 
 searchGameByName(gameName: string, publisherId: number): Observable<GameDto[]> {
@@ -72,113 +54,87 @@ searchGameByName(gameName: string, publisherId: number): Observable<GameDto[]> {
     }
   });
 }
-
-
- 
-
-
-
- 
-
-
   
   add(data: Partial<GameDto> & { logoFile?: File }): void { 
-  
-  const gameData: Partial<GameDto> = {
-    name: data.name,
-    publisher_id: data.publisher_id,
-    type: data.type,
-    minimum_number_of_player: data.minimum_number_of_player,
-    maximum_number_of_player: data.maximum_number_of_player,
-  };
+    const gameData: Partial<GameDto> = {
+      name: data.name,
+      publisher_id: data.publisher_id,
+      type: data.type,
+      minimum_number_of_player: data.minimum_number_of_player,
+      maximum_number_of_player: data.maximum_number_of_player,
+    };
+    const logo = data.logoFile || data.logo;
+    this.http.post<GameDto>(
+      `${environment.apiUrl}/game/addGameToPublisher`,
+      { ...gameData, logo },
+      { withCredentials: true }
+    ).subscribe({
+      next: (newGame) => {
+        console.log('✅ Jeu ajouté');
 
-  
-  const logo = data.logoFile || data.logo;
+        if (data.logoFile && newGame.id) {
+          this.uploadLogo(newGame.id, data.logoFile);
+        }
+        this._games.update(games => [...games, newGame]);
+      },
+      error: (err) => console.error(' Erreur', err)
+    });
+  }
 
-  this.http.post<GameDto>(
-    `${environment.apiUrl}/game/addGameToPublisher`,
-    { ...gameData, logo },
-    { withCredentials: true }
-  ).subscribe({
-    next: (newGame) => {
-      console.log('✅ Jeu ajouté');
-  
-      if (data.logoFile && newGame.id) {
-        this.uploadLogo(newGame.id, data.logoFile);
+  private uploadLogo(gameId: number, logoFile: File): void {
+    const formData = new FormData();
+    formData.append('logo', logoFile);  
+
+    this.http.post(
+      `${environment.apiUrl}/game/${gameId}/logo`,
+      formData,
+      { withCredentials: true }
+    ).subscribe({
+      next: () => console.log(' Logo uploadé'),
+      error: (err) => {
+        console.error('Message:', err.error?.error);  
       }
-      this._games.update(games => [...games, newGame]);
-    },
-    error: (err) => console.error('❌ Erreur', err)
-  });
-}
-
-
-
-private uploadLogo(gameId: number, logoFile: File): void {
-  const formData = new FormData();
-  formData.append('logo', logoFile);  
-
-  this.http.post(
-    `${environment.apiUrl}/game/${gameId}/logo`,
-    formData,
-    { withCredentials: true }
-  ).subscribe({
-    next: () => console.log(' Logo uploadé'),
-    error: (err) => {
-     
-      console.error('Message:', err.error?.error);  
-    }
-  });
-}
+    });
+  }
   
+  checkPublisherGames(publisherId: number) {
+    return this.http.get<{ hasGames: boolean; gameCount: number }>(
+      `${environment.apiUrl}/game/numberOfGameExisting/${publisherId}`
+    );
+  }
 
-
-checkPublisherGames(publisherId: number) {
-  
-  return this.http.get<{ hasGames: boolean; gameCount: number }>(
-    `${environment.apiUrl}/game/numberOfGameExisting/${publisherId}`
-  );
-}
-
-checkGameNameExists(gameName: string, publisherId: number): Observable<boolean> {
-  return this.http.get<{ exists: boolean }>(
-    `${environment.apiUrl}/game/checkIfNameExists`,
-    {
-      params: {
-        name: gameName,
-        publisherId: publisherId.toString()
+  checkGameNameExists(gameName: string, publisherId: number): Observable<boolean> {
+    return this.http.get<{ exists: boolean }>(
+      `${environment.apiUrl}/game/checkIfNameExists`,
+      {
+        params: {
+          name: gameName,
+          publisherId: publisherId.toString()
+        }
       }
-    }
-  ).pipe(
-    map(response => response.exists)
-  );
-}
+    ).pipe(
+      map(response => response.exists)
+    );
+  }
 
+  filterByEditorID(publisherId: number) {
+    return this.http.get<GameDto[]>(
+      `${environment.apiUrl}/game/gamesByEditorID/${publisherId}`
+    );
+  }
 
-filterByEditorID(publisherId: number) {
-  
-  return this.http.get<GameDto[]>(
-    `${environment.apiUrl}/game/gamesByEditorID/${publisherId}`
-  );
-}
+  getGameCountByPublisher(publisherId: number): Observable<number> {
+    return this.http.get<{ gameCount: number }>(
+      `${environment.apiUrl}/game/numberOfPresentedGame/${publisherId}`
+    ).pipe(
+      map(response => {
+        console.log(' Response from backend:', response);  
+        console.log(' GameCount value:', response.gameCount); 
+        return response.gameCount;
+      })
+    );
+  }
 
-
-
-getGameCountByPublisher(publisherId: number): Observable<number> {
-  return this.http.get<{ gameCount: number }>(
-    `${environment.apiUrl}/game/numberOfPresentedGame/${publisherId}`
-  ).pipe(
-    map(response => {
-      console.log('📊 Response from backend:', response);  
-      console.log('📍 GameCount value:', response.gameCount); 
-      return response.gameCount;
-    })
-  );
-}
-
-
-  
-  
   sortGames(order: string): void {
     this._games.update(list => {
       const copy = [...list];
@@ -220,14 +176,8 @@ getGameCountByPublisher(publisherId: number): Observable<number> {
     });
   }
   
-  
-
   findById(id: number): GameDto | undefined {
     return this._games().find(g => g.id===id)
   }
-
-
-     
- 
 
 }

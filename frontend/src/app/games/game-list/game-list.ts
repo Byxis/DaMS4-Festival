@@ -26,70 +26,44 @@ import { GameSelectForm } from '../game-select-form/game-select-form';
 })
 export class GameList {
   private dialog = inject(MatDialog);
-  showForm = false;
-  
-  showCreateForm = false;  
-  showSelectForm = false;
-  searchTerm = '';
-
-  hasGames = false;
-
-
-  
   readonly http = inject(HttpClient)
   readonly gameService = inject(GameService)
    readonly route = inject(ActivatedRoute);
 
+  showForm = false;
+  showCreateForm = false;  
+  showSelectForm = false;
+  searchTerm = '';
+  hasGames = false;
 
-
- 
-
-   isGameListForPublisher = input<boolean>(false);
-
-   listOfGameFromPublisher = input<GameDto[]>([]);
-
-   publisherId = input<number>();
-   publisherName = input<string | undefined>(undefined);
-
-   
-
-  
+  isGameListForPublisher = input<boolean>(false);
+  listOfGameFromPublisher = input<GameDto[]>([]);
+  publisherId = input<number>();
+  publisherName = input<string | undefined>(undefined);
   
   //initial sort
   orderSelection = 'name_game_asc';
-  
-   
     // show the newGame form
-    setShowFormTrue(){
+  setShowFormTrue(){
       this.showForm = true;
-     
-    }
+  }
 
-    // hide the createNewGame form
-    setShowFormFalse(){
-      this.showForm = false;
-    }
+  // hide the createNewGame form
+  setShowFormFalse(){
+    this.showForm = false;
+  }
 
-    // show the filter form
-    setFilterFormTrue(){
-      
-      this.showForm = false;
-    }
-
-    
+  // show the filter form
+  setFilterFormTrue(){ 
+    this.showForm = false;
+  }
 
   onFormClose(closeRequested: boolean): void {
     if (closeRequested) {
-      
        this.showCreateForm = false;
       console.log('Form requested close');
     }
-
   }
-
-
-  
-
 
   searchGameByPublisherID(publisherId: number): void {
     this.gameService.searchGameByPublisherIDInDBObservable(publisherId).subscribe({
@@ -117,23 +91,6 @@ export class GameList {
   }
 }
 
-  
-  
-
-
-    
-
-  makeFilterSearch(filters: any): void{
-    this.gameService.makeFilterSearchObservable(filters).subscribe({
-      next: (results) => {
-        this.gameService.setGames(results); 
-      },
-      error: (err) => {
-      console.error('Erreur lors de la recherche', err);
-    }});
-
-  }
-
   checkIfPublisherHasGames() {
     const publisherId = this.publisherId();
     if (!publisherId) return;
@@ -147,8 +104,6 @@ export class GameList {
     });
   }
 
-
-  
   changeOrder(order: string): void {
     this.orderSelection = order;
     
@@ -156,7 +111,6 @@ export class GameList {
   }
 
   constructor() {
-   
     effect(() => {
       if (this.isGameListForPublisher() && this.publisherId()) {
         
@@ -173,11 +127,6 @@ export class GameList {
   });
   }
 
-
- 
-
-
-
   openGameFormDialog(): void {
     this.dialog.open(GameForm, {
       width: '600px',
@@ -193,7 +142,6 @@ export class GameList {
     });
   }
 
-
   openGameSelectDialog(): void {
     this.dialog.open(GameSelectForm, {
       width: '500px',
@@ -204,7 +152,6 @@ export class GameList {
       this.addExistingGamesToPublisher(result.games);
     });
   }
-
 
   addExistingGamesToPublisher(games: any[]): void {
   if (!games || games.length === 0) return;
@@ -223,15 +170,7 @@ export class GameList {
     console.log('Game data to add:', gameData);  
     this.gameService.add(gameData);
   });
-
- 
-  setTimeout(() => {
-    if (this.publisherId()) {
-      this.searchGameByPublisherID(this.publisherId()!);
-    }
-  }, 1000);  
 }
-
 
 createGameFromForm(form: { 
   name: string, 
@@ -252,22 +191,7 @@ createGameFromForm(form: {
   };
 
   this.gameService.add(gameData);
-  
-  setTimeout(() => {
-    if (this.isGameListForPublisher() && this.publisherId()) {
-      this.searchGameByPublisherID(this.publisherId()!);
-    }
-  }, 1000);
-  
   this.setShowFormFalse();
 }
-
-
-  
-    
-  
-
-       
-
 
 }
