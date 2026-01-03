@@ -19,4 +19,5 @@ export interface FestivalDto {
     table_count : number
     big_table_count: number
     town_table_count : number
+    logoUrl?: string
 }

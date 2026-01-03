@@ -8,7 +8,6 @@ import { MatButton } from '@angular/material/button';
 import { Router } from '@angular/router';
 import { PublisherService } from '@publisher/publisher.service';
 import { PublisherEditDialog } from '@publisher/publisher-edit-dialog/publisher-edit-dialog.component';
-import { PublisherDTO } from '@publisher/publisherDto';
 
 @Component({
   selector: 'publisher',

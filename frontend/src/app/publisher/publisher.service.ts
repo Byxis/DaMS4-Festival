@@ -29,21 +29,20 @@ export class PublisherService {
   loadAll() {
     this.http
       .get<PublisherDTO[]>(`${environment.apiUrl}/publishers`, { withCredentials: true })
-      .pipe(catchError(() => of([])))
       .subscribe({
         next: (data) => {
-          this.publishers.set(data);
           for (const publisher of data) {
             if (publisher.logoUrl) {
               publisher.logoUrl = `${environment.apiUrl}${publisher.logoUrl}`;
-              console.log('Loaded logo URL for publisher', publisher.id, publisher.logoUrl);
             }
           }
+          this.publishers.set(data);
           this.isErrorSignal.set(false);
           this.isLoadingSignal.set(false);
         },
         error: (err) => {
           console.error('Error loading publishers:', err);
+          this.publishers.set([]);
           this.isErrorSignal.set(true);
           this.isLoadingSignal.set(false);
         },
@@ -51,6 +50,10 @@ export class PublisherService {
   }
 
   register(publisher: PublisherDTO, logoFile?: File) {
+    if (!this.isValidPublisher(publisher)) {
+      console.error('Validation Error: Publisher data is incomplete.');
+      return;
+    }
     this.http
       .post<PublisherDTO>(`${environment.apiUrl}/publishers`, publisher, {
         withCredentials: true,
@@ -67,6 +70,10 @@ export class PublisherService {
         },
         error: (err) => console.error('Error creating publisher:', err),
       });
+  }
+
+  private isValidPublisher(publisher: PublisherDTO): boolean {
+    return !!(publisher && publisher.name && publisher.name.trim().length > 0);
   }
 
   addPublisherToList(publisher: PublisherDTO) {
@@ -137,14 +144,15 @@ export class PublisherService {
             this.loadAll();
           } else {
             this.publishers.update((publishers) => {
-              const publisher = publishers.find((p) => p.id === publisherId);
-              if (publisher) {
-                if (!publisher.contacts) {
-                  publisher.contacts = [];
+              return publishers.map((p) => {
+                if (p.id === publisherId) {
+                  return {
+                    ...p,
+                    contacts: [...(p.contacts ?? []), response],
+                  };
                 }
-                publisher.contacts.push(response);
-              }
-              return publishers;
+                return p;
+              });
             });
           }
         },
@@ -160,13 +168,15 @@ export class PublisherService {
       .subscribe({
         next: () =>
           this.publishers.update((publishers) => {
-            const publisher = publishers.find((p) => p.id === publisherId);
-            if (publisher && publisher.contacts) {
-              publisher.contacts = publisher.contacts.filter(
-                (contact: ContactDTO) => contact.id !== contactId
-              );
-            }
-            return publishers;
+            return publishers.map((p) => {
+              if (p.id === publisherId && p.contacts) {
+                return {
+                  ...p,
+                  contacts: p.contacts.filter((c: ContactDTO) => c.id !== contactId),
+                };
+              }
+              return p;
+            });
           }),
         error: (err) => console.error('Error removing contact:', err),
       });
@@ -187,14 +197,17 @@ export class PublisherService {
             this.loadAll();
           } else {
             this.publishers.update((publishers) => {
-              const publisher = publishers.find((p) => p.id === publisherId);
-              if (publisher && publisher.contacts) {
-                const index = publisher.contacts.findIndex((c: ContactDTO) => c.id === response.id);
-                if (index !== -1) {
-                  publisher.contacts[index] = response;
+              return publishers.map((p) => {
+                if (p.id === publisherId && p.contacts) {
+                  return {
+                    ...p,
+                    contacts: p.contacts.map((c: ContactDTO) =>
+                      c.id === response.id ? response : c
+                    ),
+                  };
                 }
-              }
-              return publishers;
+                return p;
+              });
             });
           }
         },

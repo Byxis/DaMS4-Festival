@@ -9,13 +9,13 @@ import { publisherResolver } from './pages/publisher/publisher.resolver';
 import { PublishersList } from './pages/publishers-list/publishers-list';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
 import { FestivalList } from './festivals/festival-list-component/festival-list';
+import { FestivalsPage } from './pages/festivals-page/festivals-page';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPage },
 
-  { path: 'festivals', component: FestivalList },
   { path: 'home', component: HomePage, canActivate: [authGuard] },
-  { path: 'festivals', component: FestivalList, canActivate: [authGuard] },
+  { path: 'festivals', component: FestivalsPage, canActivate: [authGuard] },
   { path: 'admin', component: AdminComponent, canActivate: [authGuard, adminGuard] },
   { path: 'publishers', component: PublishersList, canActivate: [authGuard] },
   {
