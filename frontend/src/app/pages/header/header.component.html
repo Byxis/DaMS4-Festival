@@ -1,60 +1,63 @@
+<!-- TODO: color the line under the navigation bar using the primary theme color -->
+ <!-- TODO: add the logo when connecting it to the name and lastname-->
+
 <mat-toolbar class="header" color="transparent">
   <span class="logo">AYAE Festivals</span>
-
   <span class="spacer"></span>
 
   @if (authSvc.isLoggedIn()) {
     @if (!authSvc.isGuest()) {
       <nav class="nav">
-          <a
+        <a
           mat-button
           routerLink="/festivals"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }"
-          >
+        >
           Festivals
-          </a>
+        </a>
 
-          <a
+        <a
           mat-button
           routerLink="/editors"
           routerLinkActive="active"
-          >
+        >
           Editeurs
-          </a>
+        </a>
 
-          @if (authSvc.isAdmin()) {
+        @if (authSvc.isAdmin()) {
           <a
-              mat-button
-              routerLink="/admin"
-              routerLinkActive="active"
+            mat-button
+            routerLink="/admin"
+            routerLinkActive="active"
           >
-              Administration
+            Administration
           </a>
         }
-        <button
-          mat-icon-button
-          [matMenuTriggerFor]="profilePanel"
-          class="profile-btn"
-          [matMenuTriggerRestoreFocus]="false">
-          <mat-icon>account_circle</mat-icon>
-      </button>
-        </nav>
-      }   
-      @else {
-        <button
-          mat-icon-button
-          [matMenuTriggerFor]="profilePanel"
-          class="profile-btn"
-          [matMenuTriggerRestoreFocus]="false">
-          <mat-icon>account_circle</mat-icon>
-      </button>
-      } 
-    }
 
+        <button
+          mat-icon-button
+          [matMenuTriggerFor]="profilePanel"
+          class="profile-btn"
+          [matMenuTriggerRestoreFocus]="false"
+        >
+          <mat-icon>account_circle</mat-icon>
+        </button>
+      </nav>
+    } @else {
+      <button
+        mat-icon-button
+        [matMenuTriggerFor]="profilePanel"
+        class="profile-btn"
+        [matMenuTriggerRestoreFocus]="false"
+      >
+        <mat-icon>account_circle</mat-icon>
+      </button>
+    }
+  }
 </mat-toolbar>
 
-    <!-- Profile panel -->
+<!-- Profile panel -->
 <mat-menu #profilePanel="matMenu" class="profile-menu">
   @if (authSvc.currentUser(); as user) {
     <div class="profile-card">
