@@ -58,3 +58,17 @@ SELECT setval('entities_id_seq', (SELECT MAX(id) FROM entities) + 1);
 SELECT setval('contact_id_seq', (SELECT MAX(id) FROM contact) + 1);
 SELECT setval('users_id_seq', (SELECT MAX(id) FROM users) + 1);
 SELECT setval('festivals_id_seq', (SELECT MAX(id) FROM festivals) + 1);
+
+CREATE OR REPLACE FUNCTION insert_into_other_func()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO entities (name, first_name, last_name, type)
+    VALUES (NEW.name, NEW.first_name, NEW.last_name, 'GUEST')
+    RETURNING id INTO NEW.id;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_insert_other
+INSTEAD OF INSERT ON other
+FOR EACH ROW EXECUTE FUNCTION insert_into_other_func();
