@@ -15,10 +15,6 @@ CREATE TABLE IF NOT EXISTS type_of_games (
     id SERIAL PRIMARY KEY,
     description TEXT UNIQUE NOT NULL
 ); 
-CREATE TABLE IF NOT EXISTS type_of_games2 (
-    id SERIAL PRIMARY KEY,
-    description TEXT UNIQUE NOT NULL
-); 
 
 CREATE TABLE IF NOT EXISTS games (
     id SERIAL PRIMARY KEY,

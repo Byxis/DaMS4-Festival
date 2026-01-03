@@ -118,13 +118,6 @@ export class GameList {
         this.checkIfPublisherHasGames();
       } 
     });
-
-    effect(() => {
-    this.gameService.games(); 
-    if (this.isGameListForPublisher() && this.publisherId()) {
-      this.searchGameByPublisherID(this.publisherId()!);
-    }
-  });
   }
 
   openGameFormDialog(): void {
@@ -169,6 +162,11 @@ export class GameList {
 
     console.log('Game data to add:', gameData);  
     this.gameService.add(gameData);
+    setTimeout(() => {
+    if (this.isGameListForPublisher() && this.publisherId()) {
+      this.searchGameByPublisherID(this.publisherId()!);
+    }
+  }, 500);
   });
 }
 
@@ -192,6 +190,11 @@ createGameFromForm(form: {
 
   this.gameService.add(gameData);
   this.setShowFormFalse();
+  setTimeout(() => {
+    if (this.isGameListForPublisher() && this.publisherId()) {
+      this.searchGameByPublisherID(this.publisherId()!);
+    }
+  }, 500);
 }
 
 }
