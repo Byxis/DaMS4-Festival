@@ -15,6 +15,10 @@ CREATE TABLE IF NOT EXISTS type_of_games (
     id SERIAL PRIMARY KEY,
     description TEXT UNIQUE NOT NULL
 ); 
+CREATE TABLE IF NOT EXISTS type_of_games2 (
+    id SERIAL PRIMARY KEY,
+    description TEXT UNIQUE NOT NULL
+); 
 
 CREATE TABLE IF NOT EXISTS games (
     id SERIAL PRIMARY KEY,
@@ -27,20 +31,6 @@ CREATE TABLE IF NOT EXISTS games (
     type_of_games_id INTEGER REFERENCES type_of_games(id)
 ); 
 
-COPY editors(id, name, logo)
-FROM '/Data/editorsData.csv'
-DELIMITER ','
-CSV HEADER;
-
-COPY type_of_games(id, description)
-FROM '/Data/typesOfGamesData.csv'
-DELIMITER ','
-CSV HEADER;
-
-COPY games(id, name, minimum_number_of_player, maximum_number_of_player, editor_id, type_of_games_id, logo)
-FROM '/Data/GamesDATA.csv'
-DELIMITER ','
-CSV HEADER;
 
 CREATE TABLE IF NOT EXISTS publisher (
     id SERIAL PRIMARY KEY,
@@ -67,6 +57,11 @@ CREATE TABLE IF NOT EXISTS games_publisher (
     logo TEXT,
     type_of_games_id INTEGER REFERENCES type_of_games(id)
 ); 
+
+COPY editors(id, name, logo) FROM '/var/lib/postgresql/data/editorsData.csv' WITH (FORMAT csv, HEADER);
+COPY type_of_games(id, description) FROM '/var/lib/postgresql/data/typesOfGamesData.csv' WITH (FORMAT csv, HEADER);
+COPY games(id, name, minimum_number_of_player, maximum_number_of_player, editor_id, type_of_games_id, logo) 
+FROM '/var/lib/postgresql/data/GamesDATA.csv' WITH (FORMAT csv, HEADER);
 
 
 
