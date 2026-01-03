@@ -78,7 +78,7 @@ router.get("/", async (_req: Request, res: Response) => {
     );
     publisherRows.forEach((publisher) => {
         publisher.contacts = contactRows.filter(
-            (contact) => contact.publisher_id === publisher.id
+            (contact) => contact.entity_id === publisher.id
         );
         const logoFiles = fs
             .readdirSync("./uploads/logos")
@@ -194,7 +194,7 @@ router.post(
         }
         try {
             const { rows } = await pool.query<Contact>(
-                "INSERT INTO contact (publisher_id, name, family_name, role, telephone, email) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+                "INSERT INTO contact (entity_id, name, family_name, role, telephone, email) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
                 [id, name, family_name, role, telephone, email]
             );
             res.status(201).json(rows[0]);

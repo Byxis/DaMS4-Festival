@@ -10,15 +10,29 @@ CREATE TABLE IF NOT EXISTS entities (
     entity_type TEXT NOT NULL CHECK (entity_type IN ('publisher')),
     name TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS entities (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    type TEXT DEFAULT 'PUBLISHER' CHECK (type IN ('PUBLISHER', 'GUEST')),
+    first_name TEXT,
+    last_name TEXT
+);
 
-CREATE TABLE IF NOT EXISTS publisher (
-    id SERIAL PRIMARY KEY REFERENCES entities(id) ON DELETE CASCADE,
-    name TEXT NOT NULL
-); 
+CREATE OR REPLACE VIEW publisher AS 
+    SELECT id, name
+    FROM entities 
+    WHERE type = 'PUBLISHER';
+
+CREATE OR REPLACE VIEW other AS 
+    SELECT id, name, first_name, last_name
+    FROM entities 
+    WHERE type <> 'PUBLISHER';
+
 
 CREATE TABLE IF NOT EXISTS contact (
-    id SERIAL PRIMARY KEY REFERENCES entities(id) ON DELETE CASCADE,
-    publisher_id INTEGER REFERENCES publisher(id) ON DELETE CASCADE,
+    id SERIAL PRIMARY KEY,
+    entity_id INTEGER REFERENCES entities(id) ON DELETE CASCADE, 
+    name TEXT NOT NULL,
     family_name TEXT NOT NULL,
     role TEXT,
     telephone TEXT,
@@ -47,8 +61,7 @@ CREATE TABLE IF NOT EXISTS reservations (
     status TEXT DEFAULT 'TO_BE_CONTACTED' CHECK (status IN ('TO_BE_CONTACTED', 'CONTACTED', 'IN_DISCUSSION', 'FACTURED', 'AWAITING_PAYMENT', 'CONFIRMED', 'CANCELLED'))
 );
 
-
-SELECT setval('publisher_id_seq', (SELECT MAX(id) FROM publisher) + 1);
+SELECT setval('entities_id_seq', (SELECT MAX(id) FROM entities) + 1);
 SELECT setval('contact_id_seq', (SELECT MAX(id) FROM contact) + 1);
 SELECT setval('users_id_seq', (SELECT MAX(id) FROM users) + 1);
 SELECT setval('festivals_id_seq', (SELECT MAX(id) FROM festivals) + 1);
