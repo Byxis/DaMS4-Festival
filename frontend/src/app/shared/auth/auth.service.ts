@@ -14,6 +14,8 @@ export class AuthService {
   private readonly _currentUser = signal<UserDto | null>(null);
   private readonly _isLoading = signal(false);
   private readonly _error = signal<string | null>(null);
+  private readonly _hasBeenLoggedIn = signal(false);
+
 
   // --- État exposé (readonly, computed) ---
   readonly currentUser = this._currentUser.asReadonly();
@@ -37,6 +39,7 @@ export class AuthService {
         tap((res) => {
           if (res?.user) {
             this._currentUser.set(res.user);
+            this._hasBeenLoggedIn.set(true);
             console.log(`👍 Utilisateur connecté : ${JSON.stringify(res.user)}`); // DEBUG
           } else {
             this._error.set('Identifiants invalides');
@@ -91,7 +94,9 @@ export class AuthService {
           console.log(`ℹ️ Utilisateur actuel : ${JSON.stringify(res?.user ?? null)}`); // DEBUG
         }),
         catchError((err) => {
-          this._error.set('Session expirée');
+          if (this._hasBeenLoggedIn()) {
+            this._error.set('Session expirée');
+        }
           this._currentUser.set(null);
           return of(null);
         }),
