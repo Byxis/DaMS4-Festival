@@ -1,0 +1,6 @@
+<div class="festivals-container">
+    @for(festival of this.svc._festivals(); track festival.id; let i =$index){
+    <app-festival-card [festival]="festival">
+    </app-festival-card>
+    }
+</div>
