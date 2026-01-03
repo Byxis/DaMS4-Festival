@@ -310,8 +310,6 @@ router.post(
 
         fs.renameSync(req.file.path, newPath);
 
-        fs.accessSync(newPath);
-
         res.json({
             message: "Logo updated",
             url: `/publishers/${id}/logo`,
