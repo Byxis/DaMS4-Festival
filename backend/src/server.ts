@@ -4,7 +4,7 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
-import { ensureAdmin, ensureUser } from "./db/initAdmin.js";
+import { ensureAdmin } from "./db/initAdmin.js";
 import "dotenv/config";
 
 import publicRouter from "./routes/public.js";
@@ -20,7 +20,6 @@ import game from"./routes/game.js";
 const app = express();
 const upload = multer({ dest: "./uploads/logos" }); 
 await ensureAdmin();
-await ensureUser();
 
 // Ajout manuel des principaux en-têtes HTTP de sécurité
 app.use((req, res, next) => {
