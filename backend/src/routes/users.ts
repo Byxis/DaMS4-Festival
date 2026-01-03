@@ -27,7 +27,7 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
     const { login, password, firstName, lastName } = req.body;
     if (!login || !password || !firstName || !lastName) {
-        return res.status(400).json({ error: "Login et mot de passe requis" });
+        return res.status(400).json({ error: "Prénom, Nom, login et mot de passe requis" });
     }
     try {
         const hash = await bcrypt.hash(password, 10);
