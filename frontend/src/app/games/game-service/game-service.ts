@@ -55,47 +55,52 @@ searchGameByName(gameName: string, publisherId: number): Observable<GameDto[]> {
   });
 }
   
-  add(data: Partial<GameDto> & { logoFile?: File }): void { 
-    const gameData: Partial<GameDto> = {
-      name: data.name,
-      publisher_id: data.publisher_id,
-      type: data.type,
-      minimum_number_of_player: data.minimum_number_of_player,
-      maximum_number_of_player: data.maximum_number_of_player,
-    };
-    const logo = data.logoFile || data.logo;
-    this.http.post<GameDto>(
-      `${environment.apiUrl}/game/addGameToPublisher`,
-      { ...gameData, logo },
-      { withCredentials: true }
-    ).subscribe({
-      next: (newGame) => {
-        console.log('✅ Jeu ajouté');
+add(data: Partial<GameDto> & { logoFile?: File }): void { 
+  const gameData: Partial<GameDto> = {
+    name: data.name,
+    publisher_id: data.publisher_id,
+    type: data.type,
+    minimum_number_of_player: data.minimum_number_of_player,
+    maximum_number_of_player: data.maximum_number_of_player,
+  };
+  const logo = data.logoFile || data.logo;
+  this.http.post<GameDto>(
+    `${environment.apiUrl}/game/addGameToPublisher`,
+    { ...gameData, logo },
+    { withCredentials: true }
+  ).subscribe({
+    next: (newGame) => {
+      console.log('Jeu ajouté');
 
-        if (data.logoFile && newGame.id) {
-          this.uploadLogo(newGame.id, data.logoFile);
-        }
+      if (data.logoFile && newGame.id) {
+        this.uploadLogo(newGame.id, data.logoFile, newGame); 
+      } else {
         this._games.update(games => [...games, newGame]);
-      },
-      error: (err) => console.error(' Erreur', err)
-    });
-  }
-
-  private uploadLogo(gameId: number, logoFile: File): void {
-    const formData = new FormData();
-    formData.append('logo', logoFile);  
-
-    this.http.post(
-      `${environment.apiUrl}/game/${gameId}/logo`,
-      formData,
-      { withCredentials: true }
-    ).subscribe({
-      next: () => console.log(' Logo uploadé'),
-      error: (err) => {
-        console.error('Message:', err.error?.error);  
       }
-    });
-  }
+    },
+    error: (err) => console.error('Erreur', err)
+  });
+}
+
+private uploadLogo(gameId: number, logoFile: File, newGame: GameDto): void {
+  const formData = new FormData();
+  formData.append('logo', logoFile);  
+
+  this.http.post(
+    `${environment.apiUrl}/game/${gameId}/logo`,
+    formData,
+    { withCredentials: true }
+  ).subscribe({
+    next: () => {
+      console.log('Logo uploadé');
+      this._games.update(games => [...games, newGame]); 
+    },
+    error: (err) => {
+      console.error('Message:', err.error?.error);
+      this._games.update(games => [...games, newGame]); 
+    }
+  });
+}
   
   checkPublisherGames(publisherId: number) {
     return this.http.get<{ hasGames: boolean; gameCount: number }>(

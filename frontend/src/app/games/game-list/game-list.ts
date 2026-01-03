@@ -146,6 +146,12 @@ export class GameList {
     });
   }
 
+  private reloadGames(): void {
+    if (this.isGameListForPublisher() && this.publisherId()) {
+      this.searchGameByPublisherID(this.publisherId()!);
+    }
+  }
+
   addExistingGamesToPublisher(games: any[]): void {
   if (!games || games.length === 0) return;
 
@@ -162,12 +168,13 @@ export class GameList {
 
     console.log('Game data to add:', gameData);  
     this.gameService.add(gameData);
-    setTimeout(() => {
-    if (this.isGameListForPublisher() && this.publisherId()) {
-      this.searchGameByPublisherID(this.publisherId()!);
-    }
-  }, 500);
+    
   });
+   setTimeout(() => {
+    this.reloadGames();
+    this.gameService.sortGames(this.orderSelection);
+  }, 1500);
+  
 }
 
 createGameFromForm(form: { 
@@ -190,11 +197,11 @@ createGameFromForm(form: {
 
   this.gameService.add(gameData);
   this.setShowFormFalse();
-  setTimeout(() => {
-    if (this.isGameListForPublisher() && this.publisherId()) {
-      this.searchGameByPublisherID(this.publisherId()!);
-    }
-  }, 500);
+ setTimeout(() => {
+    this.reloadGames();
+    this.gameService.sortGames(this.orderSelection); 
+  }, 1000);
+  
 }
 
 }
