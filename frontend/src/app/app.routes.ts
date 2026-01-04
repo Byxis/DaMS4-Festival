@@ -16,8 +16,6 @@ export const routes: Routes = [
   { path: 'login', component: LoginPage },
   { path: 'home', component: HomePage, canActivate: [authGuard, guestBlockGuard] },
   { path: 'admin', component: AdminComponent, canActivate: [authGuard, adminGuard, guestBlockGuard] },
-  { path: 'festivals', component: HomePage, canActivate: [authGuard, guestBlockGuard] },
-  { path: 'publishers', component: HomePage, canActivate: [authGuard, guestBlockGuard] },
   { path: 'festivals', component: FestivalsPage, canActivate: [authGuard, guestBlockGuard] },
   { path: 'publishers', component: PublishersList, canActivate: [authGuard, guestBlockGuard] },
   {
