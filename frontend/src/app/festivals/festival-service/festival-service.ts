@@ -6,30 +6,44 @@ import { environment } from '@env/environment';
 import { catchError, of, tap } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-
 export class FestivalService {
   private readonly http = inject(HttpClient);
 
-  // --Internal properties -- 
+  // --Internal properties --
   private readonly FORCE_UPDATE: boolean = false;
   //List of local festivals loaded from server at startup
 
   private festivals = signal<FestivalDto[]>([]);
   readonly _festivals = this.festivals.asReadonly();
 
+  private isLoadingSignal = signal<boolean>(true);
+  readonly isLoading = this.isLoadingSignal.asReadonly();
+
+  private isErrorSignal = signal<boolean>(false);
+  readonly isError = this.isErrorSignal.asReadonly();
+
+  constructor() {
+    this.loadFestivalsFromServer();
+  }
+
   // -- Actions --
 
-
   loadFestivalsFromServer(): void {
-    this.http.get<FestivalDto[]>(`${environment.apiUrl}/festivals`, { withCredentials: true })
-      .pipe(catchError(err => {
-        console.error('Error loading festivals from server', err);
-        return of([]);
-      }))
-      .subscribe(response => {
+    this.http
+      .get<FestivalDto[]>(`${environment.apiUrl}/festivals`, { withCredentials: true })
+      .pipe(
+        catchError((err) => {
+          console.error('Error loading festivals from server', err);
+          this.isErrorSignal.set(true);
+          return of([]);
+        })
+      )
+      .subscribe((response) => {
         this.festivals.set(response);
+        this.isErrorSignal.set(false);
+        this.isLoadingSignal.set(false);
         for (const fest of response) {
           if (fest.logoUrl) {
             fest.logoUrl = `${environment.apiUrl}${fest.logoUrl}`;
@@ -39,14 +53,13 @@ export class FestivalService {
       });
   }
 
-
-  addFestival(festivalData: Omit<FestivalDto, "id">, logoFile?: File): void {
+  addFestival(festivalData: Omit<FestivalDto, 'id'>, logoFile?: File): void {
     this.http
       .post<FestivalDto>(`${environment.apiUrl}/festivals`, festivalData, {
-        withCredentials: true
+        withCredentials: true,
       })
       .pipe(
-        tap(response => {
+        tap((response) => {
           if (response?.id) {
             console.log('Festival created with ID:', response.id);
             this.loadFestivalsFromServer();
@@ -60,11 +73,12 @@ export class FestivalService {
             console.error('Unexpected server response when creating festival');
           }
         }),
-        catchError(err => {
+        catchError((err) => {
           console.error('HTTP error when creating festival', err);
-          return of(null)
+          return of(null);
         })
-      ).subscribe();
+      )
+      .subscribe();
   }
 
   updateFestival(
@@ -78,7 +92,7 @@ export class FestivalService {
         withCredentials: true,
       })
       .pipe(
-        tap(response => {
+        tap((response) => {
           console.log('Festival updated with ID:', festivalId);
 
           if (this.FORCE_UPDATE) {
@@ -103,46 +117,51 @@ export class FestivalService {
             this.uploadLogo(festivalId, formData);
           }
         }),
-        catchError(err => {
+        catchError((err) => {
           console.error('HTTP error when updating festival', err);
           return of(null);
         })
-      ).subscribe();
+      )
+      .subscribe();
   }
 
+  removeFestival(id: number): void {
+    this.http
+      .delete<void>(`${environment.apiUrl}/festivals/${id}`, { withCredentials: true })
+      .pipe(
+        tap((response) => {
+          console.log('Festival deleted with ID:', id);
 
-
-removeFestival(id: number): void {
-    this.http.delete<void>(`${environment.apiUrl}/festivals/${id}`, { withCredentials: true }).pipe(
-      tap(response => {
-        console.log('Festival deleted with ID:', id);
-        
-        if (this.FORCE_UPDATE) {
-          this.loadFestivalsFromServer();
-        } else {
-          this.festivals.update((festivals) => festivals.filter((f) => f.id !== id));
-        }
-      }),
-      catchError(err => {
-        console.error('HTTP error when deleting festival', err);
-        return of(null)
-      })
-    ).subscribe();
+          if (this.FORCE_UPDATE) {
+            this.loadFestivalsFromServer();
+          } else {
+            this.festivals.update((festivals) => festivals.filter((f) => f.id !== id));
+          }
+        }),
+        catchError((err) => {
+          console.error('HTTP error when deleting festival', err);
+          return of(null);
+        })
+      )
+      .subscribe();
   }
 
-loadFestivalById(id: number): void {
-    this.http.get<FestivalDto>(`${environment.apiUrl}/festivals/${id}`, { withCredentials: true }).pipe(
-      tap(response => {
-        console.log('Festival loaded with ID:', id, response);
-      }),
-      catchError(err => {
-        console.error('HTTP error when loading festival', err);
-        return of(null);
-      })
-    ).subscribe();
+  loadFestivalById(id: number): void {
+    this.http
+      .get<FestivalDto>(`${environment.apiUrl}/festivals/${id}`, { withCredentials: true })
+      .pipe(
+        tap((response) => {
+          console.log('Festival loaded with ID:', id, response);
+        }),
+        catchError((err) => {
+          console.error('HTTP error when loading festival', err);
+          return of(null);
+        })
+      )
+      .subscribe();
   }
 
-uploadLogo(festivalId: number, formData: FormData) {
+  uploadLogo(festivalId: number, formData: FormData) {
     return this.http
       .post<{ url: string }>(`${environment.apiUrl}/festivals/${festivalId}/logo`, formData, {
         withCredentials: true,
