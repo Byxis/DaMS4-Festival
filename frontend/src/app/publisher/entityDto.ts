@@ -1,6 +1,6 @@
 import { ContactDTO } from './contactDto';
 
-export interface PublisherDTO {
+export interface EntityDTO {
   id?: number;
   name: string;
   contacts?: ContactDTO[];

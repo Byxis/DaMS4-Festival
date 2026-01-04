@@ -6,7 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
-import { PublisherDTO } from '../publisherDto';
+import { EntityDTO } from '../entityDto';
 
 @Component({
   selector: 'publisher-edit-dialog',
@@ -26,7 +26,7 @@ import { PublisherDTO } from '../publisherDto';
 export class PublisherEditDialog {
   private fb = inject(FormBuilder);
   private dialogRef = inject(MatDialogRef<PublisherEditDialog>);
-  data = inject<PublisherDTO | null>(MAT_DIALOG_DATA);
+  data = inject<EntityDTO | null>(MAT_DIALOG_DATA);
 
   form = this.fb.group({
     name: [this.data?.name ?? '', Validators.required],
@@ -65,7 +65,7 @@ export class PublisherEditDialog {
   save(): void {
     if (this.form.valid) {
       this.dialogRef.close({
-        publisher: { ...this.data, name: this.form.value.name || '' } as PublisherDTO,
+        publisher: { ...this.data, name: this.form.value.name || '' } as EntityDTO,
         newLogo: this.newLogoFile,
         deleteLogo: this.logoToDelete,
       });

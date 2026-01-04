@@ -13,9 +13,7 @@ CREATE TABLE IF NOT EXISTS entities (
 CREATE TABLE IF NOT EXISTS entities (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
-    type TEXT DEFAULT 'PUBLISHER' CHECK (type IN ('PUBLISHER', 'GUEST')),
-    first_name TEXT,
-    last_name TEXT
+    type TEXT DEFAULT 'PUBLISHER' CHECK (type IN ('PUBLISHER', 'GUEST'))
 );
 
 CREATE OR REPLACE VIEW publisher AS 
@@ -24,7 +22,7 @@ CREATE OR REPLACE VIEW publisher AS
     WHERE type = 'PUBLISHER';
 
 CREATE OR REPLACE VIEW other AS 
-    SELECT id, name, first_name, last_name
+    SELECT id, name
     FROM entities 
     WHERE type <> 'PUBLISHER';
 
@@ -58,6 +56,7 @@ CREATE TABLE IF NOT EXISTS reservations (
     table_count INT DEFAULT 0,
     big_table_count INT DEFAULT 0,
     town_table_count INT DEFAULT 0,
+    note TEXT,
     status TEXT DEFAULT 'TO_BE_CONTACTED' CHECK (status IN ('TO_BE_CONTACTED', 'CONTACTED', 'IN_DISCUSSION', 'FACTURED', 'AWAITING_PAYMENT', 'CONFIRMED', 'CANCELLED'))
 );
 
