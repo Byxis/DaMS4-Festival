@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { PublisherService } from '@publisher/publisher.service';
-import { PublisherDTO } from '@publisher/publisherDto';
+import { EntityDTO } from '@publisher/entityDto';
 import { MatIcon } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -79,11 +79,11 @@ export class PublishersList {
         case 'firstContact':
           const aHasContact = a.contacts && a.contacts.length > 0;
           const bHasContact = b.contacts && b.contacts.length > 0;
-          
+
           if (!aHasContact && !bHasContact) return 0;
           if (!aHasContact) return 1;
           if (!bHasContact) return -1;
-          
+
           compareA = this.getFirstContactName(a).toLowerCase();
           compareB = this.getFirstContactName(b).toLowerCase();
           break;
@@ -101,11 +101,11 @@ export class PublishersList {
     return pubs;
   });
 
-  getContactCount(publisher: PublisherDTO): number {
+  getContactCount(publisher: EntityDTO): number {
     return publisher.contacts?.length ?? 0;
   }
 
-  getFirstContactName(publisher: PublisherDTO): string {
+  getFirstContactName(publisher: EntityDTO): string {
     if (!publisher.contacts || publisher.contacts.length === 0) {
       return 'Aucun contact';
     }
@@ -113,17 +113,17 @@ export class PublishersList {
     return `${firstContact.name} ${firstContact.family_name}`;
   }
 
-  getGameCount(publisher: PublisherDTO): number {
+  getGameCount(publisher: EntityDTO): number {
     // TODO: Implement when game data is available
     return 0;
   }
 
-  getFestivalCount(publisher: PublisherDTO): number {
+  getFestivalCount(publisher: EntityDTO): number {
     // TODO: Implement when festival participation data is available
     return 0;
   }
 
-  viewPublisher(publisher: PublisherDTO): void {
+  viewPublisher(publisher: EntityDTO): void {
     if (publisher.id) {
       this.router.navigate(['/publishers', publisher.id]);
     }
@@ -138,7 +138,7 @@ export class PublishersList {
     }
   }
 
-  trackByPublisherId(index: number, publisher: PublisherDTO): number {
+  trackByPublisherId(index: number, publisher: EntityDTO): number {
     return publisher.id ?? index;
   }
 
@@ -155,7 +155,7 @@ export class PublishersList {
     });
   }
 
-  editPublisher(event: Event, publisher: PublisherDTO): void {
+  editPublisher(event: Event, publisher: EntityDTO): void {
     event.stopPropagation();
     const dialogRef = this.dialog.open(PublisherEditDialog, {
       data: publisher,
@@ -174,7 +174,7 @@ export class PublishersList {
     });
   }
 
-  deletePublisher(event: Event, publisher: PublisherDTO): void {
+  deletePublisher(event: Event, publisher: EntityDTO): void {
     event.stopPropagation();
     if (publisher.id && confirm(`Êtes-vous sûr de vouloir supprimer "${publisher.name}" ?`)) {
       this.publisherService.delete(publisher.id);

@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '@env/environment';
 import { catchError, of } from 'rxjs';
-import { PublisherDTO } from './publisherDto';
+import { EntityDTO } from './entityDto';
 import { ContactDTO } from './contactDto';
 
 @Injectable({
@@ -11,7 +11,7 @@ import { ContactDTO } from './contactDto';
 export class PublisherService {
   private readonly http = inject(HttpClient);
 
-  private publishers = signal<PublisherDTO[]>([]);
+  private publishers = signal<EntityDTO[]>([]);
   readonly _publishers = this.publishers.asReadonly();
 
   private isLoadingSignal = signal<boolean>(true);
@@ -28,7 +28,7 @@ export class PublisherService {
 
   loadAll() {
     this.http
-      .get<PublisherDTO[]>(`${environment.apiUrl}/publishers`, { withCredentials: true })
+      .get<EntityDTO[]>(`${environment.apiUrl}/publishers`, { withCredentials: true })
       .subscribe({
         next: (data) => {
           for (const publisher of data) {
@@ -49,13 +49,13 @@ export class PublisherService {
       });
   }
 
-  register(publisher: PublisherDTO, logoFile?: File) {
+  register(publisher: EntityDTO, logoFile?: File) {
     if (!this.isValidPublisher(publisher)) {
       console.error('Validation Error: Publisher data is incomplete.');
       return;
     }
     this.http
-      .post<PublisherDTO>(`${environment.apiUrl}/publishers`, publisher, {
+      .post<EntityDTO>(`${environment.apiUrl}/publishers`, publisher, {
         withCredentials: true,
       })
       .subscribe({
@@ -72,22 +72,22 @@ export class PublisherService {
       });
   }
 
-  private isValidPublisher(publisher: PublisherDTO): boolean {
+  private isValidPublisher(publisher: EntityDTO): boolean {
     return !!(publisher && publisher.name && publisher.name.trim().length > 0);
   }
 
-  addPublisherToList(publisher: PublisherDTO) {
+  addPublisherToList(publisher: EntityDTO) {
     this.publishers.update((publishers) => [...publishers, publisher]);
   }
 
   update(
     publisherId: number,
-    publisher: Partial<PublisherDTO>,
+    publisher: Partial<EntityDTO>,
     logoFile?: File,
     deleteLogo?: boolean
   ) {
     return this.http
-      .put<PublisherDTO>(`${environment.apiUrl}/publishers/${publisherId}`, publisher, {
+      .put<EntityDTO>(`${environment.apiUrl}/publishers/${publisherId}`, publisher, {
         withCredentials: true,
       })
       .subscribe({
