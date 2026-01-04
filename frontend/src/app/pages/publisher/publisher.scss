@@ -1,3 +1,5 @@
+@use 'skeleton';
+
 $background-delete-color: #fbe6e5;
 $delete-color: #d44d3d;
 
@@ -13,19 +15,40 @@ $delete-color: #d44d3d;
   flex-wrap: wrap;
   gap: 15px;
 }
+
 .logo-name-group {
   display: flex;
   align-items: center;
   flex: 1 1 auto;
   min-width: 200px;
 }
+
 .logo-img {
   height: 30px;
   margin-right: 15px;
 }
 
+.header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.edit-btn {
+  background-color: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+}
+
 .delete-btn {
-  margin-left: 15px;
   background-color: var(--mat-sys-error-container);
   color: var(--mat-sys-on-error-container);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

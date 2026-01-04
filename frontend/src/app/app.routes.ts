@@ -6,6 +6,11 @@ import { authGuard } from '@auth/auth.guard';
 import { adminGuard } from '@admin/admin.guard';
 import { Publisher } from './pages/publisher/publisher';
 import { guestBlockGuard } from '@auth/guest-block.guard';
+import { publisherResolver } from './pages/publisher/publisher.resolver';
+import { PublishersList } from './pages/publishers-list/publishers-list';
+import { NotFoundComponent } from './pages/not-found/not-found.component';
+import { FestivalList } from './festivals/festival-list-component/festival-list';
+import { FestivalsPage } from './pages/festivals-page/festivals-page';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPage },
@@ -13,6 +18,14 @@ export const routes: Routes = [
   { path: 'admin', component: AdminComponent, canActivate: [authGuard, adminGuard, guestBlockGuard] },
   { path: 'festivals', component: HomePage, canActivate: [authGuard, guestBlockGuard] },
   { path: 'publishers', component: HomePage, canActivate: [authGuard, guestBlockGuard] },
+  { path: 'festivals', component: FestivalsPage, canActivate: [authGuard, guestBlockGuard] },
+  { path: 'publishers', component: PublishersList, canActivate: [authGuard, guestBlockGuard] },
+  {
+    path: 'publishers/:id',
+    component: Publisher,
+    resolve: { publisher: publisherResolver },
+    canActivate: [authGuard, guestBlockGuard],
+  },
   { path: '', pathMatch: 'full', redirectTo: 'home' },
-  { path: '**', redirectTo: 'home' },
+  { path: '**', component: NotFoundComponent },
 ];
