@@ -11,7 +11,7 @@ import {
 import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '@auth/auth.service';
 
 @Component({
@@ -39,15 +39,16 @@ import { AuthService } from '@auth/auth.service';
 export class Login {
   private readonly svc = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   readonly isLoading = this.svc.isLoading;
   readonly error = this.svc.error;
 
   constructor() {
     effect(() => {
-      const user = this.svc.currentUser();
-      if (!user) return;
-
-      this.svc.redirectAfterAuth(this.router);
+      if (this.svc.isLoggedIn()) {
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+        this.router.navigateByUrl(returnUrl);
+      }
     });
   }
 

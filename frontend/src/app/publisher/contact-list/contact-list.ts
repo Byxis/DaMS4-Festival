@@ -1,5 +1,5 @@
 import { Component, inject, input } from '@angular/core';
-import { ContactDTO } from '../contact-dto';
+import { ContactDTO } from '../contactDto';
 import { output } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatCard, MatCardTitle } from '@angular/material/card';

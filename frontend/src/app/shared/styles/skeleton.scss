@@ -1,0 +1,90 @@
+// Shared skeleton loading styles
+
+.skeleton-container {
+  animation: fadeIn 0.3s ease-in;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+.skeleton-logo {
+  width: 30px;
+  height: 30px;
+  margin-right: 15px;
+}
+
+.skeleton-title {
+  width: 250px;
+  height: 32px;
+}
+
+.skeleton-button {
+  width: 140px;
+  height: 36px;
+  border-radius: 4px;
+}
+
+.skeleton-content {
+  margin-top: 30px;
+
+  .skeleton-section-title {
+    width: 200px;
+    height: 24px;
+    margin-bottom: 20px;
+  }
+
+  .skeleton-text {
+    width: 100%;
+    height: 60px;
+    margin-bottom: 10px;
+  }
+}
+
+// Skeleton for card-based layouts
+.skeleton-card {
+  background-color: white;
+  border-radius: 4px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  .skeleton-card-logo {
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    margin: 0 auto 1rem;
+  }
+
+  .skeleton-card-title {
+    width: 70%;
+    height: 24px;
+    margin: 0 auto 1rem;
+  }
+
+  .skeleton-info-item {
+    width: 100%;
+    height: 40px;
+    margin-bottom: 0.75rem;
+  }
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

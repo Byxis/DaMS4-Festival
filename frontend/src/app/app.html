@@ -9,6 +9,20 @@
         [routerLinkActiveOptions]="{ exact: true }"
         ><mat-icon>home</mat-icon>Home</a
       >
+      <a
+        class="nav-item"
+        routerLink="publishers"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        ><mat-icon>business</mat-icon>Éditeurs</a
+      >
+      <a
+        class="nav-item"
+        routerLink="festivals"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        ><mat-icon>featured_play_list</mat-icon>Festivals</a
+      >
       } @if (this.authSvc.isAdmin()) {
       <a
         class="nav-item"

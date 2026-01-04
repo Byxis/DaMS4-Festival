@@ -10,12 +10,13 @@ import "dotenv/config";
 import publicRouter from "./routes/public.js";
 import usersRouter from "./routes/users.js";
 import authRouter from "./routes/auth.js";
+import publisherRouter from "./routes/publisher.js";
+import festivalsRouter from "./routes/festivals.js";
 import { verifyToken } from "./middleware/token-management.js";
 import { requireAdmin } from "./middleware/auth-admin.js";
 
 // Création de l’application Express
 const app = express();
-
 await ensureAdmin();
 
 // Ajout manuel des principaux en-têtes HTTP de sécurité
@@ -55,10 +56,15 @@ app.use(
 app.use("/api/public", publicRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/users", verifyToken, usersRouter); // protégé
+
+//Verified token for festivals routes is important, or else RequireAdmin will not work
+//indeed requireAdmin needs req.user to be defined, and this is done in verifyToken middleware
+app.use("/api/festivals", verifyToken, festivalsRouter); // protégé
+
 app.use("/api/admin", verifyToken, requireAdmin, (req, res) => {
     res.json({ message: "Bienvenue admin" });
 });
-app.use("/api/users", verifyToken, usersRouter);
+app.use("/api/publishers", verifyToken, publisherRouter);
 
 // Chargement du certificat et clé générés par mkcert (étape 0)
 const key = fs.readFileSync("./certs/localhost-key.pem");
