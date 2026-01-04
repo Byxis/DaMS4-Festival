@@ -30,6 +30,6 @@ export const routes: Routes = [
   },
   { path: '', pathMatch: 'full', redirectTo: 'home' },
   { path: '**', component: NotFoundComponent },
-
+]
 
 // Note: guestBlockGuard is used to prevent guest users from accessing certain routes before their account is confirmed by an admin
