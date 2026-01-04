@@ -7,7 +7,7 @@ import { MatButtonModule } from "@angular/material/button";
 
 @Component({
   selector: 'app-festival-list',
-  imports: [FestivalCard, FestivalNewFormComponent, MatButtonModule, MatIcon],
+  imports: [FestivalCard,  MatButtonModule],
   templateUrl: './festival-list.html',
   styleUrl: './festival-list.scss'
 })

@@ -6,6 +6,37 @@
     <mat-card-content>
         <form [formGroup]="form" (ngSubmit)="submit()">
 
+            <!-- Section Logo -->
+            <div class="logo-section">
+                <h3>{{ newLogoPreview ? 'Logo du festival' : 'Ajouter un logo' }}</h3>
+
+                @if (newLogoPreview) {
+                <div class="new-logo">
+                    <img [src]="newLogoPreview" alt="Logo du festival" class="logo-preview" />
+                    <button mat-raised-button class="delete-logo-btn" type="button" (click)="deleteLogo()">
+                        <mat-icon>delete</mat-icon>
+                        Supprimer le logo
+                    </button>
+                </div>
+                } @else {
+                <p class="no-logo">Aucun logo sélectionné</p>
+                }
+
+                <div class="upload-section">
+                    <input
+                        type="file"
+                        accept="image/*"
+                        (change)="onFileSelected($event)"
+                        #fileInput
+                        style="display: none"
+                    />
+                    <button mat-raised-button color="primary" type="button" (click)="fileInput.click()">
+                        <mat-icon>upload</mat-icon>
+                        {{ newLogoPreview ? 'Changer le logo' : 'Sélectionner un logo' }}
+                    </button>
+                </div>
+            </div>
+
             <!-- Informations générales -->
             <div class="form-section">
                 <mat-form-field appearance="outline">

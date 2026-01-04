@@ -1,43 +1,101 @@
+@if (festival().logoUrl) {
+    <!-- Version avec logo en arrière-plan -->
+    <mat-card class="has-logo" [style.--card-bg-image]="'url(' + festival().logoUrl + ')'">
+        <div class="logo-overlay"></div>
+        
+        <mat-card-header>
+            <mat-card-title>{{ festival().name }}</mat-card-title>
+        </mat-card-header>
 
-<mat-card 
-  class="festival-card" 
-  appearance="outlined"
-  (mouseenter)="isHovered = true"
-  (mouseleave)="isHovered = false"
-  >
+        <mat-card-content>
+            <div class="festival-info">
+                <div class="info-row">
+                    <mat-icon>place</mat-icon>
+                    <span>{{ festival().location }}</span>
+                </div>
+                <div class="info-row">
+                    <mat-icon>event</mat-icon>
+                    <span>{{ festival().start_date | date: 'dd/MM/yyyy' }} - {{ festival().end_date | date: 'dd/MM/yyyy' }}</span>
+                </div>
+            </div>
 
+            <div class="tables-info">
+                <h4>Tables disponibles</h4>
+                <div class="tables-grid">
+                    <div class="table-item">
+                        <span class="table-count">{{ festival().table_count }}</span>
+                        <span class="table-label">Standard</span>
+                    </div>
+                    <div class="table-item">
+                        <span class="table-count">{{ festival().big_table_count }}</span>
+                        <span class="table-label">Grandes</span>
+                    </div>
+                    <div class="table-item">
+                        <span class="table-count">{{ festival().town_table_count }}</span>
+                        <span class="table-label">Mairie</span>
+                    </div>
+                </div>
+            </div>
+        </mat-card-content>
 
-  <mat-card-header>
-    <!-- <div mat-card-avatar class="example-header-image"></div> -->
-    <mat-card-title>{{this.festival().name}}</mat-card-title>
-    <mat-card-subtitle></mat-card-subtitle>
-  </mat-card-header>
-  
-  @if(isHovered){
- <mat-card-content>
-    <p>
-      Lieu : {{this.festival().location}} <br>
-      Début : {{this.festival().start_date | date : "shortDate"}} <br>
-      Fin : {{this.festival().end_date | date : "shortDate"}} <br>
+        <mat-card-actions align="end">
+            <button mat-button color="primary">
+                <mat-icon>edit</mat-icon>
+                Modifier
+            </button>
+            <button mat-button color="accent">
+                <mat-icon>visibility</mat-icon>
+                Détails
+            </button>
+        </mat-card-actions>
+    </mat-card>
+} @else {
+    <!-- Version sans logo -->
+    <mat-card class="no-logo">
+        <mat-card-header>
+            <mat-card-title>{{ festival().name }}</mat-card-title>
+        </mat-card-header>
 
+        <mat-card-content>
+            <div class="festival-info">
+                <div class="info-row">
+                    <mat-icon>place</mat-icon>
+                    <span>{{ festival().location }}</span>
+                </div>
+                <div class="info-row">
+                    <mat-icon>event</mat-icon>
+                    <span>{{ festival().start_date | date: 'dd/MM/yyyy' }} - {{ festival().end_date | date: 'dd/MM/yyyy' }}</span>
+                </div>
+            </div>
 
-    <p>Tables disponibles :
-      {{this.festival().table_count}}</p> <br>
-    <p>Grandes tables disponibles : 
-      {{this.festival().big_table_count}}</p> <br>
-    <p>Tables de mairie disponibles : 
-      {{this.festival().town_table_count}}</p> <br>
-  </mat-card-content>
-  }
-  @else{
- <mat-card-content>
-    <p>
-      Lieu : {{this.festival().location}} <br>
-      Début : {{this.festival().start_date | date : "shortDate"}} <br>
+            <div class="tables-info">
+                <h4>Tables disponibles</h4>
+                <div class="tables-grid">
+                    <div class="table-item">
+                        <span class="table-count">{{ festival().table_count }}</span>
+                        <span class="table-label">Standard</span>
+                    </div>
+                    <div class="table-item">
+                        <span class="table-count">{{ festival().big_table_count }}</span>
+                        <span class="table-label">Grandes</span>
+                    </div>
+                    <div class="table-item">
+                        <span class="table-count">{{ festival().town_table_count }}</span>
+                        <span class="table-label">Mairie</span>
+                    </div>
+                </div>
+            </div>
+        </mat-card-content>
 
-  </mat-card-content>
-  }
- 
-
-
-</mat-card>
+        <mat-card-actions align="end">
+            <button mat-button color="primary">
+                <mat-icon>edit</mat-icon>
+                Modifier
+            </button>
+            <button mat-button color="accent">
+                <mat-icon>visibility</mat-icon>
+                Détails
+            </button>
+        </mat-card-actions>
+    </mat-card>
+}

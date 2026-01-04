@@ -4,16 +4,61 @@ mat-card {
   padding: 2rem;
 }
 
-mat-card-header {
-
-
-  margin: 1rem ;
-  padding: 1rem;
-}
 form {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+// Section pour le logo
+.logo-section {
+  padding: 1.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  margin-bottom: 2rem;
+
+  h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+
+  .no-logo {
+    opacity: 0.6;
+    font-style: italic;
+    margin: 1rem 0;
+  }
+
+  .new-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin: 1rem 0;
+
+    .logo-preview {
+      max-width: 300px;
+      max-height: 200px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .delete-logo-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+
+  .upload-section {
+    margin-top: 1rem;
+
+    button {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
 }
 
 // Section pour les informations générales
@@ -22,10 +67,6 @@ form {
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
   margin-bottom: 1rem;
-
-  &.full-width {
-    grid-template-columns: 1fr;
-  }
 }
 
 mat-form-field {
@@ -52,11 +93,6 @@ mat-form-field {
   margin-top: 1.5rem;
   padding-top: 1.5rem;
   border-top: 1px solid rgba(0, 0, 0, 0.12);
-}
-
-// Style pour les boutons
-button[type="submit"] {
-  margin-left: auto;
 }
 
 // Responsive
