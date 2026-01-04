@@ -12,6 +12,7 @@ import usersRouter from "./routes/users.js";
 import authRouter from "./routes/auth.js";
 import publisherRouter from "./routes/publisher.js";
 import festivalsRouter from "./routes/festivals.js";
+import reservationsRouter from "./routes/reservations.js";
 import { verifyToken } from "./middleware/token-management.js";
 import { requireAdmin } from "./middleware/auth-admin.js";
 
@@ -60,6 +61,7 @@ app.use("/api/users", verifyToken, usersRouter); // protégé
 //Verified token for festivals routes is important, or else RequireAdmin will not work
 //indeed requireAdmin needs req.user to be defined, and this is done in verifyToken middleware
 app.use("/api/festivals", verifyToken, festivalsRouter); // protégé
+app.use("/api/festivals", verifyToken, reservationsRouter); // protégé
 
 app.use("/api/admin", verifyToken, requireAdmin, (req, res) => {
     res.json({ message: "Bienvenue admin" });

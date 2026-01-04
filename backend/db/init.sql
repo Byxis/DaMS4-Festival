@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash TEXT NOT NULL,
     role TEXT DEFAULT 'user'
 );
+
 CREATE TABLE IF NOT EXISTS entities (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
@@ -50,7 +51,25 @@ CREATE TABLE IF NOT EXISTS reservations (
     big_table_count INT DEFAULT 0,
     town_table_count INT DEFAULT 0,
     note TEXT,
-    status TEXT DEFAULT 'TO_BE_CONTACTED' CHECK (status IN ('TO_BE_CONTACTED', 'CONTACTED', 'IN_DISCUSSION', 'FACTURED', 'AWAITING_PAYMENT', 'CONFIRMED', 'CANCELLED'))
+    status TEXT DEFAULT 'TO_BE_CONTACTED' CHECK (status IN ('TO_BE_CONTACTED', 'CONTACTED', 'IN_DISCUSSION', 'FACTURED', 'CONFIRMED', 'ABSENT'))
+);
+
+CREATE TABLE IF NOT EXISTS reservation_interactions (
+    id SERIAL PRIMARY KEY,
+    reservation_id INTEGER REFERENCES reservations(id) ON DELETE CASCADE,
+    description TEXT,
+    interaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS reservation_games (
+    id SERIAL PRIMARY KEY,
+    reservation_id INTEGER REFERENCES reservations(id) ON DELETE CASCADE,
+    game_id INTEGER NOT NULL,
+    amount INT DEFAULT 0,
+    table_count INT DEFAULT 0,
+    big_table_count INT DEFAULT 0,
+    town_table_count INT DEFAULT 0,
+    status TEXT DEFAULT 'ASKED' CHECK (status IN ('ASKED', 'CONFIRMED', 'RECEIVED', 'CANCELLED'))
 );
 
 SELECT setval('entities_id_seq', (SELECT MAX(id) FROM entities) + 1);
