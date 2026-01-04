@@ -88,3 +88,47 @@
     opacity: 1;
   }
 }
+
+.skeleton-container {
+  border: 1px solid var(--mat-sys-outline);
+  border-radius: 8px;
+  background-color: var(--mat-sys-surface);
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.skeleton-header {
+  display: grid;
+  grid-template-columns: 48px 1fr 2fr 1fr;
+  gap: 1.5rem;
+  align-items: center;
+  padding: 1rem 1.5rem;
+
+  .skeleton {
+    &-icon {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    &-title {
+      width: 150px;
+      height: 1rem;
+    }
+
+    &-items {
+      display: flex;
+      gap: 1rem;
+      flex: 1;
+
+      .skeleton-item {
+        width: 120px;
+        height: 1.5rem;
+      }
+    }
+
+    &-status {
+      width: 120px;
+      height: 2.5rem;
+    }
+  }
+}
