@@ -6,8 +6,8 @@ export interface GameDto {
   logoUrl?: string;
   logo?: string | File; 
   name: string;
-  editor_name?: string;  // ✅ Optionnel (peut être undefined)
-  publisher_id?: number;  // ✅ Ajoute publisher_id
+  editor_name?: string;  
+  publisher_id?: number;  
   type: string;
   minimum_number_of_player: number;
   maximum_number_of_player: number;

@@ -192,14 +192,14 @@ export class PublishersList {
   }
 
   constructor() {
-    // ✅ Charge les comptages pour chaque publisher
+   
     effect(() => {
       const publishers = this.publisherService._publishers();
       publishers.forEach(pub => {
         if (pub.id && !pub.numberOfGames) {
           this.gameService.getGameCountByPublisher(pub.id).subscribe({
             next: (gameCount) => {
-              pub.numberOfGames = gameCount;  // ✅ Assigne directement
+              pub.numberOfGames = gameCount;  
               console.log(`📊 Publisher ${pub.id}: ${gameCount} games`);
             },
             error: (err) => console.error('Error:', err)

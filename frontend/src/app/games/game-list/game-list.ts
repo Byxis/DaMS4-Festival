@@ -43,6 +43,15 @@ export class GameList {
   
   //initial sort
   orderSelection = 'name_game_asc';
+
+
+
+  logoErrors = new Set<number>(); 
+
+  onLogoError(gameId: number, event: any): void {
+    this.logoErrors.add(gameId);
+    event.target.style.display = 'none';
+  }
     // show the newGame form
   setShowFormTrue(){
       this.showForm = true;

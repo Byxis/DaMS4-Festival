@@ -29,9 +29,8 @@ export class GameService {
   }
 
   searchGameByPublisherIDInDBObservable(publisherID: number): Observable<GameDto[]>{
-   return this.http.get<GameDto[]>(`${environment.apiUrl}/game/filterByPublisherID`,{
-      params:{publisherID}
-    });
+   return this.http.get<GameDto[]>(`${environment.apiUrl}/games/filterByPublisherID/${publisherID}`
+    );
   }
 
   makeFilterSearchObservable(filters: {editor_name?: string,
@@ -43,11 +42,11 @@ export class GameService {
     if(filters.type) params.type = filters.type;
     if (filters.number_minimal_of_player != null) params.min = String(filters.number_minimal_of_player);
     if (filters.number_maximal_of_player != null) params.max = String(filters.number_maximal_of_player);
-    return this.http.get<GameDto[]>(`${environment.apiUrl}/game/filter`, { params });
+    return this.http.get<GameDto[]>(`${environment.apiUrl}/games/filter`, { params });
   }
 
 searchGameByName(gameName: string, publisherId: number): Observable<GameDto[]> {
-  return this.http.get<GameDto[]>(`${environment.apiUrl}/game/search`, {
+  return this.http.get<GameDto[]>(`${environment.apiUrl}/games/search`, {
     params: {
       gameName,
       publisherId: publisherId.toString()
@@ -65,7 +64,7 @@ add(data: Partial<GameDto> & { logoFile?: File }): void {
   };
   const logo = data.logoFile || data.logo;
   this.http.post<GameDto>(
-    `${environment.apiUrl}/game/addGameToPublisher`,
+    `${environment.apiUrl}/publishers/addGameToPublisher`,
     { ...gameData, logo },
     { withCredentials: true }
   ).subscribe({
@@ -87,7 +86,7 @@ private uploadLogo(gameId: number, logoFile: File, newGame: GameDto): void {
   formData.append('logo', logoFile);  
 
   this.http.post(
-    `${environment.apiUrl}/game/${gameId}/logo`,
+    `${environment.apiUrl}/games/${gameId}/logo`,
     formData,
     { withCredentials: true }
   ).subscribe({
@@ -104,16 +103,15 @@ private uploadLogo(gameId: number, logoFile: File, newGame: GameDto): void {
   
   checkPublisherGames(publisherId: number) {
     return this.http.get<{ hasGames: boolean; gameCount: number }>(
-      `${environment.apiUrl}/game/numberOfGameExisting/${publisherId}`
+      `${environment.apiUrl}/games/numberOfGameExisting/${publisherId}`
     );
   }
 
   checkGameNameExists(gameName: string, publisherId: number): Observable<boolean> {
     return this.http.get<{ exists: boolean }>(
-      `${environment.apiUrl}/game/checkIfNameExists`,
+      `${environment.apiUrl}/games/${gameName}`,
       {
         params: {
-          name: gameName,
           publisherId: publisherId.toString()
         }
       }
@@ -124,13 +122,13 @@ private uploadLogo(gameId: number, logoFile: File, newGame: GameDto): void {
 
   filterByEditorID(publisherId: number) {
     return this.http.get<GameDto[]>(
-      `${environment.apiUrl}/game/gamesByEditorID/${publisherId}`
+      `${environment.apiUrl}/games/gamesByEditorID/${publisherId}`
     );
   }
 
   getGameCountByPublisher(publisherId: number): Observable<number> {
     return this.http.get<{ gameCount: number }>(
-      `${environment.apiUrl}/game/numberOfPresentedGame/${publisherId}`
+      `${environment.apiUrl}/games/numberOfPresentedGame/${publisherId}`
     ).pipe(
       map(response => {
         console.log(' Response from backend:', response);  

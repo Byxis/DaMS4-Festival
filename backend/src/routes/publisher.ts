@@ -17,6 +17,7 @@ import { requireAdmin } from "../middleware/auth-admin.js";
  * - GET /api/publishers - Retrieve all publishers with their contacts
  * !- POST /api/publishers - Create a new publisher
  *
+ * ! POST /api/publishers/addGameToPublisher -  Create a new game, and add it to the publisher's list of games
  * - GET /api/publishers/:id - Retrieve a specific publisher by ID
  * !- DELETE /api/publishers/:id - Delete a specific publisher by ID
  * !- PUT /api/publishers/:id - Update a specific publisher name by ID
@@ -125,10 +126,65 @@ router.post("/", requireAdmin, async (req: Request, res: Response) => {
     }
 });
 
+
+//! POST /api/publishers/addGameToPublisher - Create a new game, and add it to the publisher's list of games
+router.post("/addGameToPublisher", requireAdmin, async (req, res) => {
+  const {
+    name,
+    publisher_id,
+    type,
+    minimum_number_of_player,
+    maximum_number_of_player,
+    logo
+  } = req.body;
+
+  if (!publisher_id || Number.isNaN(Number(publisher_id))) {
+    return res.status(400).json({ error: "publisher_id is required and must be a number" });
+  }
+
+  if (!name || name.toString().trim() === "") {
+    return res.status(400).json({ error: "name is required" });
+  }
+
+  let finalTypeOfGameID: number | null = null;
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+    if (type && type.toString().trim() !== "") {
+      const r = await client.query(
+        "SELECT id FROM type_of_games WHERE LOWER(description) = LOWER($1) LIMIT 1",
+        [type]
+      );
+       if (r.rowCount) {
+        finalTypeOfGameID = r.rows[0].id;
+      }
+    }
+    const result = await client.query(
+      `INSERT INTO games_publisher (name, publisher_id, minimum_number_of_player, maximum_number_of_player, logo, type_of_games_id)
+       VALUES ($1, $2, $3, $4, $5, $6) 
+       RETURNING *, (SELECT name FROM publisher WHERE id = $2) AS editor_name`,
+      [
+        name,
+        publisher_id,
+        minimum_number_of_player ?? null,
+        maximum_number_of_player ?? null,
+        logo ?? null,
+        finalTypeOfGameID
+      ]
+    );
+    await client.query("COMMIT");
+    res.status(201).json(result.rows[0]);
+  } catch (e) {
+    await client.query("ROLLBACK");
+    console.error(e);
+    res.status(500).json({ error: "Erreur lors de l'ajout du jeu au publisher" });
+  } finally {
+    client.release();
+  }
+});
+
 /* ---------- /api/publishers/:id ----------*/
-
-
-
 
 // GET /api/publishers/:id - Retrieve a specific publisher by ID
 router.get("/:id", async (req: Request, res: Response) => {

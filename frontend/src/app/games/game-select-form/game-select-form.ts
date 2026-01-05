@@ -31,17 +31,14 @@ export class GameSelectForm {
   private readonly gameService = inject(GameService);
   private readonly data = inject(MAT_DIALOG_DATA);
 
-  
   readonly availableGames = signal<any[]>([]);
   readonly selectedGames = signal<any[]>([]);
 
- 
   readonly form = new FormGroup({
     games: new FormControl<number[]>([], Validators.required)
   });
 
   constructor() {
-    
     effect(() => {
       const publisherId = this.data?.publisherId;
       if (publisherId) {
@@ -62,18 +59,12 @@ export class GameSelectForm {
     });
   }
 
-  
-  
-
-
-  
   submit(): void {
     if (this.form.valid) {
       const selectedGameIds = this.form.get('games')?.value ?? [];
       const selectedGames = this.availableGames().filter(g => 
         selectedGameIds.includes(g.id)
       );
-      
       this.dialogRef.close({
         games: selectedGames
       });

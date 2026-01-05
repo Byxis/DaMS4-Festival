@@ -68,8 +68,8 @@ app.use("/api/admin", verifyToken, requireAdmin, (req, res) => {
 });
 app.use("/api/publishers", verifyToken, publisherRouter);
 
-app.post("/api/game/:id/logo", upload.single("logo"), game);  
-app.use('/api/game', game);
+app.post("/api/games/:id/logo", upload.single("logo"), game);  
+app.use('/api/games', game);
 
 // Chargement du certificat et clé générés par mkcert (étape 0)
 const key = fs.readFileSync("./certs/localhost-key.pem");

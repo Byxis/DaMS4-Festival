@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatOptionModule } from '@angular/material/core';
 import { map, Observable } from 'rxjs';
 import { GameService } from '../game-service/game-service';
+import { GameType } from './game-type';
 
 @Component({
   selector: 'app-game-form',
@@ -29,19 +30,11 @@ import { GameService } from '../game-service/game-service';
   styleUrl: './game-form.scss',
 })
 export class GameForm {
-   private gameService = inject(GameService);  
+  private gameService = inject(GameService);  
   private dialogRef = inject(MatDialogRef<GameForm>);
   data = inject<{ publisherId: number | null; publisherName: string | null }>(MAT_DIALOG_DATA);
 
-  gameTypes = [
-    'Tout Public',
-    'Ambiance',
-    'Experts',
-    'Enfants',
-    'Classiques',
-    'Initiés',
-    'Jeu de rôle'
-  ];
+  gameTypes = Object.values(GameType);
 
   currentLogoUrl: string | null = null;
   newLogoFile: File | null = null;
@@ -123,7 +116,6 @@ export class GameForm {
     this.currentLogoUrl = null;
   }
 
- 
   submit(): void {
     if (this.form.valid) {
       const data = this.form.getRawValue();

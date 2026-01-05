@@ -10,7 +10,7 @@ export class Game {
   constructor(
     public readonly id: number,
     public name: string,
-    public editor_name: string | undefined,  // ✅ Accepte undefined
+    public editor_name: string | undefined,  
     public type: string,
     public minimum_number_of_player: number,
     public maximum_number_of_player: number

@@ -61,33 +61,27 @@
             <div class="id-badge">{{ game.id }}</div>
           </div>
 
-          <div class="cell logo-cell">
-          
-      @if (game.logo) {
-          
-          @if (typeof game.logo === 'string' && game.logo.startsWith('http')) {
-            <img [src]="game.logo" 
-                [alt]="game.name + ' logo'"
-                class="game-logo">
-          } @else if (typeof game.logo === 'string') {
-            
-            <img [src]="'https://localhost:4000/api/game/' + game.id + '/logo'" 
-                [alt]="game.name + ' logo'"
-                crossorigin="anonymous"
-                class="game-logo">
-          } @else {
-            
-            <div class="logo-placeholder">
-              <mat-icon>videogame_asset</mat-icon>
-            </div>
-          }
-        } @else {
-          <!-- ✅ Pas de logo -->
-          <div class="logo-placeholder">
-            <mat-icon>business</mat-icon>
-          </div>
-        }
-      </div>
+    <div class="cell logo-cell">
+  @if (game.logo && !logoErrors.has(game.id!)) {
+    
+    @if (typeof game.logo === 'string' && game.logo.startsWith('http')) {
+      <img [src]="game.logo" 
+          [alt]="game.name + ' logo'"
+          (error)="logoErrors.add(game.id!)"
+          class="game-logo">
+    } @else if (typeof game.logo === 'string') {
+      <img [src]="'https://localhost:4000/api/games/' + game.id + '/logo'" 
+          [alt]="game.name + ' logo'"
+          (error)="logoErrors.add(game.id!)"
+          crossorigin="anonymous"
+          class="game-logo">
+    }
+  } @else {
+    <div class="logo-placeholder">
+      <mat-icon>business</mat-icon>
+    </div>
+  }
+</div>
 
           <div class="cell name-cell">
             <div class="game-name">{{ game.name }}</div>

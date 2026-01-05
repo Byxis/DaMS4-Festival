@@ -9,195 +9,31 @@ import { DOMParser } from 'xmldom';
 import fs from "fs";  
 import path from "path";
 
+/**
+ * Routes for managing games and their logos.
+ * All routes that modify data require admin privileges (and are marked with !).
+ *
+ * Endpoints:
+ * - GET /api/games/search - Search games by name for a specific publisher
+ * - GET /api/games/:gameName - Check if a game name is available for a publisher
+ *
+ * - GET /api/games/numberOfGameExisting/:publisherId - Check if a publisher has games in the games table
+ * - GET /api/games/numberOfPresentedGame/:publisherId - Count games presented by a publisher
+ * - GET /api/games/gamesByEditorID/:publisherId - Retrieve all games from an editor (not yet added to publisher)
+ * - GET /api/games/filterByPublisherID/:publisherID - Retrieve all games presented by a publisher
+ *
+ * - GET /api/games/:id/logo - Retrieve the logo of a specific game
+ * !- POST /api/games/:id/logo - Upload a logo for a specific game
+ */
 
 const router = Router();
-
-router.post("/", async (req, res) => {
-  const {
-    name,
-    editor_name,
-    type,
-    minimum_number_of_player,
-    maximum_number_of_player,
-    logo
-  } = req.body;
-
-  let finalEditorId : number|null = null;
-  let finalTypeOfGameID : number|null = null;
-  const client = await pool.connect();
-  try {
-    await client.query("BEGIN");
-
-    
-    //check if editors exists in the db
-    if (editor_name && editor_name.toString().trim() !== "") {
-      const r = await client.query(
-        "SELECT id FROM editors WHERE LOWER(name) = LOWER($1) LIMIT 1",
-        [editor_name]
-      );
-      if (r.rowCount) {
-        finalEditorId = r.rows[0].id;
-      } else {
-        const ins = await client.query(
-          "INSERT INTO editors(name) VALUES($1) RETURNING id",
-          [editor_name]
-        );
-        finalEditorId = ins.rows[0].id;
-      }
-    }
-    //check if the type of game exists in the db
-   if (type && type.toString().trim() !== "") {
-      const r2 = await client.query(
-        "SELECT id FROM type_of_games WHERE LOWER(description) = LOWER($1) LIMIT 1",
-        [type]
-      );
-      if (r2.rowCount) {
-        finalTypeOfGameID = r2.rows[0].id;
-      } else {
-        const ins2 = await client.query(
-          "INSERT INTO type_of_games(description) VALUES($1) RETURNING id",
-          [type]
-        );
-        finalTypeOfGameID = ins2.rows[0].id;
-      }
-    }
-    const result = await client.query(
-      `INSERT INTO games (name, minimum_number_of_player, maximum_number_of_player, logo, editor_id, type_of_games_id)
-       VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`,
-      [
-        name,
-        minimum_number_of_player ?? null,
-        maximum_number_of_player ?? null,
-        logo ?? null,
-        finalEditorId,
-        finalTypeOfGameID
-      ]
-    );
-
-    await client.query("COMMIT");
-    res.status(201).json(result.rows[0]);
-  } catch (e) {
-    await client.query("ROLLBACK");
-    console.error(e);
-    res.status(500).json({ error: "Erreur lors de l'ajout du jeu" });
-  } finally {
-    client.release();
-  }
-});
-
-
-
-router.post("/addGameToPublisher", async (req, res) => {
-  const {
-    name,
-    publisher_id,
-    type,
-    minimum_number_of_player,
-    maximum_number_of_player,
-    logo
-  } = req.body;
-
- 
-  if (!publisher_id || Number.isNaN(Number(publisher_id))) {
-    return res.status(400).json({ error: "publisher_id is required and must be a number" });
-  }
-
-  if (!name || name.toString().trim() === "") {
-    return res.status(400).json({ error: "name is required" });
-  }
-
-  let finalTypeOfGameID: number | null = null;
-  const client = await pool.connect();
-
-  try {
-    await client.query("BEGIN");
-    if (type && type.toString().trim() !== "") {
-      const r = await client.query(
-        "SELECT id FROM type_of_games WHERE LOWER(description) = LOWER($1) LIMIT 1",
-        [type]
-      );
-       if (r.rowCount) {
-        finalTypeOfGameID = r.rows[0].id;
-      }
-    }
-
-    
-    const result = await client.query(
-      `INSERT INTO games_publisher (name, publisher_id, minimum_number_of_player, maximum_number_of_player, logo, type_of_games_id)
-       VALUES ($1, $2, $3, $4, $5, $6) 
-       RETURNING *, (SELECT name FROM publisher WHERE id = $2) AS editor_name`,
-      [
-        name,
-        publisher_id,
-        minimum_number_of_player ?? null,
-        maximum_number_of_player ?? null,
-        logo ?? null,
-        finalTypeOfGameID
-      ]
-    );
-
-    await client.query("COMMIT");
-    res.status(201).json(result.rows[0]);
-  } catch (e) {
-    await client.query("ROLLBACK");
-    console.error(e);
-    res.status(500).json({ error: "Erreur lors de l'ajout du jeu au publisher" });
-  } finally {
-    client.release();
-  }
-});
-
-router.post("/:id/logo", async (req: Request, res: Response) => {
-  const { id } = req.params;
-
-  if (!id || !/^\d+$/.test(id)) {
-    return res.status(400).json({ error: "Invalid ID" });
-  }
-
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: "No logo file provided" });
-    }
-
-    const uploadDir = "./uploads/logos";
-   
-    const ext = req.file.originalname.split('.').pop() || "jpg";
-    const filename = `game-${id}.${ext}`;
-    const fullPath = path.join(uploadDir, filename);
-
-
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
-    fs.renameSync(req.file.path, fullPath);
-    
-    
-
-    
-    await pool.query(
-      `UPDATE games_publisher SET logo = $1 WHERE id = $2`,
-      [fullPath, id]  
-    );
-
-    res.status(200).json({ logoUrl: fullPath });
-    } catch (e) {
-    
-    
-    const errorMessage = e instanceof Error ? e.message : String(e);
-    res.status(500).json({ error: errorMessage });
-  }
-});
-
+// GET /api/games/search - Retrieve game by his name
 router.get("/search", async (req, res) => {
   const gameName = (req.query.gameName || '').toString().trim();
   const publisherId = req.query.publisherId ? Number(req.query.publisherId) : null;
-
-  
   if (!publisherId || Number.isNaN(publisherId)) {
     return res.status(400).json({ error: "publisherId is required" });
   }
-
   try {
     const q = `
       SELECT g.id,
@@ -224,16 +60,18 @@ router.get("/search", async (req, res) => {
   }
 });
 
-router.get("/checkIfNameExists", async (req: Request, res: Response) => {
-  const { name, publisherId } = req.query;
-  if (!name) {
+// GET /api/games/:gameName - Check is the name is available before creation
+router.get("/:gameName", async (req: Request, res: Response) => {
+  const {gameName} = req.params;
+  const { publisherId } = req.query;
+  if (!gameName) {
     return res.status(400).json({ error: "Name is required" });
   }
   try {
     const result = await pool.query(
       `SELECT id FROM games_publisher 
        WHERE LOWER(name) = LOWER($1) AND publisher_id = $2`,
-      [name, publisherId || null]
+      [gameName, publisherId || null]
     );
 
     res.status(200).json({ exists: result.rowCount! > 0 });
@@ -243,38 +81,29 @@ router.get("/checkIfNameExists", async (req: Request, res: Response) => {
   }
 });
   
-
+// GET /api/games/numberOfGameExisting/:publisherId - Check is the publisher has already somes games in the games table
 router.get("/numberOfGameExisting/:publisherId", async (req: Request, res: Response) => {
   const { publisherId } = req.params;
-
   if (!publisherId || !/^\d+$/.test(publisherId)) {
     return res.status(400).json({ error: "Invalid publisher ID" });
   }
-
   try {
-    
      const publisherResult = await pool.query(
       `SELECT id, name FROM publisher WHERE id = $1`,
       [publisherId]
     );
-
      if (!publisherResult.rowCount || publisherResult.rowCount === 0) {
       return res.status(200).json({ hasGames: false });
     }
-
     const publisherName = publisherResult.rows[0].name;
-
-     const editorResult = await pool.query(
+    const editorResult = await pool.query(
       `SELECT id FROM editors WHERE LOWER(name) = LOWER($1)`,
       [publisherName]
     );
-
     if (!editorResult.rowCount || editorResult.rowCount === 0) {
       return res.status(200).json({ hasGames: false });
     }
-
     const editorExists = editorResult.rowCount > 0;
-
     let gameCount = 0;
     if (editorExists) {
       const editorId = editorResult.rows[0].id;
@@ -295,6 +124,7 @@ router.get("/numberOfGameExisting/:publisherId", async (req: Request, res: Respo
   }
 });
 
+// GET /api/games/numberOfPresentedGame/:publisherId - Count how many games are on the list of the publisher
 router.get("/numberOfPresentedGame/:publisherId", async (req: Request, res: Response) => {
   const { publisherId } = req.params;
 
@@ -318,6 +148,7 @@ router.get("/numberOfPresentedGame/:publisherId", async (req: Request, res: Resp
   }
 });
 
+// GET /api/gamesByEditorID/:publisherId - Retrieve all games from an editor (not yet added to publisher)
 router.get("/gamesByEditorID/:publisherId", async (req: Request, res: Response) => {
   const { publisherId } = req.params;
   if (!publisherId || !/^\d+$/.test(publisherId)) {
@@ -362,8 +193,10 @@ router.get("/gamesByEditorID/:publisherId", async (req: Request, res: Response) 
   }
 });
 
-router.get("/filterByPublisherID", async (req, res) => {
-  const publisherID = Number(req.query.publisherID);
+// GET /api/games/filterByPublisherID - Retrieve all games presented by a publisher
+router.get("/filterByPublisherID/:publisherID", async (req, res) => {
+  const { publisherID } = req.params;
+
   if (Number.isNaN(publisherID)) {
     return res.status(400).json({ error: "publisherID invalid" });
   }
@@ -382,7 +215,7 @@ router.get("/filterByPublisherID", async (req, res) => {
        LEFT JOIN publisher p ON p.id = g.publisher_id
       LEFT JOIN type_of_games t ON t.id = g.type_of_games_id
       WHERE g.publisher_id = $1
-      ORDER BY g.id;
+      ORDER BY g.name;
     `;
     const params = [publisherID];  
     const result = await pool.query(q, params);
@@ -397,6 +230,39 @@ router.get("/filterByPublisherID", async (req, res) => {
   }
 });
 
+
+/* ---------- /api/games/:id/logo ----------*/
+
+//! POST /api/games/:id/logo - Upload a logo for a specific game
+router.post("/:id/logo", async (req: Request, res: Response) => {
+  const { id } = req.params;
+  if (!id || !/^\d+$/.test(id)) {
+    return res.status(400).json({ error: "Invalid ID" });
+  }
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No logo file provided" });
+    }
+
+    const uploadDir = "./uploads/logos";
+    const ext = req.file.originalname.split('.').pop() || "jpg";
+    const filename = `game-${id}.${ext}`;
+    const fullPath = path.join(uploadDir, filename);
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    fs.renameSync(req.file.path, fullPath);
+    await pool.query(
+      `UPDATE games_publisher SET logo = $1 WHERE id = $2`,
+      [fullPath, id]  
+    );
+    res.status(200).json({ logoUrl: fullPath });
+    } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    res.status(500).json({ error: errorMessage });
+  }
+});
+// GET /api/games/:id/logo - Retrieve the logo of a specific game
 router.get("/:id/logo", async (req: Request, res: Response) => {
   const { id } = req.params;
   if (!id || !/^\d+$/.test(id)) {
@@ -420,34 +286,6 @@ router.get("/:id/logo", async (req: Request, res: Response) => {
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : String(e);
     res.status(500).json({ error: errorMessage });
-  }
-});
-
-router.get("/filterByEditor", async (req, res) => {
-  const editorName = (req.query.editorName || '').toString();
-  try {
-    const q = `
-      SELECT g.id,
-             g.name,
-             g.minimum_number_of_player,
-             g.maximum_number_of_player,
-             g.editor_id,
-             g.type_of_games_id,
-             g.logo,
-             e.name AS editor_name,
-             t.description AS type
-      FROM games g
-      JOIN editors e ON e.id = g.editor_id    
-      LEFT JOIN type_of_games t ON t.id = g.type_of_games_id
-      WHERE e.name ILIKE $1
-      ORDER BY g.id;
-    `;
-    const params = [`%${editorName}%`]; 
-    const result = await pool.query(q, params);
-    res.status(200).json(result.rows);
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Erreur lors de la recherche par editor" });
   }
 });
 
