@@ -230,11 +230,14 @@ export class ReservationComponent {
         status: newStatus,
       });
     } else {
+      console.log('Updating status to', newStatus);
       this.reservationService.update(festivalId, reservationId, { status: newStatus }).subscribe({
         next: () => {
+          console.log('Adding status interaction');
           this.addStatusInteraction(festivalId, reservationId, newStatus);
         },
         error: () => {
+          console.error('Error updating status');
           this.selectedStatus.set(previousStatus);
           this.resetItemsFromStatus(previousStatus);
         },
@@ -285,6 +288,7 @@ export class ReservationComponent {
     const reservationId = this.getActualReservationId();
     const festivalId = this.festivalId();
     const publisherId = this.publisherId();
+    console.log('reservationId', reservationId);
 
     if (!reservationId) {
       this.reservationService.create(festivalId, {
@@ -292,11 +296,14 @@ export class ReservationComponent {
         status,
       });
     } else {
+      console.log('Updating status to', status);
       this.reservationService.update(festivalId, reservationId, { status }).subscribe({
         next: () => {
+          console.log('Adding status interaction');
           this.addStatusInteraction(festivalId, reservationId, status);
         },
         error: () => {
+          console.error('Error updating status');
           this.selectedStatus.set(previousStatus);
           this.resetItemsFromStatus(previousStatus);
         },
