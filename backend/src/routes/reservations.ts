@@ -19,6 +19,7 @@ import type {
  * - GET /api/festivals/:id/reservations/:reservationId - Get a specific reservation with interactions and games
  * ! - PUT /api/festivals/:id/reservations/:reservationId - Update a reservation
  * ! - DELETE /api/festivals/:id/reservations/:reservationId - Delete a reservation
+ * ! - POST /api/festivals/:id/reservations/:reservationId/interactions - Add an interaction to a reservation
  */
 
 const router = Router();
@@ -244,6 +245,47 @@ router.delete(
             console.error(err);
             res.status(500).json({
                 error: "Could not delete reservation: " + err.message,
+            });
+        }
+    }
+);
+
+/* ---------- /api/festivals/:id/reservations/:reservationId/interactions ----------*/
+
+// ! POST /api/festivals/:id/reservations/:reservationId/interactions - Add an interaction to a reservation
+router.post(
+    "/:id/reservations/:reservationId/interactions",
+    requireAdmin,
+    async (req: Request, res: Response) => {
+        const { id, reservationId } = req.params;
+        const { description } = req.body;
+
+        if (!description) {
+            return res.status(400).json({ error: "description is required" });
+        }
+
+        try {
+            const { rows: reservationRows } = await pool.query(
+                `SELECT id FROM reservations WHERE festival_id = $1 AND id = $2`,
+                [id, reservationId]
+            );
+
+            if (reservationRows.length === 0) {
+                return res.status(404).json({ error: "Reservation not found" });
+            }
+
+            const { rows } = await pool.query<ReservationInteraction>(
+                `INSERT INTO reservation_interactions (reservation_id, description, interaction_date)
+                VALUES ($1, $2, NOW())
+                RETURNING *`,
+                [reservationId, description]
+            );
+
+            res.status(201).json(rows[0]);
+        } catch (err: any) {
+            console.error(err);
+            res.status(500).json({
+                error: "Could not add interaction: " + err.message,
             });
         }
     }

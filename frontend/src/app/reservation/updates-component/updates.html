@@ -1,0 +1,23 @@
+<div class="updates-section">
+  <h3 class="updates-title">
+    <mat-icon class="updates-icon">history</mat-icon>
+    Historique
+  </h3>
+  @if (sortedInteractions().length === 0) {
+  <div class="empty-state">
+    <mat-icon class="empty-icon">inbox</mat-icon>
+    <p class="empty-text">Aucune interaction pour le moment</p>
+  </div>
+  } @else {
+  <div class="interactions-list">
+    @for (interaction of sortedInteractions(); track interaction.id) {
+    <div class="interaction-item">
+      <div class="interaction-header">
+        <div class="interaction-description">{{ interaction.description }}</div>
+        <div class="interaction-date">{{ formatDate(interaction.interaction_date) }}</div>
+      </div>
+    </div>
+    }
+  </div>
+  }
+</div>
