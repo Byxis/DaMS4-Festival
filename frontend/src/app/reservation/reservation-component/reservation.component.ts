@@ -8,12 +8,23 @@ import { PublisherService } from '@publisher/publisher.service';
 import { FestivalService } from '@festivals/festival-service/festival-service';
 import { ReservationService } from '../reservation.service';
 import { Router } from '@angular/router';
-import { ReservationStatus } from '../reservation.type';
-
+import { Reservation, ReservationStatus } from '../reservation.type';
+import { TableComponent } from '../table-component/table.component';
+import { NoteComponent } from '../note-component/note.component';
+import { UpdatesComponent } from '../updates-component/updates.component';
+import { FactureComponent } from '../facture-component/facture.component';
 @Component({
   selector: 'reservation',
   standalone: true,
-  imports: [CommonModule, MatCheckboxModule, MatIconModule, MatMenuModule, MatButtonModule],
+  imports: [
+    CommonModule,
+    MatCheckboxModule,
+    MatIconModule,
+    MatMenuModule,
+    MatButtonModule,
+    TableComponent,
+    NoteComponent,
+  ],
   templateUrl: './reservation.html',
   styleUrl: './reservation.scss',
 })
@@ -83,8 +94,23 @@ export class ReservationComponent {
 
   readonly statuses = Object.values(ReservationStatus);
 
+  readonly tableConfigs = [
+    { key: 'tables_standard' as const, label: 'Tables', icon: 'chair' },
+    { key: 'tables_large' as const, label: 'Tables grandes', icon: 'chair' },
+    { key: 'tables_small' as const, label: 'Tables mairies', icon: 'chair' },
+  ];
+
   readonly currentStatusLabel = computed(() => {
     return this.getStatusLabel(this.selectedStatus());
+  });
+
+  readonly tableInputs = computed(() => {
+    const res = this.reservation();
+    return {
+      tables_standard: res?.table_count ?? 0,
+      tables_large: res?.big_table_count ?? 0,
+      tables_small: res?.town_table_count ?? 0,
+    };
   });
 
   constructor() {

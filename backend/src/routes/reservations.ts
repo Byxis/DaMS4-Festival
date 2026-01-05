@@ -177,8 +177,6 @@ router.put(
             return res.status(400).json({ error: "No fields to update" });
         }
 
-        updates.updated_at = new Date();
-
         const keys = Object.keys(updates);
         const values = Object.values(updates);
         const setClause = keys

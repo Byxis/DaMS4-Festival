@@ -2,14 +2,11 @@ export interface Reservation {
     id: number;
     festival_id: number;
     entity_id: number;
-    entity_name?: string;
     table_count: number;
     big_table_count: number;
     town_table_count: number;
     note: string | null;
     status: string;
-    created_at?: string;
-    updated_at?: string;
     interactions?: ReservationInteraction[];
     games?: ReservationGame[];
 }
