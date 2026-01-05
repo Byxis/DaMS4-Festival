@@ -5,6 +5,7 @@ export interface Reservation {
   table_count: number;
   big_table_count: number;
   town_table_count: number;
+  electrical_outlets: number;
   note: string | null;
   status: string;
   interactions?: ReservationInteraction[];
@@ -26,6 +27,7 @@ export interface ReservationGame {
   table_count: number;
   big_table_count: number;
   town_table_count: number;
+  electrical_outlets: number;
   status: string;
 }
 

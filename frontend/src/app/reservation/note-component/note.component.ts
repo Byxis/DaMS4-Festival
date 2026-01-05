@@ -2,11 +2,12 @@ import { Component, input, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReservationService } from '../reservation.service';
 import type { Reservation } from '../reservation.type';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'note',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatIcon],
   templateUrl: './note.html',
   styleUrl: './note.scss',
 })

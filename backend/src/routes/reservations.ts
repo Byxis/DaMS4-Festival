@@ -38,10 +38,11 @@ router.get("/:id/reservations", async (req: Request, res: Response) => {
                 r.table_count,
                 r.big_table_count,
                 r.town_table_count,
+                r.electrical_outlets,
                 r.note,
                 r.status,
                 COALESCE(json_agg(DISTINCT jsonb_build_object('id', ri.id, 'reservation_id', ri.reservation_id, 'description', ri.description, 'interaction_date', ri.interaction_date)) FILTER (WHERE ri.id IS NOT NULL), '[]'::json) as interactions,
-                COALESCE(json_agg(DISTINCT jsonb_build_object('id', rg.id, 'reservation_id', rg.reservation_id, 'game_id', rg.game_id, 'amount', rg.amount, 'table_count', rg.table_count, 'big_table_count', rg.big_table_count, 'town_table_count', rg.town_table_count, 'status', rg.status)) FILTER (WHERE rg.id IS NOT NULL), '[]'::json) as games
+                COALESCE(json_agg(DISTINCT jsonb_build_object('id', rg.id, 'reservation_id', rg.reservation_id, 'game_id', rg.game_id, 'amount', rg.amount, 'table_count', rg.table_count, 'big_table_count', rg.big_table_count, 'town_table_count', rg.town_table_count, 'electrical_outlets', rg.electrical_outlets, 'status', rg.status)) FILTER (WHERE rg.id IS NOT NULL), '[]'::json) as games
             FROM reservations r
             LEFT JOIN reservation_interactions ri ON r.id = ri.reservation_id
             LEFT JOIN reservation_games rg ON r.id = rg.reservation_id
@@ -154,8 +155,16 @@ router.put(
     requireAdmin,
     async (req: Request, res: Response) => {
         const { id, reservationId } = req.params;
-        const { table_count, big_table_count, town_table_count, note, status } =
-            req.body;
+        const {
+            table_count,
+            big_table_count,
+            town_table_count,
+            electrical_outlets,
+            note,
+            status,
+        } = req.body;
+
+        console.log("Update request body:", req.body);
 
         if (id === undefined || reservationId === undefined) {
             return res
@@ -172,6 +181,8 @@ router.put(
             updates.town_table_count = town_table_count;
         if (note !== undefined) updates.note = note;
         if (status !== undefined) updates.status = status;
+        if (electrical_outlets !== undefined)
+            updates.electrical_outlets = electrical_outlets;
 
         if (Object.keys(updates).length === 0) {
             return res.status(400).json({ error: "No fields to update" });

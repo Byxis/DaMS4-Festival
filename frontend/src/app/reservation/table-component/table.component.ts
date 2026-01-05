@@ -5,7 +5,7 @@ import { ReservationService } from '../reservation.service';
 import type { Reservation } from '../reservation.type';
 
 interface TableConfig {
-  key: 'tables_standard' | 'tables_large' | 'tables_small';
+  key: 'tables_standard' | 'tables_large' | 'tables_small' | 'electrical_outlets';
   label: string;
   icon: string;
 }
@@ -62,6 +62,7 @@ export class TableComponent {
     if (key === 'tables_standard') updateData.table_count = value;
     if (key === 'tables_large') updateData.big_table_count = value;
     if (key === 'tables_small') updateData.town_table_count = value;
+    if (key === 'electrical_outlets') updateData.electrical_outlets = value;
 
     this.reservationService.update(festivalId, reservation.id, updateData).subscribe({
       next: () => {
@@ -69,6 +70,7 @@ export class TableComponent {
       },
       error: () => {
         console.error('Error updating table input');
+        this.previousValue.set(previousValue);
       },
     });
   }

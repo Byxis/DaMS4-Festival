@@ -24,6 +24,8 @@ import { FactureComponent } from '../facture-component/facture.component';
     MatButtonModule,
     TableComponent,
     NoteComponent,
+    UpdatesComponent,
+    FactureComponent,
   ],
   templateUrl: './reservation.html',
   styleUrl: './reservation.scss',
@@ -95,9 +97,14 @@ export class ReservationComponent {
   readonly statuses = Object.values(ReservationStatus);
 
   readonly tableConfigs = [
-    { key: 'tables_standard' as const, label: 'Tables', icon: 'chair' },
-    { key: 'tables_large' as const, label: 'Tables grandes', icon: 'chair' },
-    { key: 'tables_small' as const, label: 'Tables mairies', icon: 'chair' },
+    { key: 'tables_standard' as const, label: 'Tables', icon: 'table_bar' },
+    { key: 'tables_large' as const, label: 'Tables grandes', icon: 'table_restaurant' },
+    { key: 'tables_small' as const, label: 'Tables mairies', icon: 'desk' },
+    {
+      key: 'electrical_outlets' as const,
+      label: 'Prises électriques',
+      icon: 'electrical_services',
+    },
   ];
 
   readonly currentStatusLabel = computed(() => {
@@ -110,6 +117,7 @@ export class ReservationComponent {
       tables_standard: res?.table_count ?? 0,
       tables_large: res?.big_table_count ?? 0,
       tables_small: res?.town_table_count ?? 0,
+      electrical_outlets: res?.electrical_outlets ?? 0,
     };
   });
 
@@ -214,6 +222,9 @@ export class ReservationComponent {
       });
     } else {
       this.reservationService.update(festivalId, reservationId, { status: newStatus }).subscribe({
+        next: () => {
+          this.addStatusInteraction(festivalId, reservationId, newStatus);
+        },
         error: () => {
           this.selectedStatus.set(previousStatus);
           this.resetItemsFromStatus(previousStatus);
@@ -260,6 +271,7 @@ export class ReservationComponent {
   setStatus(status: string) {
     const previousStatus = this.selectedStatus();
     this.selectedStatus.set(status);
+    this.resetItemsFromStatus(status);
 
     const reservationId = this.reservationId();
     const festivalId = this.festivalId();
@@ -272,8 +284,12 @@ export class ReservationComponent {
       });
     } else {
       this.reservationService.update(festivalId, reservationId, { status }).subscribe({
+        next: () => {
+          this.addStatusInteraction(festivalId, reservationId, status);
+        },
         error: () => {
           this.selectedStatus.set(previousStatus);
+          this.resetItemsFromStatus(previousStatus);
         },
       });
     }
@@ -289,6 +305,13 @@ export class ReservationComponent {
       ABSENT: 'Absent',
     };
     return statusMap[status] || 'Inconnu';
+  }
+
+  private addStatusInteraction(festivalId: number, reservationId: number, status: string) {
+    const description = `Statut changé en: ${this.getStatusLabel(status)}`;
+    this.reservationService.addInteraction(festivalId, reservationId, description).subscribe({
+      error: (err) => console.error('Error adding interaction:', err),
+    });
   }
 
   getStatusColor(status: string): string {
