@@ -80,11 +80,13 @@ export class ReservationComponent {
   });
 
   readonly isExpanded = signal(false);
-  readonly selectedStatus = signal<string>(ReservationStatus.CONFIRMED);
+  readonly selectedStatus = signal<string>(ReservationStatus.TO_BE_CONTACTED);
   private hasLoadedReservations = signal(false);
 
   private lastReservationId: number | undefined;
   private lastReservationStatus: string | undefined;
+  private createdReservationId: number | undefined;
+  private hasAddedCreationInteraction = false;
 
   readonly items = signal([
     { label: 'Contacté ?', checked: false, locked: false },
@@ -147,8 +149,14 @@ export class ReservationComponent {
           this.lastReservationStatus = reservation?.status;
 
           if (reservation) {
+            this.createdReservationId = reservation.id;
             this.selectedStatus.set(reservation.status);
             this.resetItemsFromStatus(reservation.status);
+
+            if (!this.hasAddedCreationInteraction) {
+              this.hasAddedCreationInteraction = true;
+              this.addStatusInteraction(this.festivalId(), reservation.id, reservation.status);
+            }
           } else {
             this.selectedStatus.set(ReservationStatus.TO_BE_CONTACTED);
             this.items.set([
@@ -158,6 +166,7 @@ export class ReservationComponent {
               { label: 'Payé ?', checked: false, locked: false },
               { label: 'Absent', checked: false, locked: false },
             ]);
+            this.hasAddedCreationInteraction = false;
           }
         }
       },
@@ -211,7 +220,7 @@ export class ReservationComponent {
     const previousStatus = this.selectedStatus();
     this.selectedStatus.set(newStatus);
 
-    const reservationId = this.reservationId();
+    const reservationId = this.getActualReservationId();
     const festivalId = this.festivalId();
     const publisherId = this.publisherId();
 
@@ -273,7 +282,7 @@ export class ReservationComponent {
     this.selectedStatus.set(status);
     this.resetItemsFromStatus(status);
 
-    const reservationId = this.reservationId();
+    const reservationId = this.getActualReservationId();
     const festivalId = this.festivalId();
     const publisherId = this.publisherId();
 
@@ -312,6 +321,11 @@ export class ReservationComponent {
     this.reservationService.addInteraction(festivalId, reservationId, description).subscribe({
       error: (err) => console.error('Error adding interaction:', err),
     });
+  }
+
+  private getActualReservationId(): number | undefined {
+    const inputId = this.reservationId();
+    return inputId || this.createdReservationId;
   }
 
   getStatusColor(status: string): string {

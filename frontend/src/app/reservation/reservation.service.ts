@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '@env/environment';
 import { of, tap } from 'rxjs';
-import type { Reservation } from './reservation.type';
+import type { Reservation, ReservationInteraction } from './reservation.type';
 
 @Injectable({
   providedIn: 'root',
@@ -142,5 +142,33 @@ export class ReservationService {
         },
         error: (err) => console.error('Error deleting reservation:', err),
       });
+  }
+
+  addInteraction(festivalId: number, reservationId: number, description: string) {
+    return this.http
+      .post<ReservationInteraction>(
+        `${environment.apiUrl}/festivals/${festivalId}/reservations/${reservationId}/interactions`,
+        { description },
+        { withCredentials: true }
+      )
+      .pipe(
+        tap((newInteraction) => {
+          this.reservations.update((reservations) => {
+            const index = reservations.findIndex((r) => r.id === reservationId);
+            if (index !== -1) {
+              const reservation = reservations[index];
+              return reservations.map((r, i) =>
+                i === index
+                  ? {
+                      ...r,
+                      interactions: [...(r.interactions || []), newInteraction],
+                    }
+                  : r
+              );
+            }
+            return reservations;
+          });
+        })
+      );
   }
 }
