@@ -83,7 +83,10 @@
   <div class="reservation-details">
     <div class="details-main">
       <div class="tables-section">
-        <h3 class="tables-title">Stock de tables totales</h3>
+        <h3 class="tables-title">
+          <mat-icon class="tables-icon">table_chart</mat-icon>
+          Stock de tables totales
+        </h3>
         <div class="tables-container">
           @for (tableConfig of tableConfigs; track tableConfig.key) {
           <table

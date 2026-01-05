@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS reservations (
     table_count INT DEFAULT 0,
     big_table_count INT DEFAULT 0,
     town_table_count INT DEFAULT 0,
+    electrical_outlets INT DEFAULT 0,
     note TEXT,
     status TEXT DEFAULT 'TO_BE_CONTACTED' CHECK (status IN ('TO_BE_CONTACTED', 'CONTACTED', 'IN_DISCUSSION', 'FACTURED', 'CONFIRMED', 'ABSENT'))
 );
@@ -69,6 +70,7 @@ CREATE TABLE IF NOT EXISTS reservation_games (
     table_count INT DEFAULT 0,
     big_table_count INT DEFAULT 0,
     town_table_count INT DEFAULT 0,
+    electrical_outlets INT DEFAULT 0,
     status TEXT DEFAULT 'ASKED' CHECK (status IN ('ASKED', 'CONFIRMED', 'RECEIVED', 'CANCELLED'))
 );
 
