@@ -1,0 +1,41 @@
+<div class="facture-section">
+  <h3 class="facture-title">
+    <mat-icon class="facture-icon">receipt_long</mat-icon>
+    Facture
+  </h3>
+  @if ((games() ?? []).length === 0) {
+  <div class="empty-state">
+    <mat-icon class="empty-icon">receipt</mat-icon>
+    <p class="empty-text">Aucun jeu réservé</p>
+  </div>
+  } @else {
+  <div class="facture-content">
+    <table class="facture-table">
+      <thead>
+        <tr>
+          <th>Zone</th>
+          <th>Nombre</th>
+          <th>Prix/unit</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (zone of zoneSummary().zones; track zone.key) { @if (zone.count > 0) {
+        <tr class="facture-row">
+          <td class="zone-label">{{ zone.label }}</td>
+          <td class="zone-count">{{ zone.count }}</td>
+          <td class="zone-price">{{ formatPrice(zone.price) }}</td>
+          <td class="zone-total">{{ formatPrice(zone.total) }}</td>
+        </tr>
+        } }
+      </tbody>
+    </table>
+    <div class="facture-footer">
+      <div class="grand-total">
+        <span class="grand-total-label">Total</span>
+        <span class="grand-total-amount">{{ formatPrice(zoneSummary().grandTotal) }}</span>
+      </div>
+    </div>
+  </div>
+  }
+</div>
