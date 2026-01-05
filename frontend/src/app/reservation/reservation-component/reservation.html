@@ -81,7 +81,26 @@
   </div>
   @if (isExpanded()) {
   <div class="reservation-details">
-    <!-- Contenu détaillé à ajouter plus tard -->
+    <div class="details-main">
+      <div class="tables-section">
+        <h3 class="tables-title">Stock de tables totales</h3>
+        <div class="tables-container">
+          @for (tableConfig of tableConfigs; track tableConfig.key) {
+          <table
+            [tableConfig]="tableConfig"
+            [count]="tableInputs()[tableConfig.key]"
+            [reservation]="reservation()"
+            [festivalId]="festivalId()"
+          ></table>
+          }
+        </div>
+      </div>
+      <note
+        [note]="reservation()?.note ?? null"
+        [reservation]="reservation()"
+        [festivalId]="festivalId()"
+      ></note>
+    </div>
   </div>
   } }
 </div>

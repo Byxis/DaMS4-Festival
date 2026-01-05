@@ -178,6 +178,25 @@
   border-top: 1px solid var(--mat-sys-outline);
   background-color: var(--mat-sys-surface-container-lowest);
   animation: slideDown 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  .details-main {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .details-sidebar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+
+    @media (max-width: 1200px) {
+      grid-template-columns: 1fr;
+    }
+  }
 }
 
 @keyframes slideDown {
@@ -230,4 +249,28 @@
       opacity: 0.9;
     }
   }
+}
+
+.tables-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  .tables-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--mat-sys-on-surface);
+  }
+
+  .tables-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+}
+
+table {
+  flex: 1;
+  min-width: 280px;
 }

@@ -1,0 +1,10 @@
+<div class="note-section">
+  <h3 class="note-title">Notes</h3>
+  <textarea
+    class="note-input"
+    placeholder="Ajouter une note..."
+    [value]="note() ?? ''"
+    (change)="updateNote($event)"
+    (blur)="onNoteBlur()"
+  ></textarea>
+</div>

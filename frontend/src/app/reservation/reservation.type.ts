@@ -29,6 +29,14 @@ export interface ReservationGame {
   status: string;
 }
 
+export interface ReservationTables {
+  id: number;
+  reservation_id: number;
+  tables_standard: number;
+  tables_large: number;
+  tables_small: number;
+}
+
 export enum ReservationStatus {
   TO_BE_CONTACTED = 'TO_BE_CONTACTED',
   CONTACTED = 'CONTACTED',
