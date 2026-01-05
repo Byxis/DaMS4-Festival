@@ -8,9 +8,11 @@ services:
             POSTGRES_PASSWORD: secureapp
             POSTGRES_DB: secureapp
         volumes:
-             - ./backend/db/init.sql:/docker-entrypoint-initdb.d/init.sql
-             - ./backend/db/Data:/Data  
-             - db_data:/var/lib/postgresql/data
+           - ./backend/db/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+           - ./backend/db/editorsData.csv:/tmp/editorsData.csv  
+           - ./backend/db/typesOfGamesData.csv:/tmp/typesOfGamesData.csv  
+           - ./backend/db/GamesDATA.csv:/tmp/GamesDATA.csv 
+           - db_data:/var/lib/postgresql/data
         networks:
             - secure_net
     backend:

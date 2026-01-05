@@ -54,10 +54,12 @@ CREATE TABLE IF NOT EXISTS games_publisher (
     type_of_games_id INTEGER REFERENCES type_of_games(id)
 ); 
 
-COPY editors(id, name, logo) FROM '/var/lib/postgresql/data/editorsData.csv' WITH (FORMAT csv, HEADER);
-COPY type_of_games(id, description) FROM '/var/lib/postgresql/data/typesOfGamesData.csv' WITH (FORMAT csv, HEADER);
+
+
+COPY editors(id, name, logo) FROM '/tmp/editorsData.csv' WITH (FORMAT csv, HEADER);
+COPY type_of_games(id, description) FROM '/tmp/typesOfGamesData.csv' WITH (FORMAT csv, HEADER);
 COPY games(id, name, minimum_number_of_player, maximum_number_of_player, editor_id, type_of_games_id, logo) 
-FROM '/var/lib/postgresql/data/GamesDATA.csv' WITH (FORMAT csv, HEADER);
+FROM '/tmp/GamesDATA.csv' WITH (FORMAT csv, HEADER);
 
 
 
