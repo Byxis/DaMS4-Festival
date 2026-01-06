@@ -1,27 +1,82 @@
-<mat-card class="info-block contact-block">
-  <mat-card-title>Liste des contacts</mat-card-title>
+<div class="contacts-list-container">
+  <div class="header">
+    <h2>Liste des contacts</h2>
+  </div>
 
-  <div class="contact-content">
-    <div class="contact-row contact-header">
-      <span>Prénom Nom</span>
-      <span>Rôle</span>
-      <span>Téléphone</span>
-      <span>email</span>
-      <button mat-icon-button (click)="this.onAdd()" class="highlighted">
-        <mat-icon>add_circle_outline</mat-icon>
-      </button>
+  @if (contacts().length > 0) {
+  <div class="contacts-table">
+    <div class="table-header">
+      <div
+        class="header-cell name-cell sortable"
+        (click)="sortBy('name')"
+        [matTooltip]="getSortTooltip('name', 'Nom')"
+      >
+        Nom
+        <mat-icon class="sort-icon" [class.active]="sortColumn() === 'name'">{{
+          sortColumn() === 'name' && sortDirection() === 'desc' ? 'arrow_upward' : 'arrow_downward'
+        }}</mat-icon>
+      </div>
+      <div
+        class="header-cell role-cell sortable"
+        (click)="sortBy('role')"
+        [matTooltip]="getSortTooltip('role', 'Rôle')"
+      >
+        Rôle
+        <mat-icon class="sort-icon" [class.active]="sortColumn() === 'role'">{{
+          sortColumn() === 'role' && sortDirection() === 'desc' ? 'arrow_upward' : 'arrow_downward'
+        }}</mat-icon>
+      </div>
+      <div
+        class="header-cell sortable"
+        (click)="sortBy('telephone')"
+        [matTooltip]="getSortTooltip('telephone', 'Téléphone')"
+      >
+        Téléphone
+        <mat-icon class="sort-icon" [class.active]="sortColumn() === 'telephone'">{{
+          sortColumn() === 'telephone' && sortDirection() === 'desc'
+            ? 'arrow_upward'
+            : 'arrow_downward'
+        }}</mat-icon>
+      </div>
+      <div
+        class="header-cell email-cell sortable"
+        (click)="sortBy('email')"
+        [matTooltip]="getSortTooltip('email', 'Email')"
+      >
+        Email
+        <mat-icon class="sort-icon" [class.active]="sortColumn() === 'email'">{{
+          sortColumn() === 'email' && sortDirection() === 'desc' ? 'arrow_upward' : 'arrow_downward'
+        }}</mat-icon>
+      </div>
+      <div class="header-cell actions-cell">
+        <button
+          mat-icon-button
+          (click)="onAdd()"
+          class="highlighted"
+          aria-label="Ajouter un contact"
+          matTooltip="Ajouter un nouveau contact"
+        >
+          <mat-icon>add_circle_outline</mat-icon>
+        </button>
+      </div>
     </div>
-
-    @for (contact of this.contacts(); track contact.email) {
-    <div class="contact-row">
-      <span class="contact-name">{{ contact.name }} {{ contact.family_name }}</span>
-      <span class="contact-role">{{ contact.role }}</span>
-      <span class="contact-phone">{{ contact.telephone }}</span>
-      <span class="contact-email">{{ contact.email }}</span>
-      <div>
+    @for (contact of sortedContacts(); track trackByContactId($index, contact)) {
+    <div class="table-row">
+      <div class="cell name-cell">{{ contact.name }} {{ contact.family_name }}</div>
+      <div class="cell role-cell">{{ contact.role }}</div>
+      <div class="cell">{{ contact.telephone }}</div>
+      <div class="cell email-cell">{{ contact.email }}</div>
+      <div class="cell actions-cell center">
         @if (this.authSvc.isAdmin()) {
-        <button mat-icon-button (click)="this.onEdit(contact)"><mat-icon>edit</mat-icon></button>
-        <button mat-icon-button (click)="this.onDelete(contact)">
+        <button mat-icon-button (click)="onEdit(contact)" class="edit-btn" matTooltip="Modifier">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          (click)="onDelete(contact)"
+          class="delete-btn"
+          matTooltip="Supprimer"
+        >
           <mat-icon>delete</mat-icon>
         </button>
         }
@@ -29,4 +84,14 @@
     </div>
     }
   </div>
-</mat-card>
+  } @else {
+  <div class="empty-container">
+    <mat-icon>contacts</mat-icon>
+    <p>Aucun contact disponible pour cet éditeur.</p>
+    <button mat-flat-button color="primary" (click)="onAdd()">
+      <mat-icon>add</mat-icon>
+      Ajouter un contact
+    </button>
+  </div>
+  }
+</div>

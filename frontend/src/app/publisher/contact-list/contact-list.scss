@@ -1,57 +1,82 @@
 @use 'basic';
 
-.contact-block {
-  padding: 16px;
-  overflow-x: auto;
-  max-width: 100%;
-}
+// --- Variables ---
+$grid-desktop: 2fr 1fr 1fr 2fr 100px;
+$grid-mobile: 2fr 1fr 80px;
 
-.contact-content {
-  display: inline-block;
-  min-width: 100%;
-}
-
-.contact-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 3px 0;
-  font-weight: 500;
-  white-space: nowrap;
-  min-width: min-content;
-  border-bottom: 1px solid var(--mat-sys-outline-variant);
-}
-
-.contact-header {
-  font-weight: bold;
-  white-space: nowrap;
-  min-width: min-content;
-}
-
-.contact-row > span {
-  flex: 0 0 auto;
-  min-width: 150px;
-  text-align: left;
-  padding-right: 15px;
-}
-
-.contact-row > button {
-  flex: 0 0 40px;
-  min-width: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-button {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  padding: 0;
-  background: transparent;
-}
-
-.full-width {
+// --- Styles ---
+:host {
+  display: block;
   width: 100%;
-  min-width: max-content;
+}
+
+.header {
+  @include basic.app-header;
+}
+
+.empty-container {
+  @include basic.empty-container;
+  button mat-icon {
+    margin-right: 0.5rem;
+  }
+}
+
+.contacts-table {
+  @include basic.table-container;
+}
+
+.table-header,
+.table-row {
+  display: grid;
+  grid-template-columns: $grid-desktop;
+}
+
+.table-header {
+  @include basic.table-header;
+}
+
+.table-row {
+  @include basic.table-row;
+
+  .cell {
+    &.name-cell,
+    &.role-cell,
+    &.email-cell {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &.name-cell {
+      font-weight: 500;
+    }
+  }
+}
+
+// --- Media Queries ---
+@media (max-width: 768px) {
+  .table-header,
+  .table-row {
+    grid-template-columns: $grid-mobile;
+    font-size: 0.9rem;
+  }
+
+  .header-cell,
+  .cell {
+    &.role-cell,
+    &.email-cell {
+      display: none;
+    }
+  }
+
+  .table-row .cell.actions-cell {
+    gap: 4px;
+    padding: 0 4px;
+    button {
+      @include basic.icon-size(36px);
+      mat-icon {
+        @include basic.icon-size(1.125rem);
+      }
+    }
+  }
 }
