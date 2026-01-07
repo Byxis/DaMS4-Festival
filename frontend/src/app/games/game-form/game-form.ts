@@ -85,7 +85,6 @@ export class GameForm {
       reader.readAsDataURL(this.newLogoFile);
     }
   }
-  
 
   private gameNameValidator(): AsyncValidatorFn {
   return (control: AbstractControl): Observable<ValidationErrors | null> => {
@@ -139,7 +138,10 @@ export class GameForm {
         if (control.errors['required']) return 'Entrer une valeur';
         if (control.errors['minlength']) return 'La valeur entrée est trop courte';
         if (control.errors['pattern']) return 'Format invalide';
-         if (control.errors['gameNameExists']) return 'Ce jeu existe déjà'; 
+        if (control.errors['gameNameExists']) return 'Ce jeu existe déjà';
+        if (control.errors['min']) return 'La valeur doit être au minimum 1';  
+      if (control.errors['max']) return 'La valeur doit être au maximum 99';
+         
       }
     }
     return null;
