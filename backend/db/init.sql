@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
     last_name TEXT, 
     login TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
-    role TEXT DEFAULT 'user'
+    role TEXT DEFAULT 'guest'
 );
 
 CREATE TABLE IF NOT EXISTS publisher (
