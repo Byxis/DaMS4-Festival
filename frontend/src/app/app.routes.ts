@@ -5,6 +5,7 @@ import { AdminComponent } from '@admin/admin/admin.component';
 import { authGuard } from '@auth/auth.guard';
 import { adminGuard } from '@admin/admin.guard';
 import { Publisher } from './pages/publisher/publisher';
+import { guestBlockGuard } from '@auth/guest-block.guard';
 import { publisherResolver } from './pages/publisher/publisher.resolver';
 import { PublishersList } from './pages/publishers-list/publishers-list';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
@@ -13,16 +14,15 @@ import { FestivalsPage } from './pages/festivals-page/festivals-page';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPage },
-
-  { path: 'home', component: HomePage, canActivate: [authGuard] },
-  { path: 'festivals', component: FestivalsPage, canActivate: [authGuard] },
-  { path: 'admin', component: AdminComponent, canActivate: [authGuard, adminGuard] },
-  { path: 'publishers', component: PublishersList, canActivate: [authGuard] },
+  { path: 'home', component: HomePage, canActivate: [authGuard, guestBlockGuard] },
+  { path: 'admin', component: AdminComponent, canActivate: [authGuard, adminGuard, guestBlockGuard] },
+  { path: 'festivals', component: FestivalsPage, canActivate: [authGuard, guestBlockGuard] },
+  { path: 'publishers', component: PublishersList, canActivate: [authGuard, guestBlockGuard] },
   {
     path: 'publishers/:id',
     component: Publisher,
     resolve: { publisher: publisherResolver },
-    canActivate: [authGuard],
+    canActivate: [authGuard, guestBlockGuard],
   },
   { path: '', pathMatch: 'full', redirectTo: 'home' },
   { path: '**', component: NotFoundComponent },
