@@ -1,24 +1,193 @@
 <div class="festival-detail-container">
-  @if (festival(); as f) {
-    <button (click)="goBack()" class="back-button">← Back to Festivals</button>
-    
-    <div class="festival-content">
-      @if (f.logoUrl) {
-        <img [src]="f.logoUrl" [alt]="f.name" class="festival-logo">
-      }
-      
-      <h1>{{ f.name }}</h1>
-      
-      <div class="festival-info">
-        <p><strong>Location:</strong> {{ f.location }}</p>
-        <p><strong>Start Date:</strong> {{ f.start_date | date: 'longDate' }}</p>
-        <p><strong>End Date:</strong> {{ f.end_date | date: 'longDate' }}</p>
-        <p><strong>Regular Tables:</strong> {{ f.table_count }}</p>
-        <p><strong>Big Tables:</strong> {{ f.big_table_count }}</p>
-        <p><strong>Town Tables:</strong> {{ f.town_table_count }}</p>
-      </div>
+    @if (festival(); as f) {
+
+    <!-- TOOLBAR -->
+    <mat-toolbar color="primary" class="festival-toolbar">
+        <button mat-icon-button (click)="goBack()">
+            <mat-icon>arrow_back</mat-icon>
+        </button>
+        <span class="spacer"></span>
+        <span class="toolbar-title">{{ f.name }}</span>
+        <span class="spacer"></span>
+    </mat-toolbar>
+
+    <!-- SECTION 1: Main Info + Media Sidecar -->
+    <div class="header-section">
+
+        <!-- Left: Main Info -->
+        <div class="main-info">
+            <div class="title-row">
+                <h1>{{ f.name }}</h1>
+                <button mat-icon-button color="primary" title="Edit Festival">
+                    <mat-icon>edit</mat-icon>
+                </button>
+            </div>
+
+            <!-- Date Range -->
+            <div class="info-item">
+                <mat-icon class="info-icon">event</mat-icon>
+                <div class="info-content">
+                    <span class="info-label">Dates</span>
+                    <span class="info-value">{{ getDateRange(f) }}</span>
+                </div>
+            </div>
+
+            <!-- Location -->
+            <div class="info-item">
+                <mat-icon class="info-icon">location_on</mat-icon>
+                <div class="info-content">
+                    <span class="info-label">Lieu</span>
+                    <a href="#" class="info-value location-link">{{ f.location }}</a>
+                </div>
+            </div>
+
+            <!-- Festival Stats -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <mat-icon>table_restaurant</mat-icon>
+                    <span class="stat-value">{{ f.table_count }}</span>
+                    <span class="stat-label">Tables</span>
+                </div>
+                <div class="stat-card">
+                    <mat-icon>dashboard</mat-icon>
+                    <span class="stat-value">{{ f.big_table_count }}</span>
+                    <span class="stat-label">Grandes Tables</span>
+                </div>
+                <div class="stat-card">
+                    <mat-icon>location_city</mat-icon>
+                    <span class="stat-value">{{ f.town_table_count }}</span>
+                    <span class="stat-label">Tables Municipales</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Media Sidecar -->
+        <div class="media-sidecar">
+            @if (f.logoUrl) {
+            <div class="poster-container">
+                <img [src]="f.logoUrl" [alt]="f.name" class="festival-poster">
+            </div>
+            } @else {
+            <div class="poster-placeholder">
+                <mat-icon>image_not_supported</mat-icon>
+                <span>No poster available</span>
+            </div>
+            }
+        </div>
+
     </div>
-  } @else {
-    <p class="loading">Loading festival details...</p>
-  }
+
+    <mat-divider class="section-divider"></mat-divider>
+
+    <!-- SECTION 2: Logistics / Tariff Zones -->
+    <div class="logistics-section">
+        <div class="section-header">
+            <h2>Zones Tarifaires</h2>
+            <button mat-raised-button color="primary" (click)="openAddZoneDialog()">
+                <mat-icon>add</mat-icon>
+                Ajouter une zone
+            </button>
+        </div>
+        @if (f.pricingZones && f.pricingZones.length > 0) {
+
+        <div class="zones-grid">
+            @for (zone of f.pricingZones; track $index) {
+            <mat-card class="zone-card">
+
+                <!-- Zone Header -->
+                <mat-card-header>
+                    <mat-card-title>{{ zone.name }}</mat-card-title>
+                </mat-card-header>
+
+                <!-- Zone Content -->
+                <mat-card-content>
+                    <div class="zone-details">
+
+                        <!-- Price Info -->
+                        <div class="detail-row">
+                            <span class="detail-label">Prix par table</span>
+                            <span class="detail-value price">{{ zone.price }}€</span>
+                        </div>
+
+                        <!-- Electrical Outlets -->
+                        <div class="detail-row">
+                            <span class="detail-label">Prises électriques</span>
+                            <span class="detail-value outlets">
+                                <mat-icon class="small-icon">bolt</mat-icon>
+                                {{ zone.electricalOutlet }}
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <!-- Nested: Table Type Breakdown -->
+                    @if (zone.price) {
+                    <mat-divider class="zone-divider"></mat-divider>
+                    <div class="table-breakdown">
+                        <h4>Répartition des tables</h4>
+
+                        <div class="breakdown-rows">
+                            <div class="breakdown-row">
+                                <span class="breakdown-label">
+                                    <mat-icon class="breakdown-icon">table_restaurant</mat-icon>
+                                    Tables
+                                </span>
+                                <span class="breakdown-value">{{ f.table_count }}</span>
+                                <span class="breakdown-subtotal">{{ f.table_count * zone.price }}€</span>
+                            </div>
+
+                            <div class="breakdown-row">
+                                <span class="breakdown-label">
+                                    <mat-icon class="breakdown-icon">dashboard</mat-icon>
+                                    Grandes Tables
+                                </span>
+                                <span class="breakdown-value">{{ f.big_table_count }}</span>
+                                <span class="breakdown-subtotal">{{ f.big_table_count * zone.price }}€</span>
+                            </div>
+
+                            <div class="breakdown-row">
+                                <span class="breakdown-label">
+                                    <mat-icon class="breakdown-icon">location_city</mat-icon>
+                                    Tables Municipales
+                                </span>
+                                <span class="breakdown-value">{{ f.town_table_count }}</span>
+                                <span class="breakdown-subtotal">{{ f.town_table_count * zone.price }}€</span>
+                            </div>
+                        </div>
+
+                        <!-- Zone Total -->
+                        <div class="zone-total">
+                            <span class="total-label">Revenu potentiel</span>
+                            <span class="total-value">
+                                {{ (f.table_count + f.big_table_count + f.town_table_count) * zone.price }}€
+                            </span>
+                        </div>
+                    </div>
+                    }
+
+                </mat-card-content>
+
+            </mat-card>
+            }
+        </div>
+
+        } @else {
+        <div class="no-zones">
+            <mat-icon>info</mat-icon>
+            <p>Aucune zone tarifaire définie</p>
+        </div>
+        }
+
+    </div>
+
+    } @else {
+    <!-- Loading State -->
+    <mat-toolbar color="primary">
+        <h1>Festival Details</h1>
+    </mat-toolbar>
+    <div class="loading-container">
+        <mat-spinner diameter="60"></mat-spinner>
+        <p>Chargement des détails du festival...</p>
+    </div>
+    }
 </div>

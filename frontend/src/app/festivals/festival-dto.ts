@@ -1,3 +1,5 @@
+import { ZoneTarifDTO } from "./zone-tarif-dto"
+
 export interface FestivalDto {
 
     /*
@@ -8,7 +10,7 @@ export interface FestivalDto {
     location : string
     startDate : Date
     endDate : Date
-    //TODO  :  PricingZones : dictionnary {name of the zone : (ZoneTarifDTO}
+    //PricingZones : Array of ZoneTarifDTO
     //TODO : logo : string (url of the logo)
     */
     id? : number, 
@@ -20,4 +22,5 @@ export interface FestivalDto {
     big_table_count: number
     town_table_count : number
     logoUrl?: string
+    pricingZones?: ZoneTarifDTO[];
 }

@@ -3,6 +3,7 @@ import { FestivalDto } from '../festival-dto';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { catchError, of, tap } from 'rxjs';
+import { ZoneTarifDTO } from '../zone-tarif-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -69,6 +70,30 @@ export class FestivalService {
           return of(null)
         })
       ).subscribe();
+  }
+
+
+
+    // --- NEW: Add Tariff Zone ---
+  addTariffZone(festivalId: number, zoneData: Omit<ZoneTarifDTO, 'id'>): void {
+    this.http
+      .post<ZoneTarifDTO>(
+        `${environment.apiUrl}/festivals/${festivalId}/pricing-zones`,
+        zoneData,
+        { withCredentials: true }
+      )
+      .pipe(
+        tap(response => {
+          console.log('Tariff zone created:', response);
+          // Reload the current festival to update the zones list
+          this.loadFestivalById(festivalId);
+        }),
+        catchError(err => {
+          console.error('Error creating tariff zone:', err);
+          return of(null);
+        })
+      )
+      .subscribe();
   }
 
   updateFestival(
