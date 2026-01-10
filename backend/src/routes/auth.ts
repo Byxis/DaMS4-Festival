@@ -11,8 +11,17 @@ import { JWT_SECRET } from "../config/env.js";
 import type { TokenPayload } from "../types/token-payload.js";
 
 const router = Router();
+import rateLimit from 'express-rate-limit';
 
-router.post("/login", async (req, res) => {
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,  // 15 minutes
+    limit: 5,                  // Limit each IP to 5 requests
+    message: {error: 'Too many login attempts, please try again later.'},
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+router.post('/login', loginLimiter, async (req, res) => {
     // --- LOGIN ---
     const { login, password } = req.body;
     if (!login || !password)
