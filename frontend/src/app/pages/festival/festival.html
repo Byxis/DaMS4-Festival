@@ -1,0 +1,24 @@
+<div class="festival-detail-container">
+  @if (festival(); as f) {
+    <button (click)="goBack()" class="back-button">← Back to Festivals</button>
+    
+    <div class="festival-content">
+      @if (f.logoUrl) {
+        <img [src]="f.logoUrl" [alt]="f.name" class="festival-logo">
+      }
+      
+      <h1>{{ f.name }}</h1>
+      
+      <div class="festival-info">
+        <p><strong>Location:</strong> {{ f.location }}</p>
+        <p><strong>Start Date:</strong> {{ f.start_date | date: 'longDate' }}</p>
+        <p><strong>End Date:</strong> {{ f.end_date | date: 'longDate' }}</p>
+        <p><strong>Regular Tables:</strong> {{ f.table_count }}</p>
+        <p><strong>Big Tables:</strong> {{ f.big_table_count }}</p>
+        <p><strong>Town Tables:</strong> {{ f.town_table_count }}</p>
+      </div>
+    </div>
+  } @else {
+    <p class="loading">Loading festival details...</p>
+  }
+</div>

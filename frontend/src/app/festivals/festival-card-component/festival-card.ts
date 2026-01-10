@@ -1,9 +1,9 @@
 import { DatePipe } from '@angular/common';
-import { Component, input, Output, EventEmitter, output } from '@angular/core';
+import { Component, input, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { Festival } from '../festival';
 import { FestivalDto } from '../festival-dto';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-festival-card',
@@ -15,4 +15,14 @@ import { FestivalDto } from '../festival-dto';
 export class FestivalCard {
   festival = input.required<FestivalDto>();
   isHovered = false;
+
+  private readonly router = inject(Router)
+
+
+  navigateToFestivalPage(): void {
+    console.log("You clicked on ", this.festival().id)
+    if (this.festival().id) {
+      this.router.navigate(["/festivals", this.festival().id]);
+    }
   }
+}

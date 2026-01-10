@@ -1,6 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { FestivalDto } from '../festival-dto';
-import { Festival } from '../festival';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { catchError, of, tap } from 'rxjs';
@@ -18,7 +17,12 @@ export class FestivalService {
 
   private festivals = signal<FestivalDto[]>([]);
   readonly _festivals = this.festivals.asReadonly();
+  
 
+
+  // Keeping the state of the current festival 
+  private currentFestival = signal<FestivalDto | null>(null);
+  readonly _currentFestival = this.currentFestival.asReadonly();
   // -- Actions --
 
 
@@ -134,6 +138,7 @@ loadFestivalById(id: number): void {
     this.http.get<FestivalDto>(`${environment.apiUrl}/festivals/${id}`, { withCredentials: true }).pipe(
       tap(response => {
         console.log('Festival loaded with ID:', id, response);
+        this.currentFestival.set(response);
       }),
       catchError(err => {
         console.error('HTTP error when loading festival', err);
