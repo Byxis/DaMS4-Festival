@@ -15,23 +15,24 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDialog } from '@angular/material/dialog';
 import { ZoneTarifFormComponent } from 'src/app/festivals/zone-tarif-form-component/zone-tarif-form-component';
+import { FestivalNewFormComponent } from 'src/app/festivals/festival-new-form-component/festival-new-form-component';
 
 
 @Component({
   selector: 'app-festival',
   imports: [DatePipe,
-            CommonModule,
-            MatCardModule,
-            MatToolbarModule,
-            MatButtonModule,
-            MatIconModule,
-            MatListModule,
-            MatProgressSpinnerModule,
-            MatTableModule,
-            MatDividerModule,
-            MatFormFieldModule,
-            MatInputModule
-          ],
+    CommonModule,
+    MatCardModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatIconModule,
+    MatListModule,
+    MatProgressSpinnerModule,
+    MatTableModule,
+    MatDividerModule,
+    MatFormFieldModule,
+    MatInputModule
+  ],
   templateUrl: './festival.html',
   styleUrl: './festival.scss'
 })
@@ -56,9 +57,9 @@ export class Festival {
     this.router.navigate(['/festivals']);
   }
 
-    // Open dialog to add new tariff zone
+  // Open dialog to add new tariff zone
   openAddZoneDialog(): void {
-    const dialogRef = this.dialog.open(ZoneTarifFormComponent,{
+    const dialogRef = this.dialog.open(ZoneTarifFormComponent, {
       width: '500px',
       disableClose: false,
       data: { festivalId: this.id() }
@@ -71,6 +72,25 @@ export class Festival {
       }
     });
   }
+
+
+  editFestival(): void {
+    const dialogRef = this.dialog.open(FestivalNewFormComponent, {
+      width: '1000px',
+      disableClose: false, 
+      data: {
+        festival : this.festival,
+        isEditing : true
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.svc.loadFestivalById(this.id())
+      }
+    });
+  }
+
 
 
 

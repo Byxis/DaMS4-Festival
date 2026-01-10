@@ -1,4 +1,4 @@
-import { Component, signal, WritableSignal, effect, computed, inject } from '@angular/core';
+import { Component, WritableSignal, effect, computed, inject } from '@angular/core';
 import { FestivalCard } from '../festival-card-component/festival-card';
 import { FestivalService } from '../festival-service/festival-service';
 import { MatIcon } from '@angular/material/icon';
