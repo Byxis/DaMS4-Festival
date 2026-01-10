@@ -5,9 +5,23 @@
   background: (--mat-sys-on-primary-fixed);
 }
 
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.logo-img {
+  height: 40px;
+  width: auto;
+}
+
 .logo {
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--mat-sys-on-surface);
 }
 
 .nav {

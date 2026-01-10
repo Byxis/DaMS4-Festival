@@ -1,8 +1,11 @@
 <!-- TODO: color the line under the navigation bar using the primary theme color -->
- <!-- TODO: add the logo when connecting it to the name and lastname-->
+
 
 <mat-toolbar class="header" color="transparent">
-  <span class="logo">AYAE Festivals</span>
+  <div class="logo-container" routerLink="/">
+    <img src="/AYAE_logo.png" alt="AYAE Logo" class="logo-img">
+    <span class="logo">AYAE Festivals</span>
+  </div>
   <span class="spacer"></span>
 
   @if (authSvc.isLoggedIn()) {
