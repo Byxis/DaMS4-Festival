@@ -57,43 +57,94 @@ L'application est structurée autour de plusieurs fonctionnalités principales :
 
 ## Prérequis
 
+### Général
+- Git
+
+### Pour l'utilisation avec Docker
 - Docker
 - Docker Compose
-- Git
+
+### Pour l'utilisation locale avec Node.js
 - Node.js
 - npm
+- PostgreSQL (Instance locale requise si Docker n'est pas utilisé)
 
 ## Installation
 
-Pour installer l'application, suivez ces étapes :
+### 1. Cloner le dépôt
 
-1. Cloner le dépôt :
 ```bash
-$ git clone https://github.com/byxis/DaMS4-Festival.git
+git clone https://github.com/byxis/DaMS4-Festival.git
+cd DaMS4-Festival
 ```
 
-2. Installer les dépendances :
-```bash
-$ cd DaMS4-Festival
-$ npm install
-```
+### 2. Configuration des Certificats
 
-3. Copier le fichier .env.example vers .env et remplir les valeurs :
-```bash
-$ cp backend/.env.example .env
-$ nano .env
-```
+Ajoutez vos fichiers de certificats dans le répertoire `certs`.
 
-4. Ajouter vos fichiers de certificats dans le répertoire `certs` :
 ```bash
-$ cp /path/to/your/cert.pem /path/to/your/key.pem certs/
+cp /path/to/your/cert.pem /path/to/your/key.pem certs/
 ```
-*Note : Les fichiers de certificats peuvent devoir être ajoutés au répertoire `backend/certs` et au répertoire `frontend/certs`*
+*Note : Selon votre configuration, vous pourriez avoir besoin de placer les certificats directement dans `backend/certs` et `frontend/certs`.*
 
-5. Lancer l'application avec docker :
-```bash
-$ docker compose -f docker-compose.prod.yml up --build
-```
+---
+
+### Option A : Lancer avec Docker (Recommandé)
+
+Cette méthode automatise la configuration de la base de données, du backend et du frontend.
+
+1. **Configurer l'Environnement**  
+   Si nécessaire, modifiez le fichier `docker-compose.prod.yml` pour changer des valeurs comme `JWT_SECRET`, `JWT_EXPIRATION`, `REFRESH_EXPIRATION` et `FRONTEND_URL`.
+
+2. **Lancer l'Application**
+
+   ```bash
+   docker compose -f docker-compose.prod.yml up --build
+   ```
+
+---
+
+### Option B : Lancer Localement (Node.js)
+
+Utilisez cette méthode pour le développement ou si vous préférez lancer les services manuellement.
+
+1. **Installer les Dépendances**
+
+   **Backend :**
+   ```bash
+   cd backend
+   npm install
+   ```
+
+   **Frontend :**
+   ```bash
+   cd ../frontend
+   npm install
+   ```
+
+2. **Configurer l'Environnement**
+
+   Copiez le fichier d'exemple d'environnement pour le backend et remplissez les valeurs requises (identifiants Base de Données, secrets JWT, etc.) :
+
+   ```bash
+   cd ../backend
+   cp .env.example .env
+   # Modifiez le fichier .env avec votre configuration spécifique
+   ```
+
+3. **Démarrer l'Application**
+
+   **Backend** (Terminal 1) :
+   ```bash
+   cd backend
+   npm run dev
+   ```
+
+   **Frontend** (Terminal 2) :
+   ```bash
+   cd frontend
+   ng serve
+   ```
 
 ## Auteurs
 
