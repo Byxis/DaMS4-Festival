@@ -13,6 +13,8 @@ import { PublishersList } from './pages/publishers-list/publishers-list';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
 import { FestivalList } from './festivals/festival-list-component/festival-list';
 import { FestivalsPage } from './pages/festivals-page/festivals-page';
+import { viewPublishersGuard } from '@auth/view-publishers.guard';
+import { viewFestivalsGuard } from '@auth/view-festivals.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPage },
@@ -20,13 +22,13 @@ export const routes: Routes = [
   { path: 'await-confirmation', component: AwaitConfirmationPage, canActivate: [authGuard]},
   { path: 'home', component: HomePage, canActivate: [authGuard, guestBlockGuard] },
   { path: 'admin', component: AdminComponent, canActivate: [authGuard, adminGuard, guestBlockGuard] },
-  { path: 'festivals', component: FestivalsPage, canActivate: [authGuard, guestBlockGuard] },
-  { path: 'publishers', component: PublishersList, canActivate: [authGuard, guestBlockGuard] },
+  { path: 'festivals', component: FestivalsPage, canActivate: [authGuard, guestBlockGuard, viewFestivalsGuard] },
+  { path: 'publishers', component: PublishersList, canActivate: [authGuard, guestBlockGuard, viewPublishersGuard] },
   {
     path: 'publishers/:id',
     component: Publisher,
     resolve: { publisher: publisherResolver },
-    canActivate: [authGuard, guestBlockGuard],
+    canActivate: [authGuard, guestBlockGuard, viewPublishersGuard],
   },
   { path: '', pathMatch: 'full', redirectTo: 'home' },
   { path: '**', component: NotFoundComponent },
