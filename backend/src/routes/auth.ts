@@ -14,13 +14,13 @@ const router = Router();
 
 router.post("/login", async (req, res) => {
     // --- LOGIN ---
-    const { login, password } = req.body;
-    if (!login || !password)
+    const { email, password } = req.body;
+    if (!email || !password)
         // si pas de login ou password dans la requête => ERREUR : fin du login
         return res.status(400).json({ error: "Identifiants manquants" });
 
-    const { rows } = await pool.query("SELECT * FROM users WHERE login=$1", [
-        login,
+    const { rows } = await pool.query("SELECT * FROM users WHERE email=$1", [
+        email,
     ]); // on récupère le user dans la BD
     const user = rows[0];
     if (!user) return res.status(401).json({ error: "Utilisateur inconnu" }); // pas dans la base => ERREUR : fin du login
@@ -31,12 +31,12 @@ router.post("/login", async (req, res) => {
 
     const accessToken = createAccessToken({
         id: user.id,
-        login: user.login,
+        email: user.email,
         role: user.role,
     }); // création du token d'accès
     const refreshToken = createRefreshToken({
         id: user.id,
-        login: user.login,
+        email: user.email,
         role: user.role,
     }); // création du refresh token
 
@@ -59,7 +59,7 @@ router.post("/login", async (req, res) => {
     res.json({
         message: "Authentification réussie",
         user: { 
-            login: user.login,
+            email: user.email,
             firstName: user.first_name,
             lastName: user.last_name, 
             role: user.role },
@@ -74,9 +74,9 @@ router.post("/logout", (_req, res) => {
 });
 
 router.post("/register", async (req, res) => {
-    const { login, password, firstName, lastName } = req.body;
+    const { email, password, firstName, lastName } = req.body;
 
-    if (!login || !password || !firstName || !lastName) {
+    if (!email || !password || !firstName || !lastName) {
         return res.status(400).json({ error: "Champs manquants" });
     }
 
@@ -85,8 +85,8 @@ router.post("/register", async (req, res) => {
     try {
         // Check if user already exists
         const { rows } = await pool.query(
-            "SELECT * FROM users WHERE login = $1",
-            [login]
+            "SELECT * FROM users WHERE email = $1",
+            [email]
         );
 
         const existingUser = rows[0];
@@ -103,9 +103,9 @@ router.post("/register", async (req, res) => {
                  SET password_hash = $1,
                      first_name = $2,
                      last_name = $3
-                 WHERE login = $4
-                 RETURNING id, login, first_name, last_name, role`,
-                [hashed, firstName, lastName, login]
+                 WHERE email = $4
+                 RETURNING id, email, first_name, last_name, role`,
+                [hashed, firstName, lastName, email]
             );
 
             const user = updatedRows[0];
@@ -114,7 +114,7 @@ router.post("/register", async (req, res) => {
                 message: "Compte complété",
                 user: {
                     id: user.id,
-                    login: user.login,
+                    email: user.email,
                     firstName: user.first_name,
                     lastName: user.last_name,
                     role: user.role, // role set by admin preserved
@@ -124,10 +124,10 @@ router.post("/register", async (req, res) => {
 
         // New user –> create guest
         const { rows: newRows } = await pool.query(
-            `INSERT INTO users (login, password_hash, first_name, last_name, role)
+            `INSERT INTO users (email, password_hash, first_name, last_name, role)
              VALUES ($1, $2, $3, $4, 'guest')
-             RETURNING id, login, first_name, last_name, role`,
-            [login, hashed, firstName, lastName]
+             RETURNING id, email, first_name, last_name, role`,
+            [email, hashed, firstName, lastName]
         );
 
         const user = newRows[0];
@@ -136,7 +136,7 @@ router.post("/register", async (req, res) => {
             message: "Utilisateur créé",
             user: {
                 id: user.id,
-                login: user.login,
+                email: user.email,
                 firstName: user.first_name,
                 lastName: user.last_name,
                 role: user.role,
@@ -160,7 +160,7 @@ router.post("/refresh", (req, res) => {
         const decoded = jwt.verify(refresh, JWT_SECRET) as TokenPayload;
         const newAccess = createAccessToken({
             id: decoded.id,
-            login: decoded.login,
+            email: decoded.email,
             role: decoded.role,
         });
         res.cookie("access_token", newAccess, {

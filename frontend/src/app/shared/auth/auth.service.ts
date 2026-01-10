@@ -28,13 +28,13 @@ export class AuthService {
   readonly error = this._error.asReadonly();
 
   // --- Connexion ---
-  login(login: string, password: string) {
+  login(email: string, password: string) {
     this._isLoading.set(true);
     this._error.set(null);
     this.http
       .post<{ user: UserDto }>(
         `${environment.apiUrl}/auth/login`,
-        { login, password },
+        { email, password },
         { withCredentials: true }
       )
       .pipe(
@@ -116,13 +116,13 @@ export class AuthService {
       .pipe(catchError(() => of(null)));
   }
 
-  register(login: string, password: string, firstName: string, lastName: string) {
+  register(email: string, password: string, firstName: string, lastName: string) {
     this._isLoading.set(true);
     this._error.set(null);
     this.http
       .post<{ user: UserDto }>(
         `${environment.apiUrl}/auth/register`,
-        { firstName, lastName, login, password },
+        { firstName, lastName, email, password },
         { withCredentials: true }
       )
       .pipe(

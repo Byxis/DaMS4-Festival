@@ -53,7 +53,7 @@ export class Login {
   }
 
   readonly form = new FormGroup({
-    login: new FormControl('', {
+    email: new FormControl('', {
       nonNullable: true,
       validators: [Validators.minLength(5), Validators.required],
     }),
@@ -65,10 +65,10 @@ export class Login {
 
   submit() {
     if (this.form.valid) {
-      var login: string = this.form.value.login ?? '';
+      var email: string = this.form.value.email ?? '';
       var password: string = this.form.value.password ?? '';
-      if (login && password) {
-        this.svc.login(login, password);
+      if (email && password) {
+        this.svc.login(email, password);
       }
     }
   }

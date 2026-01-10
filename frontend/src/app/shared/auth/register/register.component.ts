@@ -79,12 +79,12 @@ export class RegisterComponent {
 
   submit() {
     if (this.form.valid) {
-      var login: string = this.form.value.email ?? '';
+      var email: string = this.form.value.email ?? '';
       var password: string = this.form.value.password ?? '';
       var firstName: string = this.form.value.firstName ?? '';
       var lastName: string = this.form.value.lastName ?? '';
-      if (login && password && firstName && lastName) {
-        this.svc.register(login, password, firstName, lastName);
+      if (email && password && firstName && lastName) {
+        this.svc.register(email, password, firstName, lastName);
       }
     }
   }
