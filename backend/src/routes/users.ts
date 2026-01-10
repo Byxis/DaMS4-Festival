@@ -7,14 +7,14 @@ const router = Router();
 // Liste des utilisateurs
 
 router.get("/", async (_req, res) => {
-    const { rows } = await pool.query("SELECT id, email, first_name, last_name, role FROM users");
+    const { rows } = await pool.query("SELECT id, email, first_name AS \"firstName\", last_name AS \"lastName\", role FROM users");
     res.json(rows);
 });
 
 router.get("/:id", async (req, res) => {
     const { id } = req.params;
     const { rows } = await pool.query(
-        "SELECT id, email, first_name, last_name, role FROM users WHERE id = $1",
+        "SELECT id, email, first_name AS \"firstName\", last_name AS \"lastName\", role FROM users WHERE id = $1",
         [id]
     );
     if (rows.length === 0) {
@@ -49,7 +49,7 @@ router.post("/", async (req, res) => {
 router.get("/me", async (req, res) => {
     const user = req.user;
     const { rows } = await pool.query(
-        "SELECT id, email, first_name, last_name, role FROM users WHERE id=$1",
+        "SELECT id, email, first_name AS \"firstName\", last_name AS \"lastName\", role FROM users WHERE id=$1",
         [user?.id]
     );
     res.json(rows[0]);
@@ -57,7 +57,7 @@ router.get("/me", async (req, res) => {
 // Liste de tous les utilisateurs (réservée aux admins)
 router.get("/", requireAdmin, async (_req, res) => {
     const { rows } = await pool.query(
-        "SELECT id, email, first_name, last_name, role FROM users ORDER BY id"
+        "SELECT id, email, first_name AS \"firstName\", last_name AS \"lastName\", role FROM users ORDER BY id"
     );
     res.json(rows);
 });
