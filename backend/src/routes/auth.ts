@@ -9,10 +9,27 @@ import {
 } from "../middleware/token-management.js";
 import { JWT_SECRET } from "../config/env.js";
 import type { TokenPayload } from "../types/token-payload.js";
+import rateLimit from 'express-rate-limit';
 
 const router = Router();
 
-router.post("/login", async (req, res) => {
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,  // 15 minutes
+    limit: 5,                  // Limit each IP to 5 requests
+    message: {error: 'Too many login attempts, please try again later.'},
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const registerLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,  // 15 minutes
+    limit: 2,                  // Limit each IP to 2 requests
+    message: {error: 'Too many register attempts, please try again later.'},
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+router.post('/login', loginLimiter, async (req, res) => {
     // --- LOGIN ---
     const { email, password } = req.body;
     if (!email || !password)
