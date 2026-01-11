@@ -80,21 +80,15 @@ export class ReservationService {
   create(festivalId: number, reservation: Partial<Reservation>) {
     if (!this.isValidReservation(reservation)) {
       console.error('Validation Error: Reservation data is incomplete.');
-      return;
+      throw new Error('Validation Error: Reservation data is incomplete.');
     }
 
-    this.http
-      .post<Reservation>(
-        `${environment.apiUrl}/festivals/${festivalId}/reservations`,
-        reservation,
-        { withCredentials: true }
-      )
-      .subscribe({
-        next: (newReservation) => {
-          this.reservations.update((reservations) => [...reservations, newReservation]);
-        },
-        error: (err) => console.error('Error creating reservation:', err),
-      });
+    return this.http
+        .post<Reservation>(
+            `${environment.apiUrl}/festivals/${festivalId}/reservations`, reservation, {withCredentials: true})
+        .pipe(tap((newReservation) => {
+            this.reservations.update((reservations) => [...reservations, newReservation]);
+        }));
   }
 
   private isValidReservation(reservation: Partial<Reservation>): boolean {

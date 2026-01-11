@@ -23,7 +23,8 @@
       "@interceptors/*": ["src/app/shared/interceptors/*"],
       "@users/*": ["src/app/users/*"],
       "@publisher/*": ["src/app/publisher/*"],
-      "@festivals/*": ["src/app/festivals/*"]
+      "@festivals/*": ["src/app/festivals/*"],
+      "@shared/*": ["src/app/shared/*"]
     }
   },
   "angularCompilerOptions": {

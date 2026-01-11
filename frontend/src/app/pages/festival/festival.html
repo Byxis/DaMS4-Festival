@@ -179,6 +179,30 @@
         }
 
     </div>
+    
+    <mat-divider class="section-divider"></mat-divider>
+
+    <div>
+        <div class="reservation-header-row">
+            <h2>Reservations</h2>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="sort-selector">
+                <mat-label>Trier par</mat-label>
+                <mat-select [value]="sortBy()" (selectionChange)="sortBy.set($event.value)">
+                    @for (option of sortOptions; track option.value) {
+                    <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        @for (item of items(); track item.publisher.id) {
+            <reservation 
+                [reservationId]="item.reservation?.id"
+                [festivalId]="this.id()"
+                [publisherId]="item.publisher.id!"
+            />
+        }
+    </div>
 
     } @else {
     <!-- Loading State -->
