@@ -7,12 +7,6 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS entities (
     id SERIAL PRIMARY KEY,
-    entity_type TEXT NOT NULL CHECK (entity_type IN ('publisher')),
-    name TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS entities (
-    id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     type TEXT DEFAULT 'PUBLISHER' CHECK (type IN ('PUBLISHER', 'GUEST'))
 );
