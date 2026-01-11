@@ -1,10 +1,22 @@
 <h2 mat-dialog-title>{{ data ? 'Modifier' : 'Ajouter' }} un éditeur</h2>
 <mat-dialog-content>
   <form [formGroup]="this.form" (keydown.enter)="$event.preventDefault(); form.valid && save()">
-    <mat-form-field class="form-field">
+    <mat-form-field appearance="outline" class="full-width">
       <mat-label>Nom</mat-label>
       <input matInput formControlName="name" />
-      <mat-error>Nom requis</mat-error>
+      
+      @if (form.get('name')?.hasError('required')) {
+        <mat-error>Le nom est requis</mat-error>
+      }
+      @if (form.get('name')?.hasError('publisherExists')) {
+        <mat-error>Cet éditeur est déja présent dans la liste</mat-error>
+      }
+      @if (form.get('name')?.hasError('canImport')) {
+        <mat-hint>
+          Cet éditeur existe ! Vous pouvez l'importer
+          <button type="button" >Importer</button>
+        </mat-hint>
+      }
     </mat-form-field>
 
     <div class="logo-section">

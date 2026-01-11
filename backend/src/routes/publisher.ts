@@ -93,37 +93,47 @@ router.post("/", requireAdmin, async (req: Request, res: Response) => {
      const client = await pool.connect();
 
     try {
+
+ 
+
         const publisherResult = await client.query<Publisher>(
       "INSERT INTO publisher (name) VALUES ($1) RETURNING *",
       [name]
     );
-
-
-
-         const publisher = publisherResult.rows[0];
-
-    // ✅ 2. Vérifie si l'éditeur existe déjà
-    const editorCheck = await client.query(
-      "SELECT id FROM editors WHERE LOWER(name) = LOWER($1)",
-      [name]
-    );
-
-    // ✅ 3. Si l'éditeur n'existe pas, le crée
-    if (editorCheck.rowCount === 0) {
-      await client.query(
-        "INSERT INTO editors (name) VALUES ($1)",
-        [name]
-      );
-      console.log(`✅ Editor "${name}" créé automatiquement`);
-    }
-
-        res.status(201).json(publisher);
+        const publisher = publisherResult.rows[0];
+        return res.status(201).json(publisher);
     } catch (err: any) {
         console.error(err);
         res.status(500).json({
             error: "Could not create publisher: " + err.message,
         });
     }
+});
+
+router.get("/check-exists/:name", async (req: Request, res: Response) => {
+  const { name } = req.params;
+  
+  try {
+    // ✅ Vérifie dans 'editors' (les éditeurs importables)
+    const editorResult = await pool.query(
+      "SELECT id, name, logo FROM editors WHERE LOWER(name) = LOWER($1) LIMIT 1",
+      [name]
+    );
+    
+    // ✅ Vérifie aussi dans 'publisher' (les publishers créés)
+    const publisherResult = await pool.query(
+      "SELECT id FROM publisher WHERE LOWER(name) = LOWER($1) LIMIT 1",
+      [name]
+    );
+
+    res.json({
+      existsInEditors: editorResult.rowCount && editorResult.rowCount > 0,
+      editor: editorResult.rows[0] || null,  // Retourne les données de l'éditeur
+      existsInPublisher: publisherResult.rowCount && publisherResult.rowCount > 0,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Could not check publisher" });
+  }
 });
 
 

@@ -1,0 +1,46 @@
+.search-field {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.editors-table {
+  width: 100%;
+  margin-top: 1rem;
+
+  th {
+    font-weight: 600;
+    color: var(--mat-sys-on-surface);
+  }
+
+  td {
+    padding: 12px;
+  }
+}
+
+.loading,
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+
+  mat-icon {
+    font-size: 3rem;
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  p {
+    margin: 0;
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+mat-dialog-actions {
+  padding: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+}

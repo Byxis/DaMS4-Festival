@@ -12,6 +12,7 @@ import { MatButtonModule, MatIconButton } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { PublisherEditDialog } from 'src/app/publisher/publisher-edit-dialog/publisher-edit-dialog.component';
 import { GameService } from 'src/app/games/game-service/game-service';
+import { PublishersImportDialog } from 'src/app/publisher/publisher-import-dialog/publisher-import-dialog';
 
 type SortColumn = 'id' | 'name' | 'games' | 'contacts' | 'firstContact' | 'festivals';
 type SortDirection = 'asc' | 'desc';
@@ -37,6 +38,7 @@ export class PublishersList {
   private readonly publisherService = inject(PublisherService);
   private readonly dialog = inject(MatDialog);
    private readonly gameService = inject(GameService); 
+   errorMessage = computed(() => this.publisherService.errorMessage()); 
 
   readonly sortColumn = signal<SortColumn>('id');
   readonly sortDirection = signal<SortDirection>('asc');
@@ -190,6 +192,21 @@ export class PublishersList {
     }
     return `Trier par ${label}`;
   }
+
+  openImportEditorDialog(): void {
+  const dialogRef = this.dialog.open(PublishersImportDialog, {
+    width: '800px',
+    maxHeight: '90vh',
+  });
+
+  dialogRef.afterClosed().subscribe((result) => {
+    if (result) {
+      console.log('Éditeur importé:', result);
+      
+      this.publisherService.getExistingEditors();
+    }
+  });
+}
 
   constructor() {
    

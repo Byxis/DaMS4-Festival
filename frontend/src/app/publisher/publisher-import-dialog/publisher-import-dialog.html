@@ -1,0 +1,66 @@
+<h2 mat-dialog-title>Importer un éditeur existant</h2>
+<mat-dialog-content>
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-label>Rechercher</mat-label>
+    <input
+      matInput
+      [(ngModel)]="searchTerm"
+      (input)="filterEditors()"
+      placeholder="Filtrer par nom..."
+    />
+    <mat-icon matPrefix>search</mat-icon>
+  </mat-form-field>
+
+  @if (isLoading) {
+    <div class="loading">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Chargement...</p>
+    </div>
+  } @else if (filteredEditors.length > 0) {
+    <table mat-table [dataSource]="filteredEditors" class="editors-table">
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Nom</th>
+        <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="games">
+        <th mat-header-cell *matHeaderCellDef>Jeux</th>
+        <td mat-cell *matCellDef="let element">{{ element.numberOfGames || 0 }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="contacts">
+        <th mat-header-cell *matHeaderCellDef>Contacts</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.contacts?.length || 0 }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let element">
+          <button
+            mat-raised-button
+            color="accent"
+            (click)="importEditor(element)"
+            size="small"
+          >
+            <mat-icon>add</mat-icon>
+            Importer
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  } @else {
+    <div class="empty">
+      <mat-icon>business</mat-icon>
+      <p>Aucun éditeur disponible.</p>
+    </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions >
+  <button mat-button (click)="cancel()">Annuler</button>
+</mat-dialog-actions>
