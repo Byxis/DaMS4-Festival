@@ -19,71 +19,71 @@
       <div class="table-header">
         <div
           class="header-cell id-cell sortable"
-          (click)="sortBy('id')"
-          [matTooltip]="getSortTooltip('id', 'ID')"
+          (click)="sortBy('ID')"
+          [matTooltip]="getSortTooltip('ID', 'ID')"
         >
           ID
-          <mat-icon class="sort-icon" [class.active]="sortColumn() === 'id'">{{
-            sortColumn() === 'id' && sortDirection() === 'desc' ? 'arrow_upward' : 'arrow_downward'
+          <mat-icon class="sort-icon" [class.active]="sortKey().startsWith('ID')">{{
+            sortKey() === 'ID_REVERSE' ? 'arrow_upward' : 'arrow_downward'
           }}</mat-icon>
         </div>
         <div class="header-cell logo-cell">Logo</div>
         <div
           class="header-cell name-cell sortable"
-          (click)="sortBy('name')"
-          [matTooltip]="getSortTooltip('name', 'Nom')"
+          (click)="sortBy('NAME')"
+          [matTooltip]="getSortTooltip('NAME', 'Nom')"
         >
           Nom
-          <mat-icon class="sort-icon" [class.active]="sortColumn() === 'name'">{{
-            sortColumn() === 'name' && sortDirection() === 'desc'
+          <mat-icon class="sort-icon" [class.active]="sortKey().startsWith('NAME')">{{
+            sortKey() === 'NAME_REVERSE'
               ? 'arrow_upward'
               : 'arrow_downward'
           }}</mat-icon>
         </div>
         <div
           class="header-cell sortable"
-          (click)="sortBy('games')"
-          [matTooltip]="getSortTooltip('games', 'Jeux')"
+          (click)="sortBy('GAMES')"
+          [matTooltip]="getSortTooltip('GAMES', 'Jeux')"
         >
           Jeux
-          <mat-icon class="sort-icon" [class.active]="sortColumn() === 'games'">{{
-            sortColumn() === 'games' && sortDirection() === 'desc'
+          <mat-icon class="sort-icon" [class.active]="sortKey().startsWith('GAMES')">{{
+            sortKey() === 'GAMES_REVERSE'
               ? 'arrow_upward'
               : 'arrow_downward'
           }}</mat-icon>
         </div>
         <div
           class="header-cell sortable"
-          (click)="sortBy('contacts')"
-          [matTooltip]="getSortTooltip('contacts', 'Contacts')"
+          (click)="sortBy('CONTACTS')"
+          [matTooltip]="getSortTooltip('CONTACTS', 'Contacts')"
         >
           Contacts
-          <mat-icon class="sort-icon" [class.active]="sortColumn() === 'contacts'">{{
-            sortColumn() === 'contacts' && sortDirection() === 'desc'
+          <mat-icon class="sort-icon" [class.active]="sortKey().startsWith('CONTACTS')">{{
+            sortKey() === 'CONTACTS_REVERSE'
               ? 'arrow_upward'
               : 'arrow_downward'
           }}</mat-icon>
         </div>
         <div
           class="header-cell first-contact-cell sortable"
-          (click)="sortBy('firstContact')"
-          [matTooltip]="getSortTooltip('firstContact', 'Premier Contact')"
+          (click)="sortBy('FIRST_CONTACT')"
+          [matTooltip]="getSortTooltip('FIRST_CONTACT', 'Premier Contact')"
         >
           Premier Contact
-          <mat-icon class="sort-icon" [class.active]="sortColumn() === 'firstContact'">{{
-            sortColumn() === 'firstContact' && sortDirection() === 'desc'
+          <mat-icon class="sort-icon" [class.active]="sortKey().startsWith('FIRST_CONTACT')">{{
+            sortKey() === 'FIRST_CONTACT_REVERSE'
               ? 'arrow_upward'
               : 'arrow_downward'
           }}</mat-icon>
         </div>
         <div
           class="header-cell sortable"
-          (click)="sortBy('festivals')"
-          [matTooltip]="getSortTooltip('festivals', 'Festivals')"
+          (click)="sortBy('FESTIVALS')"
+          [matTooltip]="getSortTooltip('FESTIVALS', 'Festivals')"
         >
           Festivals
-          <mat-icon class="sort-icon" [class.active]="sortColumn() === 'festivals'">{{
-            sortColumn() === 'festivals' && sortDirection() === 'desc'
+          <mat-icon class="sort-icon" [class.active]="sortKey().startsWith('FESTIVALS')">{{
+            sortKey() === 'FESTIVALS_REVERSE'
               ? 'arrow_upward'
               : 'arrow_downward'
           }}</mat-icon>
@@ -110,98 +110,102 @@
   </div>
   } @else {
   <div class="publishers-table">
-    <div class="table-header">
-      <div
-        class="header-cell id-cell sortable"
-        (click)="sortBy('id')"
-        [matTooltip]="getSortTooltip('id', 'ID')"
-      >
-        ID
-        <mat-icon class="sort-icon" [class.active]="sortColumn() === 'id'">{{
-          sortColumn() === 'id' && sortDirection() === 'desc' ? 'arrow_upward' : 'arrow_downward'
-        }}</mat-icon>
-      </div>
-      <div class="header-cell logo-cell">Logo</div>
-      <div
-        class="header-cell name-cell sortable"
-        (click)="sortBy('name')"
-        [matTooltip]="getSortTooltip('name', 'Nom')"
-      >
-        Nom
-        <mat-icon class="sort-icon" [class.active]="sortColumn() === 'name'">{{
-          sortColumn() === 'name' && sortDirection() === 'desc' ? 'arrow_upward' : 'arrow_downward'
-        }}</mat-icon>
-      </div>
-      <div
-        class="header-cell sortable"
-        (click)="sortBy('games')"
-        [matTooltip]="getSortTooltip('games', 'Jeux')"
-      >
-        Jeux
-        <mat-icon class="sort-icon" [class.active]="sortColumn() === 'games'">{{
-          sortColumn() === 'games' && sortDirection() === 'desc' ? 'arrow_upward' : 'arrow_downward'
-        }}</mat-icon>
-      </div>
-      <div
-        class="header-cell sortable"
-        (click)="sortBy('contacts')"
-        [matTooltip]="getSortTooltip('contacts', 'Contacts')"
-      >
-        Contacts
-        <mat-icon class="sort-icon" [class.active]="sortColumn() === 'contacts'">{{
-          sortColumn() === 'contacts' && sortDirection() === 'desc'
-            ? 'arrow_upward'
-            : 'arrow_downward'
-        }}</mat-icon>
-      </div>
-      <div
-        class="header-cell first-contact-cell sortable"
-        (click)="sortBy('firstContact')"
-        [matTooltip]="getSortTooltip('firstContact', 'Premier Contact')"
-      >
-        Premier Contact
-        <mat-icon class="sort-icon" [class.active]="sortColumn() === 'firstContact'">{{
-          sortColumn() === 'firstContact' && sortDirection() === 'desc'
-            ? 'arrow_upward'
-            : 'arrow_downward'
-        }}</mat-icon>
-      </div>
-      <div
-        class="header-cell sortable"
-        (click)="sortBy('festivals')"
-        [matTooltip]="getSortTooltip('festivals', 'Festivals')"
-      >
-        Festivals
-        <mat-icon class="sort-icon" [class.active]="sortColumn() === 'festivals'">{{
-          sortColumn() === 'festivals' && sortDirection() === 'desc'
-            ? 'arrow_upward'
-            : 'arrow_downward'
-        }}</mat-icon>
-      </div>
-      <div class="header-cell actions-cell">
-        <button
-          mat-icon-button
-          (click)="this.openCreateDialog()"
-          class="highlighted"
-          aria-label="Ajouter un éditeur"
-          matTooltip="Ajouter un nouvel éditeur"
+      <div class="table-header">
+        <div
+          class="header-cell id-cell sortable"
+          (click)="sortBy('ID')"
+          [matTooltip]="getSortTooltip('ID', 'ID')"
         >
-          <mat-icon>add_circle_outline</mat-icon>
-        </button>
+          ID
+          <mat-icon class="sort-icon" [class.active]="sortKey().startsWith('ID')">{{
+            sortKey() === 'ID_REVERSE' ? 'arrow_upward' : 'arrow_downward'
+          }}</mat-icon>
+        </div>
+        <div class="header-cell logo-cell">Logo</div>
+        <div
+          class="header-cell name-cell sortable"
+          (click)="sortBy('NAME')"
+          [matTooltip]="getSortTooltip('NAME', 'Nom')"
+        >
+          Nom
+          <mat-icon class="sort-icon" [class.active]="sortKey().startsWith('NAME')">{{
+            sortKey() === 'NAME_REVERSE'
+              ? 'arrow_upward'
+              : 'arrow_downward'
+          }}</mat-icon>
+        </div>
+        <div
+          class="header-cell sortable"
+          (click)="sortBy('GAMES')"
+          [matTooltip]="getSortTooltip('GAMES', 'Jeux')"
+        >
+          Jeux
+          <mat-icon class="sort-icon" [class.active]="sortKey().startsWith('GAMES')">{{
+            sortKey() === 'GAMES_REVERSE'
+              ? 'arrow_upward'
+              : 'arrow_downward'
+          }}</mat-icon>
+        </div>
+        <div
+          class="header-cell sortable"
+          (click)="sortBy('CONTACTS')"
+          [matTooltip]="getSortTooltip('CONTACTS', 'Contacts')"
+        >
+          Contacts
+          <mat-icon class="sort-icon" [class.active]="sortKey().startsWith('CONTACTS')">{{
+            sortKey() === 'CONTACTS_REVERSE'
+              ? 'arrow_upward'
+              : 'arrow_downward'
+          }}</mat-icon>
+        </div>
+        <div
+          class="header-cell first-contact-cell sortable"
+          (click)="sortBy('FIRST_CONTACT')"
+          [matTooltip]="getSortTooltip('FIRST_CONTACT', 'Premier Contact')"
+        >
+          Premier Contact
+          <mat-icon class="sort-icon" [class.active]="sortKey().startsWith('FIRST_CONTACT')">{{
+            sortKey() === 'FIRST_CONTACT_REVERSE'
+              ? 'arrow_upward'
+              : 'arrow_downward'
+          }}</mat-icon>
+        </div>
+        <div
+          class="header-cell sortable"
+          (click)="sortBy('FESTIVALS')"
+          [matTooltip]="getSortTooltip('FESTIVALS', 'Festivals')"
+        >
+          Festivals
+          <mat-icon class="sort-icon" [class.active]="sortKey().startsWith('FESTIVALS')">{{
+            sortKey() === 'FESTIVALS_REVERSE'
+              ? 'arrow_upward'
+              : 'arrow_downward'
+          }}</mat-icon>
+        </div>
+        <div class="header-cell actions-cell">
+          <button
+            mat-icon-button
+            (click)="this.openCreateDialog()"
+            class="highlighted"
+            aria-label="Ajouter un éditeur"
+            matTooltip="Ajouter un nouvel éditeur"
+          >
+            <mat-icon>add_circle_outline</mat-icon>
+          </button>
+        </div>
       </div>
-    </div>
-    @if (publishers().length !== 0) {
-    <cdk-virtual-scroll-viewport
-      itemSize="73"
-      minBufferPx="219"
-      maxBufferPx="438"
-      class="table-viewport"
-    >
-      <div
-        *cdkVirtualFor="let publisher of publishers(); trackBy: trackByPublisherId"
-        class="table-row"
-        (click)="viewPublisher(publisher)"
+      @if (items().length !== 0) {
+      <cdk-virtual-scroll-viewport
+        itemSize="73"
+        minBufferPx="219"
+        maxBufferPx="438"
+        class="table-viewport"
       >
+        <div
+          *cdkVirtualFor="let publisher of items(); trackBy: trackByPublisherId"
+          class="table-row"
+          (click)="viewPublisher(publisher)"
+        >
         <div class="cell id-cell center">
           <span class="id-badge">{{ publisher.id }}</span>
         </div>

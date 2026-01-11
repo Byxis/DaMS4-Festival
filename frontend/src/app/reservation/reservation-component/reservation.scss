@@ -25,6 +25,24 @@
   &:hover {
     background-color: var(--mat-sys-surface-dim);
   }
+
+  @media (max-width: 880px) {
+    grid-template-columns: 48px 1fr 1fr;
+
+    .items-row {
+      display: none;
+    }
+  }
+}
+
+.skeleton-header {
+  @media (max-width: 880px) {
+    grid-template-columns: 48px 1fr 1fr;
+
+    .skeleton-items {
+      display: none;
+    }
+  }
 }
 
 .title {

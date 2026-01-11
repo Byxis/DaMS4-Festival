@@ -36,9 +36,9 @@ export class ReservationComponent {
   private readonly reservationService = inject(ReservationService);
   private readonly router = inject(Router);
 
-  readonly publisherId = input.required<number>({ alias: 'publisher' });
-  readonly festivalId = input.required<number>({ alias: 'festival' });
-  readonly reservationId = input<number | undefined>(undefined, { alias: 'reservation' });
+  readonly publisherId = input.required<number>();
+  readonly festivalId = input.required<number>();
+  readonly reservationId = input<number|undefined>(undefined);
 
   readonly publisher = computed(() => {
     const id = this.publisherId();
@@ -85,6 +85,7 @@ export class ReservationComponent {
 
   private lastReservationId: number | undefined;
   private lastReservationStatus: string | undefined;
+  private lastPublisherId: number|undefined;
   private createdReservationId: number | undefined;
   private hasAddedCreationInteraction = false;
 
@@ -140,34 +141,33 @@ export class ReservationComponent {
     effect(
       () => {
         const reservation = this.reservation();
+        const publisherId = this.publisherId();
 
-        if (
-          reservation?.id !== this.lastReservationId ||
-          reservation?.status !== this.lastReservationStatus
-        ) {
-          this.lastReservationId = reservation?.id;
-          this.lastReservationStatus = reservation?.status;
+        if (reservation?.id !== this.lastReservationId || reservation?.status !== this.lastReservationStatus ||
+            publisherId !== this.lastPublisherId)
+        {
+            this.lastReservationId = reservation?.id;
+            this.lastReservationStatus = reservation?.status;
+            this.lastPublisherId = publisherId;
 
-          if (reservation) {
-            this.createdReservationId = reservation.id;
-            this.selectedStatus.set(reservation.status);
-            this.resetItemsFromStatus(reservation.status);
-
-            if (!this.hasAddedCreationInteraction) {
-              this.hasAddedCreationInteraction = true;
-              this.addStatusInteraction(this.festivalId(), reservation.id, reservation.status);
+            if (reservation)
+            {
+                this.createdReservationId = reservation.id;
+                this.selectedStatus.set(reservation.status);
+                this.resetItemsFromStatus(reservation.status);
             }
-          } else {
-            this.selectedStatus.set(ReservationStatus.TO_BE_CONTACTED);
-            this.items.set([
-              { label: 'Contacté ?', checked: false, locked: false },
-              { label: 'En discussion ?', checked: false, locked: false },
-              { label: 'Facturé ?', checked: false, locked: false },
-              { label: 'Payé ?', checked: false, locked: false },
-              { label: 'Absent', checked: false, locked: false },
-            ]);
-            this.hasAddedCreationInteraction = false;
-          }
+            else
+            {
+                this.selectedStatus.set(ReservationStatus.TO_BE_CONTACTED);
+                this.items.set([
+                    {label: 'Contacté ?', checked: false, locked: false},
+                    {label: 'En discussion ?', checked: false, locked: false},
+                    {label: 'Facturé ?', checked: false, locked: false},
+                    {label: 'Payé ?', checked: false, locked: false},
+                    {label: 'Absent', checked: false, locked: false},
+                ]);
+                this.hasAddedCreationInteraction = false;
+            }
         }
       },
       { allowSignalWrites: true }
@@ -225,10 +225,14 @@ export class ReservationComponent {
     const publisherId = this.publisherId();
 
     if (!reservationId) {
-      this.reservationService.create(festivalId, {
-        entity_id: publisherId,
-        status: newStatus,
-      });
+        this.reservationService
+            .create(festivalId, {
+                entity_id: publisherId,
+                status: newStatus,
+            })
+            .subscribe((newRes) => {
+                this.addStatusInteraction(festivalId, newRes.id, newRes.status);
+            });
     } else {
       console.log('Updating status to', newStatus);
       this.reservationService.update(festivalId, reservationId, { status: newStatus }).subscribe({
@@ -291,10 +295,14 @@ export class ReservationComponent {
     console.log('reservationId', reservationId);
 
     if (!reservationId) {
-      this.reservationService.create(festivalId, {
-        entity_id: publisherId,
-        status,
-      });
+        this.reservationService
+            .create(festivalId, {
+                entity_id: publisherId,
+                status,
+            })
+            .subscribe((newRes) => {
+                this.addStatusInteraction(festivalId, newRes.id, newRes.status);
+            });
     } else {
       console.log('Updating status to', status);
       this.reservationService.update(festivalId, reservationId, { status }).subscribe({
