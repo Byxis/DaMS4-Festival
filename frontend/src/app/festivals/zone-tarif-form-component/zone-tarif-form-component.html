@@ -1,0 +1,33 @@
+<mat-card>
+    <mat-card-header>
+        <mat-card-title>Nouvelle Zone Tarifaire</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+        <form [formGroup]="form" (ngSubmit)="submit()">
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Nom de la zone</mat-label>
+                <input matInput formControlName="name" placeholder="ex: Zone Centrale">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Prix par table (€)</mat-label>
+                <input matInput formControlName="price" type="number" placeholder="ex: 150">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Prises électriques</mat-label>
+                <input matInput formControlName="electricalOutlet" type="number" placeholder="ex: 45">
+            </mat-form-field>
+
+        </form>
+    </mat-card-content>
+
+    <mat-card-actions>
+        <button mat-stroked-button (click)="cancel()">Annuler</button>
+        <button mat-raised-button color="primary" [disabled]="form.invalid" (click)="submit()">
+            Créer la zone
+        </button>
+    </mat-card-actions>
+</mat-card>

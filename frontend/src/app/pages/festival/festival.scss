@@ -1,0 +1,259 @@
+// --- Mixins ---
+@mixin icon-size($s) {
+  font-size: $s;
+  width: $s;
+  height: $s;
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin card-hover {
+  transition: all .3s ease;
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,.15);
+    transform: translateY(-2px);
+  }
+}
+
+// --- Main Container ---
+.festival-detail-container {
+  padding: 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  background: var(--mat-sys-surface-container-low);
+  min-height: calc(100vh - 64px);
+}
+
+.festival-toolbar {
+  margin-bottom: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.1);
+  .toolbar-title { font-size: 1.5rem; font-weight: 500; }
+  .spacer { flex: 1 1 auto; }
+}
+
+// ============================================
+// SECTION 1: Header
+// ============================================
+
+.header-section {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+.main-info {
+  background: var(--mat-sys-surface);
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.1);
+
+  .title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--mat-sys-outline-variant);
+    h1 { margin: 0; font-size: 2rem; font-weight: 600; }
+  }
+
+  .info-item {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: var(--mat-sys-surface-container);
+    border-radius: 6px;
+    border-left: 4px solid var(--mat-sys-primary);
+    &:hover { background: var(--mat-sys-surface-container-high); }
+    .info-icon { color: var(--mat-sys-primary); @include icon-size(24px); flex-shrink: 0; }
+    .info-content {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      .info-label { font-size: .75rem; color: var(--mat-sys-on-surface-variant); font-weight: 500; text-transform: uppercase; }
+      .info-value { font-size: 1rem; font-weight: 500; }
+      .location-link { color: var(--mat-sys-primary); text-decoration: none; &:hover { text-decoration: underline; } }
+    }
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 1rem;
+    margin-top: 2rem;
+    @media (max-width: 768px) { grid-template-columns: 1fr; }
+    .stat-card {
+      @include flex-center;
+      flex-direction: column;
+      gap: .5rem;
+      padding: 1.5rem;
+      background: linear-gradient(135deg,var(--mat-sys-primary) 0%,var(--mat-sys-tertiary) 100%);
+      color: var(--mat-sys-on-primary);
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.1);
+      @include card-hover;
+      mat-icon { @include icon-size(32px); }
+      .stat-value { font-size: 2rem; font-weight: 700; }
+      .stat-label { font-size: .875rem; font-weight: 500; opacity: .95; }
+    }
+  }
+}
+
+.media-sidecar {
+  .poster-container {
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--mat-sys-surface);
+    box-shadow: 0 4px 16px rgba(0,0,0,.15);
+    @include card-hover;
+    .festival-poster { width: 100%; display: block; object-fit: cover; aspect-ratio: 3/4; }
+  }
+  .poster-placeholder {
+    @include flex-center;
+    flex-direction: column;
+    height: 400px;
+    background: var(--mat-sys-surface-container);
+    border: 2px dashed var(--mat-sys-outline-variant);
+    border-radius: 8px;
+    gap: .75rem;
+    mat-icon { @include icon-size(48px); opacity: .5; }
+  }
+}
+
+// ============================================
+// SECTION 2: Tariff Zones
+// ============================================
+
+.section-divider { margin: 2.5rem 0; }
+
+.logistics-section {
+  h2 { font-size: 1.75rem; margin: 0 0 1.5rem 0; font-weight: 500; }
+  .zones-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(380px,1fr));
+    gap: 1.5rem;
+    @media (max-width: 768px) { grid-template-columns: 1fr; }
+    .zone-card {
+      background: var(--mat-sys-surface);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,.1);
+      @include card-hover;
+      mat-card-header {
+        background: linear-gradient(135deg,var(--mat-sys-primary) 0%,var(--mat-sys-tertiary) 100%);
+        color: var(--mat-sys-on-primary);
+        padding: 1.25rem;
+        mat-card-title { margin: 0; font-size: 1.25rem; font-weight: 600; }
+      }
+      mat-card-content { padding: 1.5rem; }
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: .75rem 0;
+        border-bottom: 1px solid var(--mat-sys-outline-variant);
+        &:last-child { border-bottom: 0; }
+        .detail-label { font-size: .875rem; font-weight: 500; }
+        .detail-value { font-weight: 600; &.price { color: var(--mat-sys-primary); font-size: 1.25rem; } }
+      }
+      .zone-divider { margin: 1.25rem 0; }
+      .table-breakdown {
+        h4 { margin: 0 0 1rem 0; font-size: .875rem; text-transform: uppercase; font-weight: 600; }
+        .breakdown-rows {
+          display: flex;
+          flex-direction: column;
+          gap: .75rem;
+          .breakdown-row {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 1rem;
+            padding: .875rem;
+            background: var(--mat-sys-surface-container);
+            border-radius: 6px;
+            .breakdown-label { @include flex-center; justify-content: flex-start; gap: .5rem; font-weight: 500; }
+            .breakdown-value { font-weight: 600; text-align: right; }
+            .breakdown-subtotal { font-weight: 600; color: var(--mat-sys-primary); text-align: right; }
+          }
+        }
+        .zone-total {
+          display: flex;
+          justify-content: space-between;
+          margin-top: 1rem;
+          padding: 1rem;
+          background: linear-gradient(135deg,var(--mat-sys-primary) 0%,var(--mat-sys-tertiary) 100%);
+          border-radius: 6px;
+          color: var(--mat-sys-on-primary);
+          .total-value { font-weight: 700; font-size: 1.5rem; }
+        }
+      }
+    }
+  }
+  .no-zones {
+    @include flex-center;
+    flex-direction: column;
+    padding: 4rem 2rem;
+    background: var(--mat-sys-surface);
+    border-radius: 8px;
+    border: 2px dashed var(--mat-sys-outline-variant);
+    mat-icon { @include icon-size(48px); opacity: .5; }
+  }
+}
+
+
+
+
+.logistics-section {
+  h2 { font-size: 1.75rem; margin: 0 0 1.5rem 0; font-weight: 500; }
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    
+    h2 { margin: 0; }
+    
+    button {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+  }
+
+  .zones-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(380px,1fr));
+    gap: 1.5rem;
+    @media (max-width: 768px) { grid-template-columns: 1fr; }
+    // ... rest of grid styles ...
+  }
+}
+
+.loading-container {
+  @include flex-center;
+  flex-direction: column;
+  height: 500px;
+  gap: 1.5rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .festival-detail-container { padding: 1rem; }
+  .main-info { padding: 1.5rem; .title-row h1 { font-size: 1.5rem; } }
+}
+
+

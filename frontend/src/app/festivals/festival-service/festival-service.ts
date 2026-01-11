@@ -1,9 +1,9 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { FestivalDto } from '../festival-dto';
-import { Festival } from '../festival';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { catchError, of, tap } from 'rxjs';
+import { ZoneTarifDTO } from '../zone-tarif-dto';
 
 @Injectable({
   providedIn: 'root',
@@ -17,6 +17,7 @@ export class FestivalService {
 
   private festivals = signal<FestivalDto[]>([]);
   readonly _festivals = this.festivals.asReadonly();
+  
 
   private isLoadingSignal = signal<boolean>(true);
   readonly isLoading = this.isLoadingSignal.asReadonly();
@@ -28,6 +29,10 @@ export class FestivalService {
     this.loadFestivalsFromServer();
   }
 
+
+  // Keeping the state of the current festival 
+  private currentFestival = signal<FestivalDto | null>(null);
+  readonly _currentFestival = this.currentFestival.asReadonly();
   // -- Actions --
 
   loadFestivalsFromServer(): void {
@@ -75,6 +80,30 @@ export class FestivalService {
         }),
         catchError((err) => {
           console.error('HTTP error when creating festival', err);
+          return of(null);
+        })
+      )
+      .subscribe();
+  }
+
+
+
+    // --- NEW: Add Tariff Zone ---
+  addTariffZone(festivalId: number, zoneData: Omit<ZoneTarifDTO, 'id'>): void {
+    this.http
+      .post<ZoneTarifDTO>(
+        `${environment.apiUrl}/festivals/${festivalId}/pricing-zones`,
+        zoneData,
+        { withCredentials: true }
+      )
+      .pipe(
+        tap(response => {
+          console.log('Tariff zone created:', response);
+          // Reload the current festival to update the zones list
+          this.loadFestivalById(festivalId);
+        }),
+        catchError(err => {
+          console.error('Error creating tariff zone:', err);
           return of(null);
         })
       )
@@ -152,6 +181,7 @@ export class FestivalService {
       .pipe(
         tap((response) => {
           console.log('Festival loaded with ID:', id, response);
+          this.currentFestival.set(response);
         }),
         catchError((err) => {
           console.error('HTTP error when loading festival', err);

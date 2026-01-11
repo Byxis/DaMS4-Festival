@@ -11,12 +11,14 @@ import { PublishersList } from './pages/publishers-list/publishers-list';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
 import { FestivalList } from './festivals/festival-list-component/festival-list';
 import { FestivalsPage } from './pages/festivals-page/festivals-page';
+import { Festival } from './pages/festival/festival';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPage },
   { path: 'home', component: HomePage, canActivate: [authGuard, guestBlockGuard] },
   { path: 'admin', component: AdminComponent, canActivate: [authGuard, adminGuard, guestBlockGuard] },
   { path: 'festivals', component: FestivalsPage, canActivate: [authGuard, guestBlockGuard] },
+  { path: 'festivals/:id', component: Festival, canActivate: [authGuard, guestBlockGuard] },
   { path: 'publishers', component: PublishersList, canActivate: [authGuard, guestBlockGuard] },
   {
     path: 'publishers/:id',
