@@ -204,6 +204,7 @@ export class PublishersList {
       console.log('Éditeur importé:', result);
       
       this.publisherService.getExistingEditors();
+      
     }
   });
 }

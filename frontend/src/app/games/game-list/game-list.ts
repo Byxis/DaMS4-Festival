@@ -32,7 +32,7 @@ export class GameList {
 
   showForm = false;
   showCreateForm = false;  
-  showSelectForm = false;
+  
   searchTerm = '';
   hasGames = false;
 

@@ -290,12 +290,26 @@ export class PublisherService {
   }
 
   getExistingEditors() {
-    return this.http.get<any[]>('/api/publishers/existing');
-  }
+  return this.http.get<any[]>(
+    `${environment.apiUrl}/publishers/getAllExistingPublishers`,
+    { withCredentials: true }
+  );
+}
 
   importEditor(editorId: number) {
-    return this.http.post(`/api/publishers/import/${editorId}`, {});
+    return this.http.post(`${environment.apiUrl}/publishers/import/${editorId}`, 
+      {},
+      {withCredentials: true}
+    );
   }
+
+  importEditorByName(editorName: string) {
+  return this.http.post(
+    `${environment.apiUrl}/publishers/import-by-name`,
+    { editorName },
+    { withCredentials: true }
+  );
+}
 
  
 }

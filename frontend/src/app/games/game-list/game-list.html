@@ -11,26 +11,7 @@
   
 
   
-  @if(showForm) {
-    <div class="add-game-menu">
-       <button mat-raised-button color="primary" (click)="openGameFormDialog(); showForm = false; showSelectForm=false">
-        <mat-icon>add</mat-icon>
-        Créer un nouveau jeu
-      </button>
-
-      @if(hasGames){
-   <button mat-raised-button color="primary" (click)="openGameSelectDialog(); showForm=false">
-        <mat-icon>library_add</mat-icon>
-        Ajouter un jeu existant
-      </button>
-
-      }
-       
-          <button matFab  type="button" (click)="showForm = false">
-        <mat-icon>close</mat-icon>
-    </button>
-    </div>
-  }
+  
 
   
 
@@ -47,7 +28,7 @@
       <div class="header-cell actions-cell">
         <button
           mat-icon-button
-          (click)="setShowFormTrue()"
+          (click)="openGameFormDialog()"
           aria-label="Ajouter un jeu">
           <mat-icon>add_circle_outline</mat-icon>
         </button>

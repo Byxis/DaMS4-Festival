@@ -13,9 +13,15 @@
       }
       @if (form.get('name')?.hasError('canImport')) {
         <mat-hint>
-          Cet éditeur existe ! Vous pouvez l'importer
-          <button type="button" >Importer</button>
-        </mat-hint>
+    Cet éditeur existe ! Vous pouvez l'importer
+        <button 
+          type="button" 
+          (click)="importExistingEditor(form.get('name')?.value); $event.stopPropagation()"
+          mat-button
+          color="accent">
+          Importer
+        </button>
+      </mat-hint>
       }
     </mat-form-field>
 

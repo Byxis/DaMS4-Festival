@@ -110,17 +110,191 @@ router.post("/", requireAdmin, async (req: Request, res: Response) => {
     }
 });
 
+
+router.get("/getAllExistingPublishers", requireAdmin, async (req:Request, res:Response) => {
+
+    try{
+        const { rows } = await pool.query(
+      `SELECT e.id, e.name, e.logo 
+       FROM editors e
+       WHERE LOWER(e.name) NOT IN (
+         SELECT LOWER(p.name) FROM publisher p
+       )
+       ORDER BY e.name`
+    );
+
+     res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: "Could not find existing publishers" });
+  }
+
+})
+
+
+//! POST /api/publishers/import/:editorId - Import an existing publisher
+router.post("/import/:editorId", requireAdmin, async (req: Request, res: Response) => {
+  const { editorId } = req.params;
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const { rows: existingEditor } = await client.query(
+      "SELECT id, name, logo FROM editors WHERE id = $1",
+      [editorId]
+    );
+
+    if (existingEditor.length === 0) {
+      await client.query("ROLLBACK");
+      return res.status(404).json({ error: "Editor not found" });
+    }
+
+    const editor = existingEditor[0];
+
+    const { rows: inserPublisher } = await client.query<Publisher>(
+      "INSERT INTO publisher (name) VALUES ($1) RETURNING *",
+      [editor.name]
+    );
+
+    if (inserPublisher.length === 0) {
+      await client.query("ROLLBACK");
+      return res.status(404).json({ error: "can't add new publisher" });
+    }
+
+    const newPublisher = inserPublisher[0];
+
+    const { rows: gamesRows } = await client.query(
+      "SELECT name, minimum_number_of_player, maximum_number_of_player, logo, type_of_games_id FROM games WHERE editor_id = $1",
+      [editorId]
+    );
+
+    
+
+    if (!newPublisher || Number.isNaN(Number(newPublisher.id))) {
+    return res.status(400).json({ error: "publisher_id is required and must be a number" });
+  }
+
+    for (const game of gamesRows) {
+      await client.query(
+        `INSERT INTO games_publisher (name, publisher_id, minimum_number_of_player, maximum_number_of_player, logo, type_of_games_id)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [
+          game.name,
+          newPublisher.id,
+          game.minimum_number_of_player ?? null,
+          game.maximum_number_of_player ?? null,
+          game.logo ?? null,
+          game.type_of_games_id ?? null
+        ]
+      );
+    }
+
+    await client.query("COMMIT");
+    res.status(201).json({
+      publisher: newPublisher,
+      gamesCount: gamesRows.length
+    });
+  } catch (err: any) {
+    await client.query("ROLLBACK");
+    console.error("Import error:", err);
+    res.status(500).json({ error: "Could not import publisher: " + err.message });
+  } finally {
+    client.release();
+  }
+});
+
+//! POST /api/publishers/import-by-name - Import an existing publisher by name
+router.post("/import-by-name", requireAdmin, async (req: Request, res: Response) => {
+  const { editorName } = req.body;
+  const client = await pool.connect();
+
+  if (!editorName || editorName.trim() === "") {
+    return res.status(400).json({ error: "editorName is required" });
+  }
+
+  try {
+    await client.query("BEGIN");
+
+   
+    const { rows: existingEditor } = await client.query(
+      "SELECT id, name, logo FROM editors WHERE LOWER(name) = LOWER($1)",
+      [editorName.trim()]
+    );
+
+    if (existingEditor.length === 0) {
+      await client.query("ROLLBACK");
+      return res.status(404).json({ error: "Editor not found" });
+    }
+
+    const editor = existingEditor[0];
+
+    const { rows: existingPublisher } = await client.query(
+      "SELECT id FROM publisher WHERE LOWER(name) = LOWER($1)",
+      [editor.name]
+    );
+
+    if (existingPublisher.length > 0) {
+      await client.query("ROLLBACK");
+      return res.status(409).json({ error: "Publisher already exists" });
+    }
+
+    const { rows: inserPublisher } = await client.query<Publisher>(
+      "INSERT INTO publisher (name) VALUES ($1) RETURNING *",
+      [editor.name]
+    );
+
+    const newPublisher = inserPublisher[0];
+
+
+    const { rows: gamesRows } = await client.query(
+      "SELECT name, minimum_number_of_player, maximum_number_of_player, logo, type_of_games_id FROM games WHERE editor_id = $1",
+      [editor.id]
+    );
+
+    if (!newPublisher || Number.isNaN(Number(newPublisher.id))) {
+    return res.status(400).json({ error: "publisher_id is required and must be a number" });
+  }
+
+    
+    for (const game of gamesRows) {
+      await client.query(
+        `INSERT INTO games_publisher (name, publisher_id, minimum_number_of_player, maximum_number_of_player, logo, type_of_games_id)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [
+          game.name,
+          newPublisher.id,
+          game.minimum_number_of_player ?? null,
+          game.maximum_number_of_player ?? null,
+          game.logo ?? null,
+          game.type_of_games_id ?? null
+        ]
+      );
+    }
+
+    await client.query("COMMIT");
+    res.status(201).json({
+      publisher: newPublisher,
+      gamesCount: gamesRows.length
+    });
+  } catch (err: any) {
+    await client.query("ROLLBACK");
+    console.error("Import error:", err);
+    res.status(500).json({ error: "Could not import publisher: " + err.message });
+  } finally {
+    client.release();
+  }
+});
+
 router.get("/check-exists/:name", async (req: Request, res: Response) => {
   const { name } = req.params;
   
   try {
-    // ✅ Vérifie dans 'editors' (les éditeurs importables)
+    
     const editorResult = await pool.query(
       "SELECT id, name, logo FROM editors WHERE LOWER(name) = LOWER($1) LIMIT 1",
       [name]
     );
     
-    // ✅ Vérifie aussi dans 'publisher' (les publishers créés)
     const publisherResult = await pool.query(
       "SELECT id FROM publisher WHERE LOWER(name) = LOWER($1) LIMIT 1",
       [name]
@@ -128,13 +302,16 @@ router.get("/check-exists/:name", async (req: Request, res: Response) => {
 
     res.json({
       existsInEditors: editorResult.rowCount && editorResult.rowCount > 0,
-      editor: editorResult.rows[0] || null,  // Retourne les données de l'éditeur
+      editor: editorResult.rows[0] || null, 
       existsInPublisher: publisherResult.rowCount && publisherResult.rowCount > 0,
     });
   } catch (err) {
     res.status(500).json({ error: "Could not check publisher" });
   }
 });
+
+
+
 
 
 //! POST /api/publishers/addGameToPublisher - Create a new game, and add it to the publisher's list of games

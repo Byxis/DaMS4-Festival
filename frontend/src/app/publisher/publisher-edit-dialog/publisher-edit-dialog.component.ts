@@ -29,7 +29,7 @@ import { PublisherService } from '../publisher.service';
 export class PublisherEditDialog {
   private fb = inject(FormBuilder);
   private dialogRef = inject(MatDialogRef<PublisherEditDialog>);
-  private publisherService = inject(PublisherService); 
+  public publisherService = inject(PublisherService); 
   data = inject<PublisherDTO | null>(MAT_DIALOG_DATA);
 
   form = this.fb.group({
@@ -76,7 +76,32 @@ export class PublisherEditDialog {
     }
   }
 
-  
+importExistingEditor(editorName: string | null | undefined): void {
+  if (!editorName || editorName.trim() === "") {
+    console.error('❌ Nom d\'éditeur vide');
+    return;
+  }
+
+  this.publisherService.importEditorByName(editorName).subscribe({
+    next: (result: any) => {
+      console.log('✅ Publisher importé:', result);
+      
+      this.publisherService.addPublisherToList({
+        ...result.publisher,
+        numberOfGames: result.gamesCount,
+        contacts: [],
+        logoUrl: undefined
+      });
+      
+      this.dialogRef.close(true);  
+    },
+    error: (err: any) => {
+      console.error(' Erreur import:', err);
+      alert('Erreur : ' + (err.error?.error || 'Import échoué'));
+    }
+  });
+}
+
 
   deleteLogo(): void {
     this.logoToDelete = true;
