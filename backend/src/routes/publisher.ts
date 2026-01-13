@@ -11,24 +11,29 @@ import { requireAdmin } from "../middleware/auth-admin.js";
 
 /**
  * Routes for managing publishers and their contacts, including logo uploads.
- * All routes that modify data require admin privileges (and are marked with and !).
+ * All routes that modify data require admin privileges (and are marked with !).
  *
  * Endpoints:
  * - GET /api/publishers - Retrieve all publishers with their contacts
  * !- POST /api/publishers - Create a new publisher
  *
- * ! POST /api/publishers/addGameToPublisher -  Create a new game, and add it to the publisher's list of games
+ * ! POST /api/publishers/addGameToPublisher - Create a new game, and add it to the publisher's list of games
  * - GET /api/publishers/:id - Retrieve a specific publisher by ID
  * !- DELETE /api/publishers/:id - Delete a specific publisher by ID
  * !- PUT /api/publishers/:id - Update a specific publisher name by ID
  *
- * - POST /api/publishers/:id/contacts - Add a contact to a specific publisher
+ * - GET /api/publishers/:id/contacts - Add a contact to a specific publisher
  * !- DELETE /api/publishers/:id/contacts/:contactId - Delete a specific contact from a specific publisher
  * !- PUT /api/publishers/:id/contacts/:contactId - Update a specific contact of a specific publisher
  *
  * - GET /api/publishers/:id/logo - Retrieve the logo of a specific publisher
  * !- POST /api/publishers/:id/logo - Upload a logo for a specific publisher
  * !- DELETE /api/publishers/:id/logo - Delete the logo of a specific publisher
+ *
+ * - GET /api/publishers/getAllExistingPublishers - Get all editors not yet imported with game count
+ * !- POST /api/publishers/import/:editorId - Import an existing publisher by editor ID
+ * !- POST /api/publishers/import-by-name - Import an existing publisher by editor name
+ * - GET /api/publishers/check-exists/:name - Check if a publisher or editor exists
  */
 
 const router = Router();
@@ -89,13 +94,9 @@ router.post("/", requireAdmin, async (req: Request, res: Response) => {
     if (!name) {
         return res.status(400).json({ error: "Name is required" });
     }
-
      const client = await pool.connect();
 
     try {
-
- 
-
         const publisherResult = await client.query<Publisher>(
       "INSERT INTO publisher (name) VALUES ($1) RETURNING *",
       [name]
@@ -110,7 +111,6 @@ router.post("/", requireAdmin, async (req: Request, res: Response) => {
     }
 });
 
-
 //! GET /api/publishers/getAllExistingPublishers - Get all editors not yet imported with game count
 router.get("/getAllExistingPublishers", requireAdmin, async (req: Request, res: Response) => {
   try {
@@ -119,13 +119,11 @@ router.get("/getAllExistingPublishers", requireAdmin, async (req: Request, res: 
         e.id, 
         e.name, 
         e.logo,
-        COUNT(g.id)::INTEGER as numberOfGames
+        (SELECT COUNT(*) FROM games WHERE editor_id = e.id)::INTEGER as numberOfGames
        FROM editors e
-       LEFT JOIN games g ON g.editor_id = e.id
        WHERE LOWER(e.name) NOT IN (
          SELECT LOWER(p.name) FROM publisher p
        )
-       GROUP BY e.id, e.name, e.logo
        ORDER BY e.name`
     );
 
@@ -136,6 +134,33 @@ router.get("/getAllExistingPublishers", requireAdmin, async (req: Request, res: 
     res.status(500).json({ error: "Could not find existing publishers" });
   }
 });
+
+//! GET /api/publishers/check-exists/:name - Check is a publisher name is available, or already taken
+router.get("/check-exists/:name", async (req: Request, res: Response) => {
+  const { name } = req.params;
+  
+  try {
+    
+    const editorResult = await pool.query(
+      "SELECT id, name, logo FROM editors WHERE LOWER(name) = LOWER($1) LIMIT 1",
+      [name]
+    );
+    
+    const publisherResult = await pool.query(
+      "SELECT id FROM publisher WHERE LOWER(name) = LOWER($1) LIMIT 1",
+      [name]
+    );
+
+    res.json({
+      existsInEditors: editorResult.rowCount && editorResult.rowCount > 0,
+      editor: editorResult.rows[0] || null, 
+      existsInPublisher: publisherResult.rowCount && publisherResult.rowCount > 0,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Could not check publisher" });
+  }
+});
+
 
 
 //! POST /api/publishers/import/:editorId - Import an existing publisher
@@ -291,34 +316,6 @@ router.post("/import-by-name", requireAdmin, async (req: Request, res: Response)
     client.release();
   }
 });
-
-router.get("/check-exists/:name", async (req: Request, res: Response) => {
-  const { name } = req.params;
-  
-  try {
-    
-    const editorResult = await pool.query(
-      "SELECT id, name, logo FROM editors WHERE LOWER(name) = LOWER($1) LIMIT 1",
-      [name]
-    );
-    
-    const publisherResult = await pool.query(
-      "SELECT id FROM publisher WHERE LOWER(name) = LOWER($1) LIMIT 1",
-      [name]
-    );
-
-    res.json({
-      existsInEditors: editorResult.rowCount && editorResult.rowCount > 0,
-      editor: editorResult.rows[0] || null, 
-      existsInPublisher: publisherResult.rowCount && publisherResult.rowCount > 0,
-    });
-  } catch (err) {
-    res.status(500).json({ error: "Could not check publisher" });
-  }
-});
-
-
-
 
 
 //! POST /api/publishers/addGameToPublisher - Create a new game, and add it to the publisher's list of games

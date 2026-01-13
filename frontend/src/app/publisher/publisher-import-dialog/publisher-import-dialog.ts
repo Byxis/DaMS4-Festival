@@ -43,22 +43,24 @@ export class PublishersImportDialog implements OnInit {
     this.loadEditors();
   }
 
-  
 
   loadEditors(): void {
-    this.isLoading = true;
-    this.publisherService.getExistingEditors().subscribe({
-      next: (data: any[]) => {
-        this.editors = data;
-        this.filteredEditors = data;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('Erreur:', err);
-        this.isLoading = false;
-      }
-    });
-  }
+  this.isLoading = true;
+  this.publisherService.getExistingEditors().subscribe({
+    next: (data: any[]) => {
+      
+
+      this.editors = data;
+      this.filteredEditors = data;
+      this.isLoading = false;
+    },
+    error: (err) => {
+      console.error(' Erreur:', err);
+      this.isLoading = false;
+    }
+  });
+}
+
 
   filterEditors(): void {
     const term = this.searchTerm.toLowerCase();
@@ -66,13 +68,12 @@ export class PublishersImportDialog implements OnInit {
       e.name.toLowerCase().includes(term)
     );
   }
+
+
 importEditor(editor: any): void {
   this.publisherService.importEditor(editor.id).subscribe({
     next: (result: any) => {
-      console.log('✅ Publisher importé:', result);
-      console.log('📊 gamesCount:', result.gamesCount);  
-      console.log('📊 publisher:', result.publisher);     
-      
+     
       this.publisherService.addPublisherToList({
         ...result.publisher,
         numberOfGames: result.gamesCount,  
@@ -95,7 +96,7 @@ importEditor(editor: any): void {
       );
     },
     error: (err: any) => {
-      console.error('❌ Erreur import:', err);
+      console.error(' Erreur import:', err);
     }
   });
 }

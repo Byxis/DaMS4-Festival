@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 import { PublisherDTO } from '../publisherDto';
 import { map, Observable, of } from 'rxjs';
 import { PublisherService } from '../publisher.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 @Component({
@@ -31,6 +32,7 @@ export class PublisherEditDialog {
   private dialogRef = inject(MatDialogRef<PublisherEditDialog>);
   public publisherService = inject(PublisherService); 
   data = inject<PublisherDTO | null>(MAT_DIALOG_DATA);
+  private snackBar = inject(MatSnackBar);
 
   form = this.fb.group({
     name: [this.data?.name ?? '', Validators.required , this.publisherNameValidator()],
@@ -40,6 +42,7 @@ export class PublisherEditDialog {
   newLogoFile: File | null = null;
   newLogoPreview: string | null = null;
   logoToDelete: boolean = false;
+  
   
 
  private publisherNameValidator() {
@@ -94,6 +97,7 @@ importExistingEditor(editorName: string | null | undefined): void {
       });
       
       this.dialogRef.close(true);  
+       
     },
     error: (err: any) => {
       console.error(' Erreur import:', err);
