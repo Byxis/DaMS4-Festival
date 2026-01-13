@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { PublisherService } from '../publisher.service';
 import { FormsModule } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'publishers-import-dialog',
@@ -36,6 +37,7 @@ export class PublishersImportDialog implements OnInit {
   searchTerm = '';
   isLoading = true;
   displayedColumns = ['name', 'games', 'contacts', 'actions'];
+   private snackBar = inject(MatSnackBar); 
 
   ngOnInit(): void {
     this.loadEditors();
@@ -46,7 +48,7 @@ export class PublishersImportDialog implements OnInit {
   loadEditors(): void {
     this.isLoading = true;
     this.publisherService.getExistingEditors().subscribe({
-      next: (data) => {
+      next: (data: any[]) => {
         this.editors = data;
         this.filteredEditors = data;
         this.isLoading = false;
@@ -64,15 +66,39 @@ export class PublishersImportDialog implements OnInit {
       e.name.toLowerCase().includes(term)
     );
   }
-
-  importEditor(editor: any): void {
-    this.publisherService.importEditor(editor.id).subscribe({
-      next: () => {
-        this.dialogRef.close(editor);
-      },
-      error: (err) => console.error('Erreur import:', err)
-    });
-  }
+importEditor(editor: any): void {
+  this.publisherService.importEditor(editor.id).subscribe({
+    next: (result: any) => {
+      console.log('✅ Publisher importé:', result);
+      console.log('📊 gamesCount:', result.gamesCount);  
+      console.log('📊 publisher:', result.publisher);     
+      
+      this.publisherService.addPublisherToList({
+        ...result.publisher,
+        numberOfGames: result.gamesCount,  
+        contacts: [],
+        logoUrl: undefined
+      });
+  
+      this.editors = this.editors.filter(e => e.id !== editor.id);
+      this.filterEditors(); 
+      
+      this.snackBar.open(
+        `${editor.name} importé avec succès !`,
+        'Fermer',
+        {
+          duration: 4000,
+          horizontalPosition: 'end',
+          verticalPosition: 'bottom',
+          panelClass: ['success-snackbar']
+        }
+      );
+    },
+    error: (err: any) => {
+      console.error('❌ Erreur import:', err);
+    }
+  });
+}
 
   cancel(): void {
     this.dialogRef.close();

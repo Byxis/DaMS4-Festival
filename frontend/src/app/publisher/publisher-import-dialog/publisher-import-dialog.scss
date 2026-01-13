@@ -1,46 +1,70 @@
-.search-field {
-  width: 100%;
-  margin-bottom: 1.5rem;
-}
+.editors-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
 
-.editors-table {
-  width: 100%;
-  margin-top: 1rem;
-
-  th {
-    font-weight: 600;
-    color: var(--mat-sys-on-surface);
-  }
-
-  td {
+  .editor-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding: 12px;
+    border: 1px solid var(--mat-sys-outline-variant);
+    border-radius: 8px;
+    gap: 16px;
+
+    .editor-info {
+      flex: 1;
+
+      .editor-name {
+        font-weight: 500;
+        margin-bottom: 8px;
+      }
+
+      .editor-details {
+        display: flex;
+        gap: 16px;
+        font-size: 0.875rem;
+        color: var(--mat-sys-on-surface-variant);
+
+        .detail {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+
+          mat-icon {
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+          }
+        }
+      }
+    }
+
+    .import-btn {
+      flex-shrink: 0;
+    }
   }
 }
 
-.loading,
 .empty {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--mat-sys-on-surface-variant);
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+  }
+}
+
+.loading {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
-  text-align: center;
-
-  mat-icon {
-    font-size: 3rem;
-    width: 3rem;
-    height: 3rem;
-    margin-bottom: 1rem;
-    opacity: 0.5;
-  }
-
-  p {
-    margin: 0;
-    color: var(--mat-sys-on-surface-variant);
-  }
-}
-
-mat-dialog-actions {
-  padding: 1rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 32px 16px;
+  gap: 16px;
 }

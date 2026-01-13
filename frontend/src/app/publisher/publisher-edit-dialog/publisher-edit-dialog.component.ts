@@ -84,7 +84,7 @@ importExistingEditor(editorName: string | null | undefined): void {
 
   this.publisherService.importEditorByName(editorName).subscribe({
     next: (result: any) => {
-      console.log('✅ Publisher importé:', result);
+      console.log(' Publisher importé:', result);
       
       this.publisherService.addPublisherToList({
         ...result.publisher,

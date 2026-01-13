@@ -106,7 +106,7 @@ $grid-mobile: 2fr 1fr 1fr 1fr 80px;
       font-weight: 500;
       color: var(--mat-sys-on-surface-variant);
       font-size: 0.875rem;
-      padding-right: 16px;
+      padding-right: 0px;
       border-right: 1px solid transparent;
 
       .header-cell {
@@ -138,14 +138,28 @@ $grid-mobile: 2fr 1fr 1fr 1fr 80px;
           }
         }
 
-        &.actions-cell {
-          @include flex-center;
-          gap: 0.5rem;
+       &.actions-cell {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      padding-right: 40px;
 
-          button {
-            flex-shrink: 0;
-          }
+      button {
+        width: 40px;     
+        height: 40px;    
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        mat-icon {
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
         }
+      }
+    }
+  
       }
     }
 

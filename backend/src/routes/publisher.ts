@@ -111,24 +111,31 @@ router.post("/", requireAdmin, async (req: Request, res: Response) => {
 });
 
 
-router.get("/getAllExistingPublishers", requireAdmin, async (req:Request, res:Response) => {
-
-    try{
-        const { rows } = await pool.query(
-      `SELECT e.id, e.name, e.logo 
+//! GET /api/publishers/getAllExistingPublishers - Get all editors not yet imported with game count
+router.get("/getAllExistingPublishers", requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT 
+        e.id, 
+        e.name, 
+        e.logo,
+        COUNT(g.id)::INTEGER as numberOfGames
        FROM editors e
+       LEFT JOIN games g ON g.editor_id = e.id
        WHERE LOWER(e.name) NOT IN (
          SELECT LOWER(p.name) FROM publisher p
        )
+       GROUP BY e.id, e.name, e.logo
        ORDER BY e.name`
     );
 
-     res.json(rows);
+    console.log(' Éditeurs:', rows);  
+    res.json(rows);
   } catch (err) {
+    console.error(' Erreur:', err);
     res.status(500).json({ error: "Could not find existing publishers" });
   }
-
-})
+});
 
 
 //! POST /api/publishers/import/:editorId - Import an existing publisher

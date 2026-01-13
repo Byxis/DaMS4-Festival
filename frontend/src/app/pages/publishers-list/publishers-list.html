@@ -13,17 +13,7 @@
     </mat-form-field>
     </div>
 
-    <div class="button-container">
-      <button
-        mat-raised-button
-        color="accent"
-        (click)="this.openImportEditorDialog()"
-        matTooltip="Importer un éditeur existant"
-      >
-        <mat-icon>library_add</mat-icon>
-        Importer un éditeur
-      </button>
-  </div>
+    
 
   @if (isLoading()) {
     <div class="skeleton-container">
@@ -207,7 +197,18 @@
           >
             <mat-icon>add_circle_outline</mat-icon>
           </button>
-        </div>
+        
+        
+      <button
+        mat-icon-button
+        color="accent"
+        (click)="this.openImportEditorDialog()"
+        matTooltip="Importer un éditeur existant"
+      >
+        <mat-icon>cloud_download</mat-icon>
+       
+      </button>
+  </div>
       </div>
       <cdk-virtual-scroll-viewport
         itemSize="73"
