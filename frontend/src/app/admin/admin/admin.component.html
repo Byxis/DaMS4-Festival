@@ -9,7 +9,7 @@
       mat-icon-button
       aria-label="Add user"
       class="add-btn"
-      (click)="onAddUser()"
+      (click)="openCreateDialog()"
     >
       <mat-icon>person_add</mat-icon>
     </button>
@@ -45,7 +45,7 @@
             <div>{{ user.email }}</div>
 
             <div class="actions">
-              <button mat-icon-button (click)="onEditUser(user)">
+              <button mat-icon-button (click)="openEditDialog(user)">
                 <mat-icon>edit</mat-icon>
               </button>
             </div>

@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
-    first_name TEXT,
-    last_name TEXT, 
+    first_name TEXT DEFAULT '',
+    last_name TEXT DEFAULT '', 
     email TEXT UNIQUE NOT NULL,
-    password_hash TEXT NOT NULL,
+    password_hash TEXT,
     role TEXT DEFAULT 'guest'
 );
 
