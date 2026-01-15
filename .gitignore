@@ -1,4 +1,4 @@
- See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
 # Certs files
 **/certs/
@@ -50,3 +50,8 @@
 # System files
 */.DS_Store
 */Thumbs.db
+
+# Node
+/node_modules
+/npm-debug.log
+/yarn-error.log

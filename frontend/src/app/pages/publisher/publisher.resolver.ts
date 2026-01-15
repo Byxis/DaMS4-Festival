@@ -16,7 +16,7 @@ export const publisherResolver: ResolveFn<number> = async (route) => {
     throw new Error('Error loading publishers');
   }
 
-  let publisher = publisherService._publishers().find((p) => p.id === id);
+  const publisher = publisherService._publishers().find((p) => p.id === id);
   if (!publisher) {
     router.navigate(['/not-found']);
     throw new Error('Publisher not found');

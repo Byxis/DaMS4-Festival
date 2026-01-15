@@ -35,7 +35,7 @@ services:
             JWT_SECRET: "mon_secret_jwt_super_long_et_complexe"
             JWT_EXPIRATION: "15m"
             REFRESH_EXPIRATION: "7d"
-            FRONTEND_URL: http://localhost:8080
+            FRONTEND_URL: https://localhost:8080
         volumes:
             - ./backend/certs:/app/certs:ro
             - uploads_data:/app/uploads
@@ -43,6 +43,7 @@ services:
             - "4000:4000"
         networks:
             - secure_net
+
     frontend:
         build:
             context: ./frontend
@@ -60,7 +61,8 @@ services:
         container_name: secureapp_adminer_prod
         restart: unless-stopped
         depends_on:
-            - db
+            db:
+                condition: service_healthy
         ports:
             - "8081:8080"
         environment:

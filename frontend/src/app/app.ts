@@ -9,6 +9,7 @@ import { GameList } from './games/game-list/game-list';
 import { GameForm } from './games/game-form/game-form';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { HeaderComponent } from './pages/header/header.component';
 
 
 export class AppModule {}
@@ -28,7 +29,9 @@ export class AppModule {}
     MatIcon,
     MatButton,
     GameList, 
-    GameForm
+    GameForm,
+    RouterOutlet,
+    HeaderComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss',

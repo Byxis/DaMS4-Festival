@@ -58,7 +58,16 @@ const upload = multer({
             path.extname(file.originalname).toLowerCase()
         );
         const mime = allowedTypes.test(file.mimetype);
-        cb(null, ext && mime);
+
+        if (ext && mime) {
+            return cb(null, true);
+        } else {
+            return cb(
+                new Error(
+                    "Invalid file type. Only JPEG, JPG, PNG, GIF, or WEBP images are allowed."
+                )
+            );
+        }
     },
     limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max
 });
@@ -585,8 +594,6 @@ router.post(
         const newPath = `./uploads/logos/${id}${ext}`;
 
         fs.renameSync(req.file.path, newPath);
-
-        fs.accessSync(newPath);
 
         res.json({
             message: "Logo updated",

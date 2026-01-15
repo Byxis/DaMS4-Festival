@@ -9,10 +9,27 @@ import {
 } from "../middleware/token-management.js";
 import { JWT_SECRET } from "../config/env.js";
 import type { TokenPayload } from "../types/token-payload.js";
+import rateLimit from 'express-rate-limit';
 
 const router = Router();
 
-router.post("/login", async (req, res) => {
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,  // 15 minutes
+    limit: 5,                  // Limit each IP to 5 requests
+    message: {error: 'Too many login attempts, please try again later.'},
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const registerLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,  // 15 minutes
+    limit: 2,                  // Limit each IP to 2 requests
+    message: {error: 'Too many register attempts, please try again later.'},
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+router.post('/login', loginLimiter, async (req, res) => {
     // --- LOGIN ---
     const { login, password } = req.body;
     if (!login || !password)
@@ -69,15 +86,15 @@ router.post("/logout", (_req, res) => {
     res.json({ message: "Déconnexion réussie" });
 });
 
-router.post("/register", async (req, res) => {
+router.post("/register", registerLimiter, async (req, res) => {
     const { login, password } = req.body;
     if (!login || !password)
         return res.status(400).json({ error: "Champs manquants" });
     const hashed = await bcrypt.hash(password, 10);
     try {
         const { rows } = await pool.query(
-            `INSERT INTO users (login, password_hash, role)
-            VALUES ($1, $2, 'user')
+            `INSERT INTO users (login, password_hash)
+            VALUES ($1, $2)
             RETURNING id, login, role`,
             [login, hashed]
         );

@@ -11,6 +11,7 @@ import publicRouter from "./routes/public.js";
 import usersRouter from "./routes/users.js";
 import authRouter from "./routes/auth.js";
 import publisherRouter from "./routes/publisher.js";
+import festivalsRouter from "./routes/festivals.js";
 import { verifyToken } from "./middleware/token-management.js";
 import { requireAdmin } from "./middleware/auth-admin.js";
 import multer from "multer"; 
@@ -51,11 +52,11 @@ app.use(cookieParser());
 // Configuration CORS : autoriser le front Angular en HTTPS local
 app.use(
     cors({
-        origin: "https://localhost:8080",
+        origin: process.env.FRONTEND_URL || "https://localhost:8080",
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE"],
         allowedHeaders: ["Content-Type", "Authorization"],
-    })
+    }),
 );
 app.use(express.static("./uploads")); 
 
@@ -63,6 +64,11 @@ app.use(express.static("./uploads"));
 app.use("/api/public", publicRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/users", verifyToken, usersRouter); // protégé
+
+//Verified token for festivals routes is important, or else RequireAdmin will not work
+//indeed requireAdmin needs req.user to be defined, and this is done in verifyToken middleware
+app.use("/api/festivals", verifyToken, festivalsRouter); // protégé
+
 app.use("/api/admin", verifyToken, requireAdmin, (req, res) => {
     res.json({ message: "Bienvenue admin" });
 });
