@@ -1,0 +1,55 @@
+<h2 mat-dialog-title>Importer un éditeur existant</h2>
+<mat-dialog-content>
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Rechercher</mat-label>
+    <input
+      matInput
+      [(ngModel)]="searchTerm"
+      (input)="filterEditors()"
+      placeholder="Filtrer par nom..."
+    />
+    <mat-icon matPrefix>search</mat-icon>
+  </mat-form-field>
+
+  @if (isLoading) {
+    <div class="loading">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Chargement...</p>
+    </div>
+  } @else if (filteredEditors.length > 0) {
+    <div class="editors-list">
+      @for (editor of filteredEditors; track editor.id) {
+        <div class="editor-item">
+          <div class="editor-info">
+            <div class="editor-name">{{ editor.name }}</div>
+            <div class="editor-details">
+              <span class="detail">
+                <mat-icon>games</mat-icon>
+                {{ editor.numberofgames || 0 }} jeux
+              </span>
+             
+            </div>
+          </div>
+          <button
+            mat-raised-button
+            color="accent"
+            (click)="importEditor(editor)"
+            class="import-btn"
+          >
+            <mat-icon>add</mat-icon>
+            Importer
+          </button>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="empty">
+      <mat-icon>business</mat-icon>
+      <p>Aucun éditeur disponible.</p>
+    </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button (click)="cancel()">Annuler</button>
+</mat-dialog-actions>

@@ -8,15 +8,18 @@ services:
             POSTGRES_PASSWORD: secureapp
             POSTGRES_DB: secureapp
         volumes:
-            - db_data:/var/lib/postgresql/data
-            - ./backend/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+           - ./backend/db/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+           - ./backend/db/editorsData.csv:/tmp/editorsData.csv  
+           - ./backend/db/typesOfGamesData.csv:/tmp/typesOfGamesData.csv  
+           - ./backend/db/GamesDATA.csv:/tmp/GamesDATA.csv 
+           - db_data:/var/lib/postgresql/data
         networks:
             - secure_net
         healthcheck:
             test: ["CMD-SHELL", "pg_isready -U secureapp -d secureapp"]
-            interval: 1s
-            timeout: 10s
-            retries: 15
+            interval: 5s
+            timeout: 5s
+            retries: 30
     backend:
         build:
             context: ./backend
@@ -25,7 +28,7 @@ services:
         restart: unless-stopped
         depends_on:
             db:
-                condition: service_healthy
+                 condition: service_healthy 
         environment:
             NODE_ENV: production
             DATABASE_URL: postgresql://secureapp:secureapp@db:5432/secureapp

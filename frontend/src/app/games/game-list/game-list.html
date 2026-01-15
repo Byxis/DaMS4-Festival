@@ -1,0 +1,97 @@
+<div class="game-list-container">
+  <div class="header">
+    <mat-card-title>Liste des jeux présentés</mat-card-title>
+
+    <mat-form-field class="search-field" appearance="outline">
+      <mat-label>Chercher un jeu</mat-label>
+      <input matInput [(ngModel)]="searchTerm" placeholder="name of the game" (input)="searchGameByName($event.target.value)" />
+    </mat-form-field>
+  </div>
+
+  
+
+  
+  
+
+  
+
+  
+  <div class="game-table">
+    <div class="table-header">
+      <div class="header-cell id-cell">ID</div>
+      <div class="header-cell logo-cell">Logo</div>
+      <div class="header-cell name-cell">Name</div>
+      <div class="header-cell first-contact-cell">Editor</div>
+      <div class="header-cell">Type</div>
+      <div class="header-cell">Min</div>
+      <div class="header-cell">Max</div>
+      <div class="header-cell actions-cell">
+        <button
+          mat-icon-button
+          (click)="openGameFormDialog()"
+          aria-label="Ajouter un jeu">
+          <mat-icon>add_circle_outline</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="table-viewport">
+      @for (game of gameService.games(); track game.id) {
+        <div class="table-row">
+          <div class="cell id-cell">
+            <div class="id-badge">{{ game.id }}</div>
+          </div>
+
+    <div class="cell logo-cell">
+  @if (game.logo && !logoErrors.has(game.id!)) {
+    
+    @if (typeof game.logo === 'string' && game.logo.startsWith('http')) {
+      <img [src]="game.logo" 
+          [alt]="game.name + ' logo'"
+          (error)="logoErrors.add(game.id!)"
+          class="game-logo">
+    } @else if (typeof game.logo === 'string') {
+      <img [src]="'https://localhost:4000/api/games/' + game.id + '/logo'" 
+          [alt]="game.name + ' logo'"
+          (error)="logoErrors.add(game.id!)"
+          crossorigin="anonymous"
+          class="game-logo">
+    }
+  } @else {
+    <div class="logo-placeholder">
+      <mat-icon>business</mat-icon>
+    </div>
+  }
+</div>
+
+          <div class="cell name-cell">
+            <div class="game-name">{{ game.name }}</div>
+          </div>
+
+          <div class="cell first-contact-cell">
+            <div class="cell-content">
+              <span>{{ game.editor_name || 'unknown' }}</span>
+            </div>
+          </div>
+
+          <div class="cell">
+            <div class="cell-content">
+              <span>{{ game.type || 'N/A' }}</span>
+            </div>
+          </div>
+
+          <div class="cell center">
+            <span>{{ game.minimum_number_of_player }}</span>
+          </div>
+
+          <div class="cell center">
+            <span>{{ game.maximum_number_of_player }}</span>
+          </div>
+
+        
+         
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -10,8 +10,14 @@
 */out-tsc
 */bazel-out
 
+# Angular File
+**/.angular/ 
+
+#Festival's data
+*/Data/
+
 # Node
-*/node_modules
+**/node_modules
 */npm-debug.log
 */yarn-error.log
 
