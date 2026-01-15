@@ -48,10 +48,6 @@ button:hover {
   color: var(--mat-sys-surface);
 }
 
-mat-card-title {
-  color: var(--mat-sys-primary);
-}
-
 a {
   align-self: center;
   padding: 10px;
@@ -75,6 +71,10 @@ a {
   align-self: center;
     position: absolute;
     margin-left: 30px; 
+}
+
+mat-card-title {
+  color: var(--mat-sys-primary);
 }
 
 :host {

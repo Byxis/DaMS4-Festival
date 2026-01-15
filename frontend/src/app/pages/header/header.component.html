@@ -61,16 +61,14 @@
 <mat-menu #profilePanel="matMenu" class="profile-menu">
   @if (authSvc.currentUser(); as user) {
     <div class="profile-card">
-      <div class="avatar-wrapper">
-        <mat-icon class="avatar">account_circle</mat-icon>
-      </div>
+      <mat-icon class="avatar">account_circle</mat-icon>
 
       <div class="name">
-        prénom NOM
+        {{user.firstName}} {{user.lastName}}
       </div>
 
       <div class="email">
-        email
+        {{user.email}}
       </div>
 
       <div class="role">

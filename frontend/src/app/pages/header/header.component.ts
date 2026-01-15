@@ -24,7 +24,7 @@ export class HeaderComponent {
 
   logout() {
     this.authSvc.logout();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/']);
   }
 
   goToLoginPage() {
