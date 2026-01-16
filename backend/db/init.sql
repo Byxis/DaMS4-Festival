@@ -28,12 +28,32 @@ CREATE TABLE IF NOT EXISTS festivals (
     end_date DATE NOT NULL,
     table_count INT DEFAULT 0,
     big_table_count INT DEFAULT 0,
-    town_table_count INT DEFAULT 0
+    town_table_count INT DEFAULT 0é
 ); 
 
+CREATE TABLE IF NOT EXISTS tarif_zone(
+    id SERIAL PRIMARY KEY,
+    festival_id INTEGER REFERENCES festivals(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    price INTEGER NOT NULL,
+    numberOutlets INTEGER DEFAULT 0,
+    maxTable INTEGER NOT NULL
+);
+
+
+CREATE TABLE IF NOT EXISTS game_zone(
+    id SERIAL PRIMARY KEY,
+    tarif_zone_id INTEGER REFERENCES tarif_zone(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    reserved_table INTEGER DEFAULT 0,
+    reserved_big_table INTEGER DEFAULT 0,
+    reserved_town_table INTEGER DEFAULT 0,
+);
 
 
 SELECT setval('publisher_id_seq', (SELECT MAX(id) FROM publisher) + 1);
 SELECT setval('contact_id_seq', (SELECT MAX(id) FROM contact) + 1);
 SELECT setval('users_id_seq', (SELECT MAX(id) FROM users) + 1);
-SELECT setval('festivals_id_seq', (SELECT MAX(id) FROM festivals) + 1);
+SELECT setval('tarif_zone_id_seq', (SELECT MAX(id) FROM tarif_zone) + 1);
+
+SELECT setval('game_zone_id_seq', (SELECT MAX(id) FROM game_zone) + 1);
