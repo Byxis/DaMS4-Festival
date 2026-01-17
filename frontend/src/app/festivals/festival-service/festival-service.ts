@@ -1,9 +1,10 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { FestivalDto } from '../festival-dto';
+import { FestivalDto } from '../dtos/festival-dto';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { catchError, of, tap } from 'rxjs';
-import { ZoneTarifDTO } from '../zone-tarif-dto';
+import { ZoneTarifDTO } from '../dtos/zone-tarif-dto';
+import { ZoneGameDTO } from '../dtos/zone-game-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,7 @@ export class FestivalService {
 
   private festivals = signal<FestivalDto[]>([]);
   readonly _festivals = this.festivals.asReadonly();
-  
+
 
 
   // Keeping the state of the current festival 
@@ -27,24 +28,61 @@ export class FestivalService {
   // -- Actions --
 
 
+  /* ---------- FESTIVALS ---------- */
+
+  /**
+   * Load all festivals (basic info only, no zones)
+   */
+
+
   loadFestivalsFromServer(): void {
     this.http.get<FestivalDto[]>(`${environment.apiUrl}/festivals`, { withCredentials: true })
-      .pipe(catchError(err => {
-        console.error('Error loading festivals from server', err);
-        return of([]);
-      }))
-      .subscribe(response => {
-        this.festivals.set(response);
-        for (const fest of response) {
-          if (fest.logoUrl) {
-            fest.logoUrl = `${environment.apiUrl}${fest.logoUrl}`;
-            console.log('Logo URL set to', fest.logoUrl, 'for festival', fest.name);
-          }
-        }
-      });
+      .pipe(
+        tap(response => {
+          // Add full logo URLs
+          response.forEach(fest => {
+            if (fest.logoUrl) {
+              fest.logoUrl = `${environment.apiUrl}${fest.logoUrl}`;
+            }
+          });
+          this.festivals.set(response);
+        }),
+        catchError(err => {
+          console.error('Error loading festivals from server', err);
+          return of([]);
+        })
+      )
+      .subscribe();
   }
 
 
+
+
+  /**
+   * Load a specific festival by ID (with full details including zones)
+   */
+  loadFestivalById(id: number): void {
+    this.http.get<FestivalDto>(`${environment.apiUrl}/festivals/${id}`, { withCredentials: true })
+      .pipe(
+        tap(response => {
+          // Add full logo URL
+          if (response.logoUrl) {
+            response.logoUrl = `${environment.apiUrl}${response.logoUrl}`;
+          }
+          this.currentFestival.set(response);
+        }),
+        catchError(err => {
+          console.error('HTTP error when loading festival', err);
+          this.currentFestival.set(null);
+          return of(null);
+        })
+      )
+      .subscribe();
+  }
+
+  /**
+   * Create a new festival
+   */
   addFestival(festivalData: Omit<FestivalDto, "id">, logoFile?: File): void {
     this.http
       .post<FestivalDto>(`${environment.apiUrl}/festivals`, festivalData, {
@@ -56,46 +94,23 @@ export class FestivalService {
             console.log('Festival created with ID:', response.id);
             this.loadFestivalsFromServer();
 
-            if (logoFile && response.id) {
+            if (logoFile) {
               const formData = new FormData();
               formData.append('logo', logoFile);
               this.uploadLogo(response.id, formData);
             }
-          } else {
-            console.error('Unexpected server response when creating festival');
           }
         }),
         catchError(err => {
           console.error('HTTP error when creating festival', err);
-          return of(null)
-        })
-      ).subscribe();
-  }
-
-
-
-    // --- NEW: Add Tariff Zone ---
-  addTariffZone(festivalId: number, zoneData: Omit<ZoneTarifDTO, 'id'>): void {
-    this.http
-      .post<ZoneTarifDTO>(
-        `${environment.apiUrl}/festivals/${festivalId}/pricing-zones`,
-        zoneData,
-        { withCredentials: true }
-      )
-      .pipe(
-        tap(response => {
-          console.log('Tariff zone created:', response);
-          // Reload the current festival to update the zones list
-          this.loadFestivalById(festivalId);
-        }),
-        catchError(err => {
-          console.error('Error creating tariff zone:', err);
           return of(null);
         })
       )
       .subscribe();
   }
-
+  /**
+   * Update an existing festival
+   */
   updateFestival(
     festivalId: number,
     festivalData: Partial<FestivalDto>,
@@ -113,20 +128,21 @@ export class FestivalService {
           if (this.FORCE_UPDATE) {
             this.loadFestivalsFromServer();
           } else {
-            this.festivals.update((festivals) => {
-              const index = festivals.findIndex((f) => f.id === festivalId);
-              if (index !== -1) {
-                return festivals.map((f, i) => (i === index ? { ...f, ...response } : f));
-              }
-              return festivals;
-            });
+            this.festivals.update((festivals) =>
+              festivals.map((f) => (f.id === festivalId ? { ...f, ...response } : f))
+            );
           }
 
-          if (deleteLogo && festivalId) {
+          // Update current festival if it's the one being edited
+          if (this.currentFestival()?.id === festivalId) {
+            this.loadFestivalById(festivalId);
+          }
+
+          if (deleteLogo) {
             this.deleteLogo(festivalId);
           }
 
-          if (logoFile && festivalId) {
+          if (logoFile) {
             const formData = new FormData();
             formData.append('logo', logoFile);
             this.uploadLogo(festivalId, formData);
@@ -136,91 +152,262 @@ export class FestivalService {
           console.error('HTTP error when updating festival', err);
           return of(null);
         })
-      ).subscribe();
+      )
+      .subscribe();
   }
 
 
 
-removeFestival(id: number): void {
-    this.http.delete<void>(`${environment.apiUrl}/festivals/${id}`, { withCredentials: true }).pipe(
-      tap(response => {
-        console.log('Festival deleted with ID:', id);
-        
-        if (this.FORCE_UPDATE) {
-          this.loadFestivalsFromServer();
-        } else {
-          this.festivals.update((festivals) => festivals.filter((f) => f.id !== id));
-        }
-      }),
-      catchError(err => {
-        console.error('HTTP error when deleting festival', err);
-        return of(null)
-      })
-    ).subscribe();
+  /**
+   * Delete a festival
+   */
+  removeFestival(id: number): void {
+    this.http.delete<void>(`${environment.apiUrl}/festivals/${id}`, { withCredentials: true })
+      .pipe(
+        tap(() => {
+          console.log('Festival deleted with ID:', id);
+          
+          if (this.FORCE_UPDATE) {
+            this.loadFestivalsFromServer();
+          } else {
+            this.festivals.update((festivals) => festivals.filter((f) => f.id !== id));
+          }
+
+          // Clear current festival if it was deleted
+          if (this.currentFestival()?.id === id) {
+            this.currentFestival.set(null);
+          }
+        }),
+        catchError(err => {
+          console.error('HTTP error when deleting festival', err);
+          return of(null);
+        })
+      )
+      .subscribe();
   }
 
-loadFestivalById(id: number): void {
-    this.http.get<FestivalDto>(`${environment.apiUrl}/festivals/${id}`, { withCredentials: true }).pipe(
-      tap(response => {
-        console.log('Festival loaded with ID:', id, response);
-        this.currentFestival.set(response);
-      }),
-      catchError(err => {
-        console.error('HTTP error when loading festival', err);
-        return of(null);
-      })
-    ).subscribe();
-  }
 
-uploadLogo(festivalId: number, formData: FormData) {
-    return this.http
+  /* ---------- LOGOS ---------- */
+
+  /**
+   * Upload a logo for a festival
+   */
+  uploadLogo(festivalId: number, formData: FormData): void {
+    this.http
       .post<{ url: string }>(`${environment.apiUrl}/festivals/${festivalId}/logo`, formData, {
         withCredentials: true,
       })
-      .subscribe({
-        next: (response) => {
-          if (this.FORCE_UPDATE) {
-            this.loadFestivalsFromServer();
-          } else {
-            console.log('Updating logo for festival', festivalId);
-            const timestamp = Date.now();
-            this.festivals.update((festivals) => {
-              const festival = festivals.find((f) => f.id === festivalId);
-              if (festival) {
-                const baseUrl = response.url || `/festivals/${festivalId}/logo`;
-                festival.logoUrl = `${environment.apiUrl}${baseUrl}${
-                  baseUrl.includes('?') ? '&' : '?'
-                }t=${timestamp}`;
-              }
-              return festivals;
-            });
+      .pipe(
+        tap((response) => {
+          console.log('Logo uploaded for festival', festivalId);
+          const timestamp = Date.now();
+          const baseUrl = response.url || `/festivals/${festivalId}/logo`;
+          const fullUrl = `${environment.apiUrl}${baseUrl}?t=${timestamp}`;
+
+          // Update in festivals list
+          this.festivals.update((festivals) =>
+            festivals.map((f) => (f.id === festivalId ? { ...f, logoUrl: fullUrl } : f))
+          );
+
+          // Update current festival if applicable
+          if (this.currentFestival()?.id === festivalId) {
+            this.currentFestival.update((festival) =>
+              festival ? { ...festival, logoUrl: fullUrl } : null
+            );
           }
-        },
-        error: (err) => console.error('Error uploading logo', err),
-      });
+        }),
+        catchError((err) => {
+          console.error('Error uploading logo', err);
+          return of(null);
+        })
+      )
+      .subscribe();
   }
 
-  deleteLogo(festivalId: number) {
-    return this.http
+
+
+  /**
+   * Delete a logo for a festival
+   */
+  deleteLogo(festivalId: number): void {
+    this.http
       .delete<void>(`${environment.apiUrl}/festivals/${festivalId}/logo`, {
         withCredentials: true,
       })
-      .subscribe({
-        next: () => {
-          if (this.FORCE_UPDATE) {
-            this.loadFestivalsFromServer();
-          } else {
-            console.log('Logo deleted for festival', festivalId);
-            this.festivals.update((festivals) => {
-              const festival = festivals.find((f) => f.id === festivalId);
-              if (festival) {
-                festival.logoUrl = undefined;
-              }
-              return festivals;
-            });
+      .pipe(
+        tap(() => {
+          console.log('Logo deleted for festival', festivalId);
+
+          // Update in festivals list
+          this.festivals.update((festivals) =>
+            festivals.map((f) => (f.id === festivalId ? { ...f, logoUrl: undefined } : f))
+          );
+
+          // Update current festival if applicable
+          if (this.currentFestival()?.id === festivalId) {
+            this.currentFestival.update((festival) =>
+              festival ? { ...festival, logoUrl: undefined } : null
+            );
           }
-        },
-        error: (err) => console.error('Error deleting logo', err),
-      });
+        }),
+        catchError((err) => {
+          console.error('Error deleting logo', err);
+          return of(null);
+        })
+      )
+      .subscribe();
+  }
+
+
+  /* ---------- TARIF ZONES ---------- */
+
+  /**
+   * Add a tarif zone to a festival
+   */
+  addTarifZone(festivalId: number, zoneData: Omit<ZoneTarifDTO, 'id'>): void {
+    this.http
+      .post<ZoneTarifDTO>(
+        `${environment.apiUrl}/festivals/${festivalId}/tarif-zones`,
+        zoneData,
+        { withCredentials: true }
+      )
+      .pipe(
+        tap(response => {
+          console.log('Tarif zone created:', response);
+          // Reload the current festival to get updated zones
+          this.loadFestivalById(festivalId);
+        }),
+        catchError(err => {
+          console.error('Error creating tarif zone:', err);
+          return of(null);
+        })
+      )
+      .subscribe();
+  }
+
+/**
+   * Update a tarif zone
+   */
+  updateTarifZone(festivalId: number, tarifZoneId: number, zoneData: Partial<ZoneTarifDTO>): void {
+    this.http
+      .put<ZoneTarifDTO>(
+        `${environment.apiUrl}/festivals/${festivalId}/tarif-zones/${tarifZoneId}`,
+        zoneData,
+        { withCredentials: true }
+      )
+      .pipe(
+        tap(response => {
+          console.log('Tarif zone updated:', response);
+          this.loadFestivalById(festivalId);
+        }),
+        catchError(err => {
+          console.error('Error updating tarif zone:', err);
+          return of(null);
+        })
+      )
+      .subscribe();
+  }
+ /**
+   * Delete a tarif zone
+   */
+  removeTarifZone(festivalId: number, tarifZoneId: number): void {
+    this.http
+      .delete<void>(
+        `${environment.apiUrl}/festivals/${festivalId}/tarif-zones/${tarifZoneId}`,
+        { withCredentials: true }
+      )
+      .pipe(
+        tap(() => {
+          console.log('Tarif zone deleted:', tarifZoneId);
+          this.loadFestivalById(festivalId);
+        }),
+        catchError(err => {
+          console.error('Error deleting tarif zone:', err);
+          return of(null);
+        })
+      )
+      .subscribe();
+  }
+
+
+
+  /* ---------- GAME ZONES ---------- */
+
+  /**
+   * Add a game zone to a tarif zone
+   */
+  addGameZone(
+    festivalId: number,
+    tarifZoneId: number,
+    gameZoneData: Omit<ZoneGameDTO, 'id'>
+  ): void {
+    this.http
+      .post<ZoneGameDTO>(
+        `${environment.apiUrl}/festivals/${festivalId}/tarif-zones/${tarifZoneId}/game-zones`,
+        gameZoneData,
+        { withCredentials: true }
+      )
+      .pipe(
+        tap(response => {
+          console.log('Game zone created:', response);
+          this.loadFestivalById(festivalId);
+        }),
+        catchError(err => {
+          console.error('Error creating game zone:', err);
+          return of(null);
+        })
+      )
+      .subscribe();
+  }
+
+  /**
+   * Update a game zone
+   */
+  updateGameZone(
+    festivalId: number,
+    tarifZoneId: number,
+    gameZoneId: number,
+    gameZoneData: Partial<ZoneGameDTO>
+  ): void {
+    this.http
+      .put<ZoneGameDTO>(
+        `${environment.apiUrl}/festivals/${festivalId}/tarif-zones/${tarifZoneId}/game-zones/${gameZoneId}`,
+        gameZoneData,
+        { withCredentials: true }
+      )
+      .pipe(
+        tap(response => {
+          console.log('Game zone updated:', response);
+          this.loadFestivalById(festivalId);
+        }),
+        catchError(err => {
+          console.error('Error updating game zone:', err);
+          return of(null);
+        })
+      )
+      .subscribe();
+  }
+
+  /**
+   * Delete a game zone
+   */
+  removeGameZone(festivalId: number, tarifZoneId: number, gameZoneId: number): void {
+    this.http
+      .delete<void>(
+        `${environment.apiUrl}/festivals/${festivalId}/tarif-zones/${tarifZoneId}/game-zones/${gameZoneId}`,
+        { withCredentials: true }
+      )
+      .pipe(
+        tap(() => {
+          console.log('Game zone deleted:', gameZoneId);
+          this.loadFestivalById(festivalId);
+        }),
+        catchError(err => {
+          console.error('Error deleting game zone:', err);
+          return of(null);
+        })
+      )
+      .subscribe();
   }
 }
+

@@ -6,7 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
-import { ZoneTarifDTO } from '../zone-tarif-dto';
+import { ZoneTarifDTO } from '../dtos/zone-tarif-dto';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { catchError, of, tap } from 'rxjs';
@@ -54,7 +54,7 @@ export class ZoneTarifFormComponent {
     const festivalId = this.data.festivalId;
 
     // Use FestivalService to add the zone
-    this.festivalService.addTariffZone(festivalId, zoneData);
+    this.festivalService.addTarifZone(festivalId, zoneData);
 
     // Close dialog after submitting
     this.dialogRef.close(true);

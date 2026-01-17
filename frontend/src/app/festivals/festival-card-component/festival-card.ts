@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Component, input, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { FestivalDto } from '../festival-dto';
+import { FestivalDto } from '../dtos/festival-dto';
 import { Router } from '@angular/router';
 
 @Component({

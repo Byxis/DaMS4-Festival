@@ -8,7 +8,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { FestivalService } from '../festival-service/festival-service';
-import { FestivalDto } from '../festival-dto';
+import { FestivalDto } from '../dtos/festival-dto';
 
 @Component({
   selector: 'app-festival-new-form',
