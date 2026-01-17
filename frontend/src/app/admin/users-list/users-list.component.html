@@ -1,0 +1,48 @@
+@if (users().length > 0) {
+    <mat-card class="users-card">
+      <mat-list>
+
+        <!-- Header row -->
+        <div class="user-row header">
+          <div></div>
+          <div>Prénom</div>
+          <div>Nom</div>
+          <div>rôle</div>
+          <div>email</div>
+          <div></div>
+        </div>
+
+        <!-- User rows -->
+        @for (user of users(); track user.id) {
+          <div class="user-row">
+            <mat-icon class="user-icon">person</mat-icon>
+
+            <div>{{ user.firstName }}</div>
+            <div>{{ user.lastName }}</div>
+
+            <div>
+              <mat-chip class="role-chip">{{ user.role }}</mat-chip>
+            </div>
+
+            <div>{{ user.email }}</div>
+
+            <div class="actions">
+              <button mat-icon-button (click)="openEditDialog(user)">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <mat-divider></mat-divider>
+        }
+
+      </mat-list>
+    </mat-card>
+
+  
+  } @else {
+    <mat-card class="empty-card">
+      <mat-card-content>No users found.</mat-card-content>
+    </mat-card>
+  }
+
