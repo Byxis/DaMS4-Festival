@@ -1,3 +1,5 @@
+import type { Tarif_Zone } from "./tarif_zone.js";
+
 export interface Festival {
     id: number;
     name: string;
@@ -8,4 +10,5 @@ export interface Festival {
     big_table_count: number;
     town_table_count: number;
     logoUrl? : string;
+    tarif_zones: Tarif_Zone[];
 }
