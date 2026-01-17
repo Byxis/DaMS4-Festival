@@ -15,61 +15,38 @@
 
   <div class="zones-table">
     <div class="table-header">
-      <div
-        class="header-cell id-cell sortable"
-        (click)="sortBy('id')"
-        [matTooltip]="getSortTooltip('id', 'ID')"
-      >
-        ID
-        <mat-icon class="sort-icon" [class.active]="sortColumn() === 'id'">{{
-          sortColumn() === 'id' && sortDirection() === 'desc' ? 'arrow_upward' : 'arrow_downward'
-        }}</mat-icon>
-      </div>
-      <div
-        class="header-cell name-cell sortable"
-        (click)="sortBy('name')"
-        [matTooltip]="getSortTooltip('name', 'Nom')"
-      >
+      <div class="header-cell name-cell sortable" (click)="sortBy('name')">
         Nom
         <mat-icon class="sort-icon" [class.active]="sortColumn() === 'name'">{{
           sortColumn() === 'name' && sortDirection() === 'desc' ? 'arrow_upward' : 'arrow_downward'
         }}</mat-icon>
       </div>
-      <div
-        class="header-cell sortable"
-        (click)="sortBy('price')"
-        [matTooltip]="getSortTooltip('price', 'Prix')"
-      >
-        Prix
-        <mat-icon class="sort-icon" [class.active]="sortColumn() === 'price'">{{
-          sortColumn() === 'price' && sortDirection() === 'desc' ? 'arrow_upward' : 'arrow_downward'
-        }}</mat-icon>
-      </div>
-      <div
-        class="header-cell sortable"
-        (click)="sortBy('outlets')"
-        [matTooltip]="getSortTooltip('outlets', 'Prises électriques')"
-      >
+      <div class="header-cell hide-tablet hide-mobile">Stock tables</div>
+      <div class="header-cell hide-tablet hide-mobile">Grandes tables</div>
+      <div class="header-cell hide-tablet hide-mobile">Tables mairies</div>
+      <div class="header-cell hide-tablet hide-mobile">Surface m²</div>
+      <div class="header-cell sortable hide-mobile" (click)="sortBy('outlets')">
         Prises
         <mat-icon class="sort-icon" [class.active]="sortColumn() === 'outlets'">{{
           sortColumn() === 'outlets' && sortDirection() === 'desc' ? 'arrow_upward' : 'arrow_downward'
         }}</mat-icon>
       </div>
-      <div
-        class="header-cell sortable"
-        (click)="sortBy('gameZones')"
-        [matTooltip]="getSortTooltip('gameZones', 'Zones de jeu')"
-      >
-        Zones de jeu
+      <div class="header-cell sortable" (click)="sortBy('gameZones')">
+        Zones
         <mat-icon class="sort-icon" [class.active]="sortColumn() === 'gameZones'">{{
-          sortColumn() === 'gameZones' && sortDirection() === 'desc'
-            ? 'arrow_upward'
-            : 'arrow_downward'
+          sortColumn() === 'gameZones' && sortDirection() === 'desc' ? 'arrow_upward' : 'arrow_downward'
+        }}</mat-icon>
+      </div>
+      <div class="header-cell sortable" (click)="sortBy('price')">
+        Prix
+        <mat-icon class="sort-icon" [class.active]="sortColumn() === 'price'">{{
+          sortColumn() === 'price' && sortDirection() === 'desc' ? 'arrow_upward' : 'arrow_downward'
         }}</mat-icon>
       </div>
       <div class="header-cell actions-cell">
         <button
           mat-icon-button
+          color="primary"
           (click)="openCreateDialog()"
           class="add-btn"
           aria-label="Ajouter une zone"
@@ -81,121 +58,52 @@
     </div>
 
     @if (tarifZones().length !== 0) {
-    <cdk-virtual-scroll-viewport
-      itemSize="65"
-      minBufferPx="195"
-      maxBufferPx="390"
-      class="table-viewport"
-    >
+    <div class="table-body">
       @for(zone of tarifZones(); track trackByZoneId($index, zone)) {
         <div class="table-row-container">
-          <!-- Row principale -->
           <div
             class="table-row"
             [class.expanded]="expandedZoneId() === zone.id"
             (click)="toggleZone(zone.id!)"
           >
-            <div class="cell id-cell center">
-              <span class="id-badge">{{ zone.id }}</span>
-            </div>
             <div class="cell name-cell">
               <mat-icon class="expand-icon">
                 {{ expandedZoneId() === zone.id ? 'expand_more' : 'chevron_right' }}
               </mat-icon>
               <span class="zone-name">{{ zone.name }}</span>
             </div>
-            <div class="cell center">
-              <div class="cell-content">
-                <mat-icon class="cell-icon">euro</mat-icon>
-                <span>{{ zone.price }} €</span>
-              </div>
-            </div>
-            <div class="cell center">
-              <div class="cell-content">
-                <mat-icon class="cell-icon">power</mat-icon>
-                <span>{{ zone.electricalOutlet }}</span>
-              </div>
-            </div>
-            <div class="cell center">
-              <div class="cell-content">
-                <mat-icon class="cell-icon">sports_esports</mat-icon>
-                <span>{{ getGameZoneCount(zone) }}</span>
-              </div>
-            </div>
+            
+            <div class="cell center hide-tablet hide-mobile">{{ getTotalTables(zone) }}</div>
+            <div class="cell center hide-tablet hide-mobile">{{ getTotalBigTables(zone) }}</div>
+            <div class="cell center hide-tablet hide-mobile">{{ getTotalTownTables(zone) }}</div>
+            <div class="cell center hide-tablet hide-mobile">{{ calculateSurface(zone) }}</div>
+            <div class="cell center hide-mobile">{{ zone.electricalOutlet }}</div>
+            <div class="cell center">{{ getGameZoneCount(zone) }}</div>
+            <div class="cell center price-cell">{{ zone.price }} €</div>
+
             <div class="cell actions-cell center">
-              <button
-                mat-icon-button
-                (click)="editZone($event, zone)"
-                class="edit-btn"
-                matTooltip="Modifier la zone"
-              >
+              @if (expandedZoneId() === zone.id) {
+                <button
+                  mat-icon-button
+                  (click)="addGameZone($event, zone)"
+                  class="add-gz-btn-mini"
+                  matTooltip="Ajouter une zone de jeu"
+                >
+                  <mat-icon>add_circle_outline</mat-icon>
+                </button>
+              }
+              <button mat-icon-button (click)="editZone($event, zone)" class="edit-btn">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button
-                mat-icon-button
-                (click)="deleteZone($event, zone)"
-                class="delete-btn"
-                matTooltip="Supprimer la zone"
-              >
+              <button mat-icon-button (click)="deleteZone($event, zone)" class="delete-btn">
                 <mat-icon>delete</mat-icon>
               </button>
             </div>
           </div>
 
-          <!-- Détails expandables -->
+          <!-- Expanded Content : Game zones list only -->
           @if(expandedZoneId() === zone.id) {
             <div class="zone-details">
-              <div class="details-grid">
-                <div class="detail-card">
-                  <div class="detail-header">
-                    <mat-icon>table_restaurant</mat-icon>
-                    <h4>Stock tables</h4>
-                  </div>
-                  <div class="detail-value">{{ getTotalTables(zone) }}</div>
-                </div>
-
-                <div class="detail-card">
-                  <div class="detail-header">
-                    <mat-icon>table_bar</mat-icon>
-                    <h4>Stock tables grandes</h4>
-                  </div>
-                  <div class="detail-value">{{ getTotalBigTables(zone) }}</div>
-                </div>
-
-                <div class="detail-card">
-                  <div class="detail-header">
-                    <mat-icon>domain</mat-icon>
-                    <h4>Stock tables mairies</h4>
-                  </div>
-                  <div class="detail-value">{{ getTotalTownTables(zone) }}</div>
-                </div>
-
-                <div class="detail-card">
-                  <div class="detail-header">
-                    <mat-icon>square_foot</mat-icon>
-                    <h4>Surface m²</h4>
-                  </div>
-                  <div class="detail-value">{{ calculateSurface(zone) }} m²</div>
-                </div>
-
-                <div class="detail-card">
-                  <div class="detail-header">
-                    <mat-icon>power</mat-icon>
-                    <h4>Prises</h4>
-                  </div>
-                  <div class="detail-value">{{ zone.electricalOutlet }}</div>
-                </div>
-
-                <div class="detail-card">
-                  <div class="detail-header">
-                    <mat-icon>sports_esports</mat-icon>
-                    <h4>Zones de jeu</h4>
-                  </div>
-                  <div class="detail-value">{{ getGameZoneCount(zone) }}</div>
-                </div>
-              </div>
-
-              <!-- Composant GameZonesList -->
               <app-game-zones-list 
                 [festivalId]="festivalId()"
                 [tarifZone]="zone"
@@ -204,15 +112,11 @@
           }
         </div>
       }
-    </cdk-virtual-scroll-viewport>
+    </div>
     } @else {
     <div class="empty-container">
       <mat-icon>playlist_add</mat-icon>
       <p>Aucune zone tarifaire disponible.</p>
-      <button mat-raised-button color="primary" (click)="openCreateDialog()">
-        <mat-icon>add</mat-icon>
-        Ajouter une zone
-      </button>
     </div>
     }
   </div>

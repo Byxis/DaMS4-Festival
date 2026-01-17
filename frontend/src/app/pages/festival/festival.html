@@ -1,16 +1,6 @@
 <div class="festival-detail-container">
     @if (festival(); as f) {
 
-    <!-- TOOLBAR -->
-    <mat-toolbar color="primary" class="festival-toolbar">
-        <button mat-icon-button (click)="goBack()">
-            <mat-icon>arrow_back</mat-icon>
-        </button>
-        <span class="spacer"></span>
-        <span class="toolbar-title">{{ f.name }}</span>
-        <span class="spacer"></span>
-    </mat-toolbar>
-
     <!-- SECTION 1: Main Info + Media Sidecar -->
     <div class="header-section">
 
@@ -44,17 +34,17 @@
             <!-- Festival Stats -->
             <div class="stats-row">
                 <div class="stat-card">
-                    <mat-icon>table_restaurant</mat-icon>
+                    <mat-icon>table_bar</mat-icon>
                     <span class="stat-value">{{ f.table_count }}</span>
                     <span class="stat-label">Tables</span>
                 </div>
                 <div class="stat-card">
-                    <mat-icon>dashboard</mat-icon>
+                    <mat-icon>table_restaurant</mat-icon>
                     <span class="stat-value">{{ f.big_table_count }}</span>
                     <span class="stat-label">Grandes Tables</span>
                 </div>
                 <div class="stat-card">
-                    <mat-icon>location_city</mat-icon>
+                    <mat-icon>desk</mat-icon>
                     <span class="stat-value">{{ f.town_table_count }}</span>
                     <span class="stat-label">Tables Municipales</span>
                 </div>
@@ -80,7 +70,7 @@
     <mat-divider class="section-divider"></mat-divider>
 
     <!-- SECTION 2: Tarif Zones List Component -->
-    <app-tarif-zones-list [festivalId]="id()"></app-tarif-zones-list>
+    <tarif-zones-list [festivalId]="id()"></tarif-zones-list>
 
     } @else {
     <!-- Loading State -->

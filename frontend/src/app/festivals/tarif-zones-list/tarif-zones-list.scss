@@ -1,6 +1,13 @@
-$grid-desktop: 80px 1fr 120px 120px 120px 120px;
-$grid-tablet: 80px 1fr 120px 120px 120px;
-$grid-mobile: 1fr 100px 100px 80px;
+$grid-desktop: minmax(150px, 1.5fr) repeat(7, 1fr) 140px;
+$grid-tablet: 1.5fr repeat(4, 1fr) 140px;
+$grid-mobile: 1.2fr 1fr 1fr 100px;
+
+.hide-tablet {
+    @media (max-width: 1200px) { display: none !important; }
+}
+.hide-mobile {
+    @media (max-width: 768px) { display: none !important; }
+}
 
 @mixin icon-size($size) {
     font-size: $size;
@@ -80,12 +87,11 @@ $grid-mobile: 1fr 100px 100px 80px;
     border-bottom: 1px solid var(--mat-sys-outline-variant);
     font-weight: 500;
     color: var(--mat-sys-on-surface-variant);
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     padding-right: 16px;
 
     .header-cell {
         @include flex-center;
-        padding: 1rem 0.5rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         gap: 0.5rem;
@@ -108,11 +114,23 @@ $grid-mobile: 1fr 100px 100px 80px;
                 }
             }
         }
+
+        &.actions-cell {
+            .add-btn {
+                mat-icon {
+                    color: var(--mat-sys-primary);
+                }
+
+                &:hover {
+                    background-color: var(--mat-sys-surface-container-highest);
+                }
+            }
+        }
     }
 }
 
-.table-viewport {
-    height: 400px;
+.table-body {
+    max-height: 400px;
     overflow-y: auto;
 }
 
@@ -139,22 +157,14 @@ $grid-mobile: 1fr 100px 100px 80px;
     }
 
     .cell {
-        padding: 1rem 0.5rem;
+        padding: 0 0.5rem;
         display: flex;
         align-items: center;
+        height: 100%;
         overflow: hidden;
 
         &.center {
             justify-content: center;
-        }
-
-        &.id-cell .id-badge {
-            background-color: var(--mat-sys-secondary-container);
-            color: var(--mat-sys-on-secondary-container);
-            padding: 0.25rem 0.75rem;
-            border-radius: 12px;
-            font-weight: 500;
-            font-size: 0.875rem;
         }
 
         &.name-cell {
@@ -193,15 +203,30 @@ $grid-mobile: 1fr 100px 100px 80px;
                 @include icon-size(36px);
                 @include flex-center;
                 border-radius: 50%;
+                padding: 0;
+                margin: 0;
+                line-height: 1;
 
                 mat-icon {
                     @include icon-size(1.125rem);
+                    @include flex-center;
                 }
             }
 
             .add-btn {
                 background-color: var(--mat-sys-primary);
                 color: var(--mat-sys-on-primary);
+            }
+
+            .add-gz-btn-mini {
+                mat-icon {
+                    @include icon-size(1.5rem);
+                    color: var(--mat-sys-primary);
+                }
+
+                &:hover {
+                    background-color: var(--mat-sys-surface-container-highest);
+                }
             }
 
             .edit-btn {
@@ -218,60 +243,9 @@ $grid-mobile: 1fr 100px 100px 80px;
 }
 
 .zone-details {
-    padding: 1.5rem;
-    background-color: var(--mat-sys-surface-container-low);
-    border-top: 1px solid var(--mat-sys-outline-variant);
+    padding: 0.5rem 0 1rem 0;
+    background-color: var(--mat-sys-surface-container);
     animation: slideDown 0.3s ease-out;
-
-    .details-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .detail-card {
-        background-color: var(--mat-sys-surface);
-        border-radius: 8px;
-        padding: 1rem;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-
-        .detail-header {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.75rem;
-            color: var(--mat-sys-on-surface-variant);
-
-            mat-icon {
-                @include icon-size(1.25rem);
-            }
-
-            h4 {
-                margin: 0;
-                font-size: 0.875rem;
-                font-weight: 500;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
-        }
-
-        .detail-value {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--mat-sys-on-surface);
-        }
-
-        &.edit-card {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            button {
-                width: 100%;
-            }
-        }
-    }
 
 
 
@@ -292,11 +266,6 @@ $grid-mobile: 1fr 100px 100px 80px;
         .table-header,
         .table-row {
             grid-template-columns: $grid-tablet;
-
-            .header-cell.id-cell,
-            .cell.id-cell {
-                display: none;
-            }
         }
     }
 
@@ -306,15 +275,6 @@ $grid-mobile: 1fr 100px 100px 80px;
         .table-row {
             grid-template-columns: $grid-mobile;
             font-size: 0.75rem;
-
-            .header-cell:nth-child(4),
-            .cell:nth-child(4) {
-                display: none;
-            }
-        }
-
-        .zone-details .details-grid {
-            grid-template-columns: 1fr;
         }
     }
 }

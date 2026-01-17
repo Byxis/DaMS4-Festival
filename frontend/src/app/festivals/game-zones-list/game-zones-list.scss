@@ -1,3 +1,7 @@
+$grid-desktop: minmax(150px, 1.5fr) repeat(7, 1fr) 140px;
+$grid-tablet: 1.5fr repeat(4, 1fr) 140px;
+$grid-mobile: 1.2fr 1fr 1fr 100px;
+
 @mixin icon-size($size) {
   font-size: $size;
   width: $size;
@@ -12,181 +16,104 @@
 
 :host {
   display: block;
+  width: 100%;
 }
 
 .game-zones-section {
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--mat-sys-outline-variant);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
 
-  .game-zones-header {
+.game-zone-row {
+  display: grid;
+  grid-template-columns: $grid-desktop;
+  height: 48px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.03);
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.875rem;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+  }
+
+  .gz-cell {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    padding: 0 0.5rem;
+    height: 100%;
 
-    h4 {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin: 0;
-      font-size: 1rem;
+    &.center {
+      justify-content: center;
+    }
+
+    &.name {
+      gap: 0.75rem;
       font-weight: 500;
       color: var(--mat-sys-on-surface);
 
-      mat-icon {
+      .gz-icon {
         @include icon-size(1.25rem);
-      }
-    }
-  }
-
-  .game-zones-table {
-    background-color: var(--mat-sys-surface);
-    border-radius: 6px;
-    overflow: hidden;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-
-    .game-zone-header-row {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr 120px;
-      background-color: var(--mat-sys-surface-container);
-      border-bottom: 1px solid var(--mat-sys-outline-variant);
-      font-weight: 500;
-      font-size: 0.875rem;
-      color: var(--mat-sys-on-surface-variant);
-
-      .gz-header {
-        padding: 0.75rem 1rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-
-        &.center {
-          text-align: center;
-        }
+        color: var(--mat-sys-primary);
       }
     }
 
-    .game-zone-row {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr 120px;
-      border-bottom: 1px solid var(--mat-sys-outline-variant);
-      transition: background-color 0.2s;
+    &.actions {
+      justify-content: center;
+      gap: 0.25rem;
 
-      &:hover {
-        background-color: var(--mat-sys-surface-container-low);
-      }
+      button {
+        @include icon-size(28px);
+        @include flex-center;
+        padding: 0;
 
-      &:last-child {
-        border-bottom: none;
-      }
-
-      .gz-cell {
-        padding: 1rem;
-        display: flex;
-        align-items: center;
-
-        &.center {
-          justify-content: center;
-          gap: 0.25rem;
-        }
-
-        &.name {
-          gap: 0.75rem;
-          font-weight: 500;
-
-          .gz-icon {
-            @include icon-size(1.25rem);
-            color: var(--mat-sys-primary);
-          }
-        }
-
-        &.actions {
-          gap: 0.5rem;
-
-          button {
-            @include icon-size(32px);
-
-            mat-icon {
-              @include icon-size(1rem);
-            }
-          }
-        }
-
-        .stat-icon {
-          @include icon-size(1rem);
-          color: var(--mat-sys-on-surface-variant);
-        }
-
-        .stat-value {
-          font-weight: 500;
-          color: var(--mat-sys-on-surface);
-          min-width: 20px;
-          text-align: center;
+        mat-icon {
+          @include icon-size(0.875rem);
         }
       }
-    }
-  }
-
-  .no-game-zones {
-    @include flex-center;
-    flex-direction: column;
-    padding: 2rem;
-    background-color: var(--mat-sys-surface-container-low);
-    border-radius: 6px;
-    gap: 0.5rem;
-
-    mat-icon {
-      @include icon-size(2rem);
-      color: var(--mat-sys-outline);
-      opacity: 0.5;
-    }
-
-    p {
-      margin: 0;
-      color: var(--mat-sys-on-surface-variant);
-      font-size: 0.875rem;
     }
   }
 }
 
-@media (max-width: 1024px) {
-  .game-zones-table {
-    .game-zone-header-row,
-    .game-zone-row {
-      grid-template-columns: 2fr 1fr 1fr 100px;
+.no-game-zones {
+  @include flex-center;
+  padding: 1rem;
+  background-color: var(--mat-sys-surface-container-high);
+  border: 1px dashed var(--mat-sys-outline-variant);
+  border-radius: 6px;
+  gap: 0.75rem;
+  color: var(--mat-sys-on-surface-variant);
 
-      .gz-header:nth-child(4),
-      .gz-cell:nth-child(4) {
-        display: none;
-      }
-    }
+  mat-icon {
+    @include icon-size(1.25rem);
+    opacity: 0.7;
   }
+
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+  }
+}
+
+// Global Hiding Utilities (must match parent)
+.hide-tablet {
+    @media (max-width: 1200px) { display: none !important; }
+}
+.hide-mobile {
+    @media (max-width: 768px) { display: none !important; }
+}
+
+@media (max-width: 1200px) {
+    .game-zone-row {
+        grid-template-columns: $grid-tablet;
+    }
 }
 
 @media (max-width: 768px) {
-  .game-zones-section .game-zones-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-
-    button {
-      width: 100%;
-    }
-  }
-
-  .game-zones-table {
-    .game-zone-header-row,
     .game-zone-row {
-      grid-template-columns: 2fr 80px;
-
-      .gz-header:nth-child(2),
-      .gz-cell:nth-child(2),
-      .gz-header:nth-child(3),
-      .gz-cell:nth-child(3),
-      .gz-header:nth-child(4),
-      .gz-cell:nth-child(4) {
-        display: none;
-      }
+        grid-template-columns: $grid-mobile;
+        font-size: 0.75rem;
     }
-  }
 }
