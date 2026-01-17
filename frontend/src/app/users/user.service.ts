@@ -3,13 +3,12 @@ import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '@env/environment';
 import { catchError, of } from 'rxjs';
 import { UserDto } from 'src/app/shared/types/user-dto';
-import { InviteUserResponse } from 'src/app/shared/types/invite-user-response';
+import { UserResponse } from 'src/app/shared/types/user-response';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
-
   
   private readonly http = inject(HttpClient);
 
@@ -23,7 +22,7 @@ export class UserService {
   }
 
   editUser(user: UserDto) {
-    return this.http.put<InviteUserResponse>(
+    return this.http.put<UserResponse>(
       `${environment.apiUrl}/users/${user.id}`,
       user,
       { withCredentials: true }
@@ -31,11 +30,20 @@ export class UserService {
   }
 
   createUser(user: UserDto) {
-    return this.http.post<InviteUserResponse>(
+    return this.http.post<UserResponse>(
       `${environment.apiUrl}/users/invite`,
       user,
       { withCredentials: true }
     );
   }
+
+  deleteUser(user: UserDto) {
+    return this.http.delete<UserResponse>(
+      `${environment.apiUrl}/users/${user.id}`,
+      { withCredentials: true }
+    );
+  }
+
+  
 
 }

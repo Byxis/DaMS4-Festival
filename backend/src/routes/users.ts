@@ -154,4 +154,16 @@ router.get("/", requireAdmin, async (_req, res) => {
     res.json(rows);
 });
 
+router.delete("/:id", requireAdmin, async (req, res) => {
+    const { id } = req.params;
+    const { rows } = await pool.query("DELETE FROM users WHERE id = $1 RETURNING *", [id]);
+    if (rows.length === 0) {
+        return res.status(404).json({ error: "Utilisateur introuvable" });
+    }
+    res.json({
+        message: "Utilisateur supprimé",
+        user: rows[0],
+    });
+});
+
 export default router;

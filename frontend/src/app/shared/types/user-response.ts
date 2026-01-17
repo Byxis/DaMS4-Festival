@@ -1,6 +1,6 @@
 import { UserDto } from "./user-dto";
 
-export interface InviteUserResponse {
+export interface UserResponse {
   message: string;
   user: UserDto;
 }
