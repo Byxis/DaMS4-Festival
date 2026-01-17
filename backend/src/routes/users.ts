@@ -31,11 +31,15 @@ router.put("/:id", async (req, res) => {
       return res.status(404).json({ error: "Utilisateur introuvable" });
     }
 
-    res.json(result.rows[0]);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Erreur serveur" });
-  }
+    return res.status(200).json({
+      message: "Utilisateur modifié",
+      user: result.rows[0],
+    });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Erreur serveur" });
+    }
 });
 
 router.get("/:id", async (req, res) => {
@@ -51,7 +55,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // Création d'un utilisateur
-router.post("/", async (req, res) => {
+router.post("/register", async (req, res) => {
     const { email, password, firstName, lastName, role} = req.body;
 
     if (!email) {
@@ -81,6 +85,58 @@ router.post("/", async (req, res) => {
     }
     
 });
+
+// Création d'un utilisateur par un admin (invitation)
+router.post("/invite", requireAdmin, async (req, res) => {
+  const { email, firstName, lastName, role } = req.body;
+
+  if (!email || !role) {
+    return res.status(400).json({ error: "Email et rôle requis" });
+  }
+
+  try {
+    // Check if user already exists
+    const { rows } = await pool.query("SELECT * FROM users WHERE email = $1", [
+      email,
+    ]);
+
+    const existingUser = rows[0];
+
+    if (existingUser) {
+      return res.status(409).json({ error: "Utilisateur déjà existant" });
+    }
+
+    const { rows: newRows } = await pool.query(
+      `INSERT INTO users (email, first_name, last_name, role, password_hash)
+       VALUES ($1, $2, $3, $4, NULL)
+       RETURNING id, email, first_name, last_name, role`,
+      [
+        email,
+        firstName || null,
+        lastName || null,
+        role,
+      ]
+    );
+
+    const user = newRows[0];
+
+    return res.status(201).json({
+      message: "Utilisateur invité",
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        role: user.role,
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Erreur serveur" });
+  }
+});
+
+
 
 router.get("/me", async (req, res) => {
     const user = req.user;

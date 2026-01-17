@@ -52,7 +52,7 @@ export class CreateUserDialog {
 
     email: new FormControl(this.data?.email ?? '', {
       nonNullable: true,
-      validators: [Validators.email, Validators.required],
+      validators: [Validators.email, Validators.required, Validators.minLength(5)],
     }),
 
     role: new FormControl<string | ''>(this.data?.role ?? '', {

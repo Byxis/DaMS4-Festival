@@ -31,6 +31,7 @@ export class AuthService {
   login(email: string, password: string) {
     this._isLoading.set(true);
     this._error.set(null);
+
     this.http
       .post<{ user: UserDto }>(
         `${environment.apiUrl}/auth/login`,
@@ -51,7 +52,7 @@ export class AuthService {
         catchError((err) => {
           console.error('👎 Erreur HTTP', err);
           if (err.status === 401) {
-            this._error.set('Identifiants invalides');
+            this._error.set(err?.error?.error ?? 'Identifiants invalides');
           } else if (err.status === 0) {
             this._error.set('Serveur injoignable (vérifiez HTTPS ou CORS)');
           } else {

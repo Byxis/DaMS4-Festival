@@ -3,6 +3,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '@env/environment';
 import { catchError, of } from 'rxjs';
 import { UserDto } from 'src/app/shared/types/user-dto';
+import { InviteUserResponse } from 'src/app/shared/types/invite-user-response';
 
 @Injectable({
   providedIn: 'root',
@@ -22,45 +23,19 @@ export class UserService {
   }
 
   editUser(user: UserDto) {
-    this.http
-      .put<UserDto>(`${environment.apiUrl}/users/${user.id}`, user, {
-        withCredentials: true,
-      })
-      .pipe(
-        catchError((err) => {
-          console.error('👎 Erreur HTTP', err);
-          return of(null);
-        })
-      )
-      .subscribe((updatedUser: UserDto | null) => {
-        if (updatedUser) {
-          const currentUsers = this.users();
-          const index = currentUsers.findIndex((u) => u.id === updatedUser.id);
-          if (index !== -1) {
-            currentUsers[index] = updatedUser;
-            this.users.set([...currentUsers]);
-          }
-        }
-      });
+    return this.http.put<InviteUserResponse>(
+      `${environment.apiUrl}/users/${user.id}`,
+      user,
+      { withCredentials: true }
+    );
   }
 
-  // admin created user
   createUser(user: UserDto) {
-    this.http
-      .post<UserDto>(`${environment.apiUrl}/users`, user, {
-        withCredentials: true,
-      })
-      .pipe(
-        catchError((err) => {
-          console.error('👎 Erreur HTTP', err);
-          return of(null);
-        })
-      )
-      .subscribe((newUser: UserDto | null) => {
-        if (newUser) {
-          this.users.set([...this.users(), newUser]);
-        }
-      });
+    return this.http.post<InviteUserResponse>(
+      `${environment.apiUrl}/users/invite`,
+      user,
+      { withCredentials: true }
+    );
   }
 
 }
