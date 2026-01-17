@@ -1,4 +1,3 @@
-
 <mat-card 
   class="festival-card" 
   appearance="outlined"
@@ -7,38 +6,41 @@
   (click)="navigateToFestivalPage()"
   >
 
-
-  <mat-card-header>
-    <!-- <div mat-card-avatar class="example-header-image"></div> -->
-    <mat-card-title>{{this.festival().name}}</mat-card-title>
-    <mat-card-subtitle></mat-card-subtitle>
-  </mat-card-header>
-  
-  @if(isHovered){
- <mat-card-content>
-    <p>
-      Lieu : {{this.festival().location}} <br>
-      Début : {{this.festival().start_date | date : "shortDate"}} <br>
-      Fin : {{this.festival().end_date | date : "shortDate"}} <br>
-
-
-    <p>Tables disponibles :
-      {{this.festival().table_count}}</p> <br>
-    <p>Grandes tables disponibles : 
-      {{this.festival().big_table_count}}</p> <br>
-    <p>Tables de mairie disponibles : 
-      {{this.festival().town_table_count}}</p> <br>
-  </mat-card-content>
+  <!-- Logo en arrière-plan -->
+  @if(festival().logoUrl) {
+    <div class="card-background" [style.background-image]="'url(' + festival().logoUrl + ')'"></div>
   }
-  @else{
- <mat-card-content>
-    <p>
-      Lieu : {{this.festival().location}} <br>
-      Début : {{this.festival().start_date | date : "shortDate"}} <br>
 
-  </mat-card-content>
-  }
- 
-
+  <div class="card-content-overlay">
+    <mat-card-header>
+      <!-- Placeholder en petit si pas de logo -->
+      @if(!festival().logoUrl) {
+        <div mat-card-avatar class="festival-logo-placeholder">
+          <span>{{ getInitials() }}</span>
+        </div>
+      }
+      
+      <mat-card-title>{{festival().name}}</mat-card-title>
+      <mat-card-subtitle>{{festival().location}}</mat-card-subtitle>
+    </mat-card-header>
+    
+    @if(isHovered){
+      <mat-card-content>
+        <p>
+          Début : {{festival().start_date | date : "shortDate"}} <br>
+          Fin : {{festival().end_date | date : "shortDate"}} <br>
+        </p>
+        <p>Tables disponibles : {{festival().table_count}}</p>
+        <p>Grandes tables disponibles : {{festival().big_table_count}}</p>
+        <p>Tables de mairie disponibles : {{festival().town_table_count}}</p>
+      </mat-card-content>
+    } @else {
+      <mat-card-content>
+        <p>
+          Début : {{festival().start_date | date : "shortDate"}}
+        </p>
+      </mat-card-content>
+    }
+  </div>
 
 </mat-card>

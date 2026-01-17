@@ -25,4 +25,15 @@ export class FestivalCard {
       this.router.navigate(["/festivals", this.festival().id]);
     }
   }
+
+
+    getInitials(): string {
+    const name = this.festival().name;
+    return name
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  }
 }

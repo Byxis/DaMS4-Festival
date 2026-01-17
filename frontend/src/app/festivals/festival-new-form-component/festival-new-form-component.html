@@ -27,19 +27,44 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Nombre de tables</mat-label>
-        <input matInput formControlName="table_count" type="number" placeholder="ex: 150">
+        <mat-label>Tables</mat-label>
+        <input matInput formControlName="table_count" type="number" placeholder="150">
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Nombre de grandes tables</mat-label>
-        <input matInput formControlName="big_table_count" type="number" placeholder="ex: 40">
+        <mat-label>Grandes tables</mat-label>
+        <input matInput formControlName="big_table_count" type="number" placeholder="40">
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Nombre de tables municipales</mat-label>
-        <input matInput formControlName="town_table_count" type="number" placeholder="ex: 20">
+        <mat-label>Tables municipales</mat-label>
+        <input matInput formControlName="town_table_count" type="number" placeholder="20">
       </mat-form-field>
+
+      <!-- Logo Upload Section -->
+      <div class="logo-section">
+        @if(logoPreview) {
+          <div class="logo-preview">
+            <img [src]="logoPreview" alt="Logo preview">
+            <button mat-icon-button (click)="removeLogo()" type="button">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        } @else {
+          <div class="logo-upload">
+            <input 
+              type="file" 
+              accept="image/*" 
+              (change)="onLogoSelected($event)"
+              #fileInput
+              style="display: none">
+            <button mat-stroked-button type="button" (click)="fileInput.click()">
+              <mat-icon>upload</mat-icon>
+              Uploader un logo
+            </button>
+          </div>
+        }
+      </div>
 
     </form>
   </mat-card-content>

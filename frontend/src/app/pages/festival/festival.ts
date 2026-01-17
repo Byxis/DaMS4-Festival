@@ -60,7 +60,8 @@ export class Festival {
   // Open dialog to add new tariff zone
   openAddZoneDialog(): void {
     const dialogRef = this.dialog.open(ZoneTarifFormComponent, {
-      width: '500px',
+    width: '800px',  // ou '90vw' pour 90% de la largeur de l'écran
+    maxWidth: '95vw', // limite à 95% de la largeur sur petits écrans
       disableClose: false,
       data: { festivalId: this.id() }
     });

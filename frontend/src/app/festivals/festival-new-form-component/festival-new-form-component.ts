@@ -36,6 +36,11 @@ export class FestivalNewFormComponent {
   isEditing = false;
   festivalId: number | null = null;
 
+
+  selectedLogoFile: File | null = null;
+  logoPreview: string | null = null;
+
+
   constructor() {
     // Initialize flags from data
     this.isEditing = this.data?.isEditing ?? false;
@@ -85,15 +90,19 @@ export class FestivalNewFormComponent {
     return `${year}-${month}-${day}`;
   }
 
-  submit(): void {
+submit(): void {
     if (this.form.invalid) return;
 
     const formData: Omit<FestivalDto, 'id'> = this.form.value;
 
     if (this.isEditing && this.festivalId) {
-      this.festivalService.updateFestival(this.festivalId, formData);
+      this.festivalService.updateFestival(
+        this.festivalId, 
+        formData, 
+        this.selectedLogoFile || undefined
+      );
     } else {
-      this.festivalService.addFestival(formData);
+      this.festivalService.addFestival(formData, this.selectedLogoFile || undefined);
     }
 
     this.dialogRef.close(true);
@@ -109,6 +118,27 @@ export class FestivalNewFormComponent {
 
   getSubmitButtonText(): string {
     return this.isEditing ? 'Mettre à jour' : 'Créer';
+  }
+
+
+
+  onLogoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.selectedLogoFile = input.files[0];
+      
+      // Créer une prévisualisation
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        this.logoPreview = e.target?.result as string;
+      };
+      reader.readAsDataURL(this.selectedLogoFile);
+    }
+  }
+
+  removeLogo(): void {
+    this.selectedLogoFile = null;
+    this.logoPreview = null;
   }
 
 }
