@@ -43,13 +43,16 @@
 
       <!-- Logo Upload Section -->
       <div class="logo-section">
-        @if(logoPreview) {
+        @if(hasLogoToDisplay()) {
           <div class="logo-preview">
             <img [src]="logoPreview" alt="Logo preview">
-            <button mat-icon-button (click)="removeLogo()" type="button">
+            <button mat-icon-button (click)="removeLogo()" type="button" color="warn">
               <mat-icon>close</mat-icon>
             </button>
           </div>
+          @if(hasExistingLogo) {
+            <p class="logo-hint">Logo actuel du festival</p>
+          }
         } @else {
           <div class="logo-upload">
             <input 
@@ -60,9 +63,12 @@
               style="display: none">
             <button mat-stroked-button type="button" (click)="fileInput.click()">
               <mat-icon>upload</mat-icon>
-              Uploader un logo
+              {{ isEditing ? 'Changer le logo' : 'Uploader un logo' }}
             </button>
           </div>
+          @if(deleteLogo) {
+            <p class="logo-hint warning">Le logo sera supprimé lors de la mise à jour</p>
+          }
         }
       </div>
 

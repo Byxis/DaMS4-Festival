@@ -78,9 +78,11 @@ export class Festival {
   editFestival(): void {
     const dialogRef = this.dialog.open(FestivalNewFormComponent, {
       width: '1000px',
+      maxWidth: '95vw',
       disableClose: false, 
       data: {
-        festival : this.festival,
+        festival : this.festival(),
+        festivalId: this.id(),
         isEditing : true
       }
     });

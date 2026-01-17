@@ -114,3 +114,15 @@ mat-card-actions {
     font-size: 1.25rem;
   }
 }
+
+
+.logo-hint {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #666;
+  
+  &.warning {
+    color: #f44336;
+    font-weight: 500;
+  }
+}
