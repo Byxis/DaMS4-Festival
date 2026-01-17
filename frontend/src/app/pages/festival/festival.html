@@ -1,16 +1,6 @@
 <div class="festival-detail-container">
     @if (festival(); as f) {
 
-    <!-- TOOLBAR -->
-    <mat-toolbar color="primary" class="festival-toolbar">
-        <button mat-icon-button (click)="goBack()">
-            <mat-icon>arrow_back</mat-icon>
-        </button>
-        <span class="spacer"></span>
-        <span class="toolbar-title">{{ f.name }}</span>
-        <span class="spacer"></span>
-    </mat-toolbar>
-
     <!-- SECTION 1: Main Info + Media Sidecar -->
     <div class="header-section">
 
@@ -18,7 +8,7 @@
         <div class="main-info">
             <div class="title-row">
                 <h1>{{ f.name }}</h1>
-                <button mat-icon-button color="primary" title="Edit Festival">
+                <button mat-icon-button color="primary" title="Edit Festival" (click)="editFestival()">
                     <mat-icon>edit</mat-icon>
                 </button>
             </div>
@@ -44,17 +34,17 @@
             <!-- Festival Stats -->
             <div class="stats-row">
                 <div class="stat-card">
-                    <mat-icon>table_restaurant</mat-icon>
+                    <mat-icon>table_bar</mat-icon>
                     <span class="stat-value">{{ f.table_count }}</span>
                     <span class="stat-label">Tables</span>
                 </div>
                 <div class="stat-card">
-                    <mat-icon>dashboard</mat-icon>
+                    <mat-icon>table_restaurant</mat-icon>
                     <span class="stat-value">{{ f.big_table_count }}</span>
                     <span class="stat-label">Grandes Tables</span>
                 </div>
                 <div class="stat-card">
-                    <mat-icon>location_city</mat-icon>
+                    <mat-icon>desk</mat-icon>
                     <span class="stat-value">{{ f.town_table_count }}</span>
                     <span class="stat-label">Tables Municipales</span>
                 </div>
@@ -79,107 +69,9 @@
 
     <mat-divider class="section-divider"></mat-divider>
 
-    <!-- SECTION 2: Logistics / Tariff Zones -->
-    <div class="logistics-section">
-        <div class="section-header">
-            <h2>Zones Tarifaires</h2>
-            <button mat-raised-button color="primary" (click)="openAddZoneDialog()">
-                <mat-icon>add</mat-icon>
-                Ajouter une zone
-            </button>
-        </div>
-        @if (f.pricingZones && f.pricingZones.length > 0) {
+    <!-- SECTION 2: Tarif Zones List Component -->
+    <tarif-zones-list [festivalId]="id()"></tarif-zones-list>
 
-        <div class="zones-grid">
-            @for (zone of f.pricingZones; track $index) {
-            <mat-card class="zone-card">
-
-                <!-- Zone Header -->
-                <mat-card-header>
-                    <mat-card-title>{{ zone.name }}</mat-card-title>
-                </mat-card-header>
-
-                <!-- Zone Content -->
-                <mat-card-content>
-                    <div class="zone-details">
-
-                        <!-- Price Info -->
-                        <div class="detail-row">
-                            <span class="detail-label">Prix par table</span>
-                            <span class="detail-value price">{{ zone.price }}€</span>
-                        </div>
-
-                        <!-- Electrical Outlets -->
-                        <div class="detail-row">
-                            <span class="detail-label">Prises électriques</span>
-                            <span class="detail-value outlets">
-                                <mat-icon class="small-icon">bolt</mat-icon>
-                                {{ zone.electricalOutlet }}
-                            </span>
-                        </div>
-
-                    </div>
-
-                    <!-- Nested: Table Type Breakdown -->
-                    @if (zone.price) {
-                    <mat-divider class="zone-divider"></mat-divider>
-                    <div class="table-breakdown">
-                        <h4>Répartition des tables</h4>
-
-                        <div class="breakdown-rows">
-                            <div class="breakdown-row">
-                                <span class="breakdown-label">
-                                    <mat-icon class="breakdown-icon">table_restaurant</mat-icon>
-                                    Tables
-                                </span>
-                                <span class="breakdown-value">{{ f.table_count }}</span>
-                                <span class="breakdown-subtotal">{{ f.table_count * zone.price }}€</span>
-                            </div>
-
-                            <div class="breakdown-row">
-                                <span class="breakdown-label">
-                                    <mat-icon class="breakdown-icon">dashboard</mat-icon>
-                                    Grandes Tables
-                                </span>
-                                <span class="breakdown-value">{{ f.big_table_count }}</span>
-                                <span class="breakdown-subtotal">{{ f.big_table_count * zone.price }}€</span>
-                            </div>
-
-                            <div class="breakdown-row">
-                                <span class="breakdown-label">
-                                    <mat-icon class="breakdown-icon">location_city</mat-icon>
-                                    Tables Municipales
-                                </span>
-                                <span class="breakdown-value">{{ f.town_table_count }}</span>
-                                <span class="breakdown-subtotal">{{ f.town_table_count * zone.price }}€</span>
-                            </div>
-                        </div>
-
-                        <!-- Zone Total -->
-                        <div class="zone-total">
-                            <span class="total-label">Revenu potentiel</span>
-                            <span class="total-value">
-                                {{ (f.table_count + f.big_table_count + f.town_table_count) * zone.price }}€
-                            </span>
-                        </div>
-                    </div>
-                    }
-
-                </mat-card-content>
-
-            </mat-card>
-            }
-        </div>
-
-        } @else {
-        <div class="no-zones">
-            <mat-icon>info</mat-icon>
-            <p>Aucune zone tarifaire définie</p>
-        </div>
-        }
-
-    </div>
-    
     <mat-divider class="section-divider"></mat-divider>
 
     <div>

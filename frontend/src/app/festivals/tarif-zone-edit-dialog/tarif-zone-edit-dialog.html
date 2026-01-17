@@ -1,0 +1,25 @@
+<h2 mat-dialog-title>{{ getTitle() }}</h2>
+<mat-dialog-content>
+  <form [formGroup]="form">
+    <mat-form-field appearance="outline">
+      <mat-label>Nom de la zone</mat-label>
+      <input matInput formControlName="name" placeholder="ex: Zone VIP">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Prix (€)</mat-label>
+      <input matInput type="number" formControlName="price" placeholder="150">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Prises électriques</mat-label>
+      <input matInput type="number" formControlName="electricalOutlet" placeholder="5">
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Annuler</button>
+  <button mat-raised-button color="primary" [disabled]="form.invalid" (click)="submit()">
+    {{ isEditing ? 'Mettre à jour' : 'Créer' }}
+  </button>
+</mat-dialog-actions>

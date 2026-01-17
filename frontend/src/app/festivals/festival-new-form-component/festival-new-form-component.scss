@@ -1,72 +1,128 @@
 mat-card {
-  max-width: 900px;
-  margin: 2rem auto;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
   padding: 2rem;
 }
 
 mat-card-header {
-
-
-  margin: 1rem ;
-  padding: 1rem;
+  margin-bottom: 2rem;
 }
+
+mat-card-title {
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
 form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-// Section pour les informations générales
-.form-section {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-bottom: 1rem;
-
-  &.full-width {
-    grid-template-columns: 1fr;
-  }
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
 }
 
-mat-form-field {
+.form-field {
   width: 100%;
 }
 
-// Section pour les tables (3 colonnes)
-.tables-section {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-  margin-bottom: 1rem;
+// Les champs de dates côte à côte
+.form-field:nth-child(3),
+.form-field:nth-child(4) {
+  grid-column: span 1;
+}
 
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
+// Les champs de tables sur une ligne
+.form-field:nth-child(5),
+.form-field:nth-child(6),
+.form-field:nth-child(7) {
+  grid-column: span 1;
+}
+
+// La section logo prend toute la largeur
+.logo-section {
+  grid-column: span 2;
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.logo-preview {
+  position: relative;
+  display: inline-block;
+  
+  img {
+    width: 150px;
+    height: 150px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 2px solid #ddd;
+  }
+
+  button {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: white;
   }
 }
 
-// Actions du formulaire
-.form-actions {
+.logo-upload {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 1rem;
+}
+
+mat-card-actions {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
   margin-top: 1.5rem;
-  padding-top: 1.5rem;
+  padding-top: 1rem;
   border-top: 1px solid rgba(0, 0, 0, 0.12);
 }
 
-// Style pour les boutons
-button[type="submit"] {
-  margin-left: auto;
-}
-
-// Responsive
-@media (max-width: 768px) {
-  mat-card {
-    margin: 1rem;
-    padding: 1.5rem;
+// Responsive pour tablettes
+@media (max-width: 900px) {
+  form {
+    grid-template-columns: 1fr;
   }
 
-  .form-section {
-    grid-template-columns: 1fr;
+  .logo-section {
+    grid-column: span 1;
+  }
+
+  .form-field:nth-child(3),
+  .form-field:nth-child(4),
+  .form-field:nth-child(5),
+  .form-field:nth-child(6),
+  .form-field:nth-child(7) {
+    grid-column: span 1;
+  }
+}
+
+// Responsive pour mobiles
+@media (max-width: 768px) {
+  mat-card {
+    margin: 0.5rem;
+    padding: 1rem;
+  }
+
+  mat-card-title {
+    font-size: 1.25rem;
+  }
+}
+
+
+.logo-hint {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #666;
+  
+  &.warning {
+    color: #f44336;
+    font-weight: 500;
   }
 }

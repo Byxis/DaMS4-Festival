@@ -1,0 +1,119 @@
+$grid-desktop: minmax(150px, 1.5fr) repeat(7, 1fr) 140px;
+$grid-tablet: 1.5fr repeat(4, 1fr) 140px;
+$grid-mobile: 1.2fr 1fr 1fr 100px;
+
+@mixin icon-size($size) {
+  font-size: $size;
+  width: $size;
+  height: $size;
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.game-zones-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.game-zone-row {
+  display: grid;
+  grid-template-columns: $grid-desktop;
+  height: 48px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.03);
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.875rem;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+  }
+
+  .gz-cell {
+    display: flex;
+    align-items: center;
+    padding: 0 0.5rem;
+    height: 100%;
+
+    &.center {
+      justify-content: center;
+    }
+
+    &.name {
+      gap: 0.75rem;
+      font-weight: 500;
+      color: var(--mat-sys-on-surface);
+
+      .gz-icon {
+        @include icon-size(1.25rem);
+        color: var(--mat-sys-primary);
+      }
+    }
+
+    &.actions {
+      justify-content: center;
+      gap: 0.25rem;
+
+      button {
+        @include icon-size(28px);
+        @include flex-center;
+        padding: 0;
+
+        mat-icon {
+          @include icon-size(0.875rem);
+        }
+      }
+    }
+  }
+}
+
+.no-game-zones {
+  @include flex-center;
+  padding: 1rem;
+  background-color: var(--mat-sys-surface-container-high);
+  border: 1px dashed var(--mat-sys-outline-variant);
+  border-radius: 6px;
+  gap: 0.75rem;
+  color: var(--mat-sys-on-surface-variant);
+
+  mat-icon {
+    @include icon-size(1.25rem);
+    opacity: 0.7;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+  }
+}
+
+// Global Hiding Utilities (must match parent)
+.hide-tablet {
+    @media (max-width: 1200px) { display: none !important; }
+}
+.hide-mobile {
+    @media (max-width: 768px) { display: none !important; }
+}
+
+@media (max-width: 1200px) {
+    .game-zone-row {
+        grid-template-columns: $grid-tablet;
+    }
+}
+
+@media (max-width: 768px) {
+    .game-zone-row {
+        grid-template-columns: $grid-mobile;
+        font-size: 0.75rem;
+    }
+}

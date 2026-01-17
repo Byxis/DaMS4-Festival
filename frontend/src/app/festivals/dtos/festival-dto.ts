@@ -1,5 +1,6 @@
 import { ZoneTarifDTO } from "./zone-tarif-dto"
 
+
 export interface FestivalDto {
 
     /*
@@ -22,5 +23,5 @@ export interface FestivalDto {
     big_table_count: number
     town_table_count : number
     logoUrl?: string
-    pricingZones?: ZoneTarifDTO[];
+    tarif_zones?: ZoneTarifDTO[];
 }

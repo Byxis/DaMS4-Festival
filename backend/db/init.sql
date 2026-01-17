@@ -43,6 +43,24 @@ CREATE TABLE IF NOT EXISTS festivals (
     town_table_count INT DEFAULT 0
 ); 
 
+CREATE TABLE IF NOT EXISTS tarif_zone(
+    id SERIAL PRIMARY KEY,
+    festival_id INTEGER REFERENCES festivals(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    price INTEGER NOT NULL,
+    numberOutlets INTEGER DEFAULT 0,
+    maxTable INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS game_zone(
+    id SERIAL PRIMARY KEY,
+    tarif_zone_id INTEGER REFERENCES tarif_zone(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    reserved_table INTEGER DEFAULT 0,
+    reserved_big_table INTEGER DEFAULT 0,
+    reserved_town_table INTEGER DEFAULT 0
+);
+
 CREATE TABLE IF NOT EXISTS reservations (
     id SERIAL PRIMARY KEY,
     festival_id INTEGER REFERENCES festivals(id) ON DELETE CASCADE,
@@ -53,7 +71,7 @@ CREATE TABLE IF NOT EXISTS reservations (
     town_table_count INT DEFAULT 0,
     electrical_outlets INT DEFAULT 0,
     note TEXT,
-    status TEXT DEFAULT 'TO_BE_CONTACTED' CHECK (status IN ('TO_BE_CONTACTED', 'CONTACTED', 'IN_DISCUSSION', 'FACTURED', 'CONFIRMED', 'ABSENT'))
+    status TEXT DEFAULT 'TO_BE_CONTACTED' CHECK (status IN ('TO_BE_CONTACTED', 'CONTACTED', 'IN_DISCUSSION', 'FACTURED', 'AWAITING_PAYMENT', 'CONFIRMED', 'CANCELLED', 'ABSENT'))
 );
 
 CREATE TABLE IF NOT EXISTS reservation_interactions (
@@ -78,13 +96,15 @@ CREATE TABLE IF NOT EXISTS reservation_games (
 SELECT setval('entities_id_seq', (SELECT MAX(id) FROM entities) + 1);
 SELECT setval('contact_id_seq', (SELECT MAX(id) FROM contact) + 1);
 SELECT setval('users_id_seq', (SELECT MAX(id) FROM users) + 1);
+SELECT setval('tarif_zone_id_seq', (SELECT MAX(id) FROM tarif_zone) + 1);
+SELECT setval('game_zone_id_seq', (SELECT MAX(id) FROM game_zone) + 1);
 SELECT setval('festivals_id_seq', (SELECT MAX(id) FROM festivals) + 1);
 
 CREATE OR REPLACE FUNCTION insert_into_other_func()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO entities (name, first_name, last_name, type)
-    VALUES (NEW.name, NEW.first_name, NEW.last_name, 'GUEST')
+    INSERT INTO entities (name, type)
+    VALUES (NEW.name, 'GUEST')
     RETURNING id INTO NEW.id;
     RETURN NEW;
 END;
