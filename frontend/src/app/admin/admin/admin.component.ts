@@ -6,20 +6,21 @@ import { MatDialog } from '@angular/material/dialog';
 import { CreateUserDialog } from '@admin/create-user-dialog/create-user-dialog.component';
 import { UsersListComponent } from "@admin/users-list/users-list.component";
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatChipListbox, MatChipOption } from '@angular/material/chips';
 
 @Component({
   selector: 'admin',
-  imports: [MatIcon, UsersListComponent],
+  imports: [MatIcon, UsersListComponent, MatFormField, MatLabel, MatInputModule, MatChipListbox, MatChipOption],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.scss',
 })
 export class AdminComponent {
-  private readonly userSvc = inject(UserService);
+  readonly userSvc = inject(UserService);
   private readonly dialog = inject(MatDialog);
   private readonly snack = inject(MatSnackBar);
   readonly users: WritableSignal<UserDto[]> = this.userSvc.users;
-
-  displayedColumns: string[] = ['firstName', 'lastName', 'role', 'email'];
 
   openCreateDialog(): void {
     const dialogRef = this.dialog.open(CreateUserDialog, {

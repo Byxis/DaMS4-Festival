@@ -1,7 +1,6 @@
 import { CreateUserDialog } from '@admin/create-user-dialog/create-user-dialog.component';
-import { Component, effect, inject, WritableSignal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { MatCard, MatCardContent } from '@angular/material/card';
-import { MatChip } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { MatDivider } from '@angular/material/divider';
 import { MatIcon } from '@angular/material/icon';
@@ -10,7 +9,6 @@ import { UserService } from '@users/user.service';
 import { UserDto } from '../../shared/types/user-dto';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { roleEnToFr } from 'src/app/shared/utils/roles';
-import { MatMenu, MatMenuContent, MatMenuTrigger } from '@angular/material/menu';
 import { MatFormField } from '@angular/material/form-field';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { AuthService } from '@auth/auth.service';
@@ -25,7 +23,7 @@ import { AuthService } from '@auth/auth.service';
 export class UsersListComponent {
 
   private readonly userSvc = inject(UserService);
-  readonly users: WritableSignal<UserDto[]> = this.userSvc.users;
+  readonly users = this.userSvc.filteredUsers;
   readonly dialog = inject(MatDialog);
   readonly snack = inject(MatSnackBar);
   readonly authSvc = inject(AuthService);
@@ -49,11 +47,12 @@ export class UsersListComponent {
 
       this.userSvc.editUser(result.user as UserDto).subscribe({
         next: (res) => {
-          const current = this.users();
+          const current = [...this.userSvc.users()];
           const idx = current.findIndex(u => u.id === res.user.id);
+
           if (idx !== -1) {
             current[idx] = res.user;
-            this.users.set([...current]);
+            this.userSvc.users.set(current);
           }
 
           // show server message
@@ -106,16 +105,17 @@ export class UsersListComponent {
     if (!ok) {
       // revert UI value
       user.role = oldRole;
-      this.users.set([...this.users()]);
+      this.userSvc.users.set([...this.userSvc.users()]);
       return;
     }
     this.userSvc.updateUserRole(user, role).subscribe({
       next: (res) => {
-        const current = this.users();
+        const current = [...this.userSvc.users()];
         const idx = current.findIndex(u => u.id === res.user.id);
+
         if (idx !== -1) {
           current[idx] = res.user;
-          this.users.set([...current]);
+          this.userSvc.users.set(current);
         }
 
         this.snack.open(res.message, "OK", { duration: 2500 });
