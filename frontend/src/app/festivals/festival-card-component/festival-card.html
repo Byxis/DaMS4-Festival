@@ -6,39 +6,27 @@
   (click)="navigateToFestivalPage()"
   >
 
-  <!-- Logo en arrière-plan -->
   @if(festival().logoUrl) {
     <div class="card-background" [style.background-image]="'url(' + festival().logoUrl + ')'"></div>
   }
 
+  <div class="festival-banner">
+    <div class="festival-name">{{festival().name}}</div>
+    <div class="festival-dates">
+      {{festival().start_date | date : "shortDate"}} - {{festival().end_date | date : "shortDate"}}
+    </div>
+    <div class="festival-location">
+      <mat-icon>location_on</mat-icon>
+      <span>{{festival().location}}</span>
+    </div>
+  </div>
+
   <div class="card-content-overlay">
-    <mat-card-header>
-      <!-- Placeholder en petit si pas de logo -->
-      @if(!festival().logoUrl) {
-        <div mat-card-avatar class="festival-logo-placeholder">
-          <span>{{ getInitials() }}</span>
-        </div>
-      }
-      
-      <mat-card-title>{{festival().name}}</mat-card-title>
-      <mat-card-subtitle>{{festival().location}}</mat-card-subtitle>
-    </mat-card-header>
-    
     @if(isHovered){
       <mat-card-content>
-        <p>
-          Début : {{festival().start_date | date : "shortDate"}} <br>
-          Fin : {{festival().end_date | date : "shortDate"}} <br>
-        </p>
         <p>Tables disponibles : {{festival().table_count}}</p>
         <p>Grandes tables disponibles : {{festival().big_table_count}}</p>
         <p>Tables de mairie disponibles : {{festival().town_table_count}}</p>
-      </mat-card-content>
-    } @else {
-      <mat-card-content>
-        <p>
-          Début : {{festival().start_date | date : "shortDate"}}
-        </p>
       </mat-card-content>
     }
   </div>
