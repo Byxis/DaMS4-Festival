@@ -80,6 +80,24 @@
   padding: 16px;
 }
 
+mat-card-content {
+  padding-top: 8px;
+  
+  p {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      color: var(--mat-sys-primary);
+    }
+  }
+}
+
 .festival-logo-placeholder {
   width: 40px;
   height: 40px;

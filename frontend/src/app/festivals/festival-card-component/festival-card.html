@@ -24,9 +24,11 @@
   <div class="card-content-overlay">
     @if(isHovered){
       <mat-card-content>
-        <p>Tables disponibles : {{festival().table_count}}</p>
-        <p>Grandes tables disponibles : {{festival().big_table_count}}</p>
-        <p>Tables de mairie disponibles : {{festival().town_table_count}}</p>
+        <p>Tables disponibles :</p>
+        <br>
+        <p><mat-icon>table_bar</mat-icon> {{festival().table_count}} / {{festival().table_count}}</p>
+        <p><mat-icon>table_restaurant</mat-icon> {{festival().big_table_count}} / {{festival().big_table_count}}</p>
+        <p><mat-icon>desk</mat-icon> {{festival().town_table_count}} / {{festival().town_table_count}}</p>
       </mat-card-content>
     }
   </div>
