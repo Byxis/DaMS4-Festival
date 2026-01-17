@@ -1,0 +1,70 @@
+<div class="game-zones-section">
+  <div class="game-zones-header">
+    <h4>
+      <mat-icon>sports_esports</mat-icon>
+      Zones de jeu
+    </h4>
+    <button 
+      mat-raised-button 
+      color="primary"
+      (click)="addGameZone($event)"
+    >
+      <mat-icon>add</mat-icon>
+      Ajouter une zone de jeu
+    </button>
+  </div>
+
+  @if(tarifZone().game_zones && tarifZone().game_zones!.length > 0) {
+    <div class="game-zones-table">
+      <div class="game-zone-header-row">
+        <div class="gz-header">Nom</div>
+        <div class="gz-header center">Tables</div>
+        <div class="gz-header center">Grandes tables</div>
+        <div class="gz-header center">Tables mairies</div>
+        <div class="gz-header center">Actions</div>
+      </div>
+      @for(gameZone of tarifZone().game_zones; track trackByGameZoneId($index, gameZone)) {
+        <div class="game-zone-row">
+          <div class="gz-cell name">
+            <mat-icon class="gz-icon">videogame_asset</mat-icon>
+            <span>{{ gameZone.name }}</span>
+          </div>
+          <div class="gz-cell center">
+            <mat-icon class="stat-icon">table_restaurant</mat-icon>
+            <span class="stat-value">{{ gameZone.reserved_table }}</span>
+          </div>
+          <div class="gz-cell center">
+            <mat-icon class="stat-icon">table_bar</mat-icon>
+            <span class="stat-value">{{ gameZone.reserved_big_table }}</span>
+          </div>
+          <div class="gz-cell center">
+            <mat-icon class="stat-icon">domain</mat-icon>
+            <span class="stat-value">{{ gameZone.reserved_town_table }}</span>
+          </div>
+          <div class="gz-cell center actions">
+            <button
+              mat-icon-button
+              (click)="editGameZone($event, gameZone)"
+              matTooltip="Modifier"
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              color="warn"
+              (click)="deleteGameZone($event, gameZone)"
+              matTooltip="Supprimer"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="no-game-zones">
+      <mat-icon>sports_esports</mat-icon>
+      <p>Aucune zone de jeu pour le moment</p>
+    </div>
+  }
+</div>

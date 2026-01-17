@@ -1,0 +1,16 @@
+<h2 mat-dialog-title>{{ getTitle() }}</h2>
+<mat-dialog-content>
+  <form [formGroup]="form">
+    <mat-form-field appearance="outline">
+      <mat-label>Nom de la zone de jeu</mat-label>
+      <input matInput formControlName="name" placeholder="ex: Zone RPG, Zone Jeux de société, etc.">
+      <mat-hint>Entrez uniquement le nom de la zone</mat-hint>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Annuler</button>
+  <button mat-raised-button color="primary" [disabled]="form.invalid" (click)="submit()">
+    {{ isEditing ? 'Mettre à jour' : 'Créer' }}
+  </button>
+</mat-dialog-actions>
