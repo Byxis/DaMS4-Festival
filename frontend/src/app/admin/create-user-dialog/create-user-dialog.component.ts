@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-
 import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
@@ -10,6 +9,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { UserDto } from '../../shared/types/user-dto';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { roleFrToEn } from 'src/app/shared/utils/roles';
 
 
 @Component({
@@ -31,7 +31,7 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 export class CreateUserDialog {
 
   private readonly dialogRef = inject(MatDialogRef<CreateUserDialog>);
-  readonly roles = ['admin', 'editor', 'publisher', 'guest'];
+  readonly roles = ['Administrateur', 'Rédacteur', 'Éditeur de jeux', 'Invité'];
   readonly data = inject<UserDto | null>(MAT_DIALOG_DATA, { optional: true });
 
 
@@ -71,11 +71,14 @@ export class CreateUserDialog {
 
     const firstName = this.form.value.firstName?.trim() ?? '';
     const lastName = this.form.value.lastName?.trim() ?? '';
+    
+    //convert role to english
+    const roleEn = roleFrToEn(role);
 
     const payload: Partial<UserDto> = {
       id: this.data?.id, 
       email: email.trim(),
-      role: role,
+      role: roleEn,
       firstName: firstName,
       lastName: lastName,
     };

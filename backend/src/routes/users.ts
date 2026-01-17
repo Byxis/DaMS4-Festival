@@ -166,4 +166,37 @@ router.delete("/:id", requireAdmin, async (req, res) => {
     });
 });
 
+router.put("/:id/role", requireAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { role } = req.body;
+
+  const allowedRoles = ["admin", "editor", "publisher", "guest"];
+  if (!role || !allowedRoles.includes(role)) {
+    return res.status(400).json({ error: "Rôle invalide" });
+  }
+
+  try {
+    const result = await pool.query(
+      `UPDATE users
+       SET role=$1
+       WHERE id=$2
+       RETURNING id, first_name as \"firstName\", last_name as \"lastName\", email, role`,
+      [role, id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Utilisateur introuvable" });
+    }
+
+    return res.status(200).json({
+      message: "Rôle utilisateur modifié",
+      user: result.rows[0],
+    });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Erreur serveur" });
+    }
+});
+
 export default router;

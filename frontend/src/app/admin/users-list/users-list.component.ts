@@ -9,19 +9,28 @@ import { MatList } from '@angular/material/list';
 import { UserService } from '@users/user.service';
 import { UserDto } from '../../shared/types/user-dto';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { roleEnToFr } from 'src/app/shared/utils/roles';
+import { MatMenu, MatMenuContent, MatMenuTrigger } from '@angular/material/menu';
+import { MatFormField } from '@angular/material/form-field';
+import { MatOption, MatSelect } from '@angular/material/select';
+import { AuthService } from '@auth/auth.service';
 
 
 @Component({
   selector: 'app-users-list',
-  imports: [MatChip, MatList, MatDivider, MatIcon, MatCard, MatCardContent],
+  imports: [MatList, MatDivider, MatIcon, MatCard, MatCardContent, MatFormField, MatSelect, MatOption],
   templateUrl: './users-list.component.html',
   styleUrl: './users-list.component.scss'
 })
 export class UsersListComponent {
+
   private readonly userSvc = inject(UserService);
   readonly users: WritableSignal<UserDto[]> = this.userSvc.users;
   readonly dialog = inject(MatDialog);
   readonly snack = inject(MatSnackBar);
+  readonly authSvc = inject(AuthService);
+  readonly roleEnToFr = roleEnToFr;
+  selectedUser: UserDto | null = null;
   // Charge la liste à l’arrivée sur la page
   constructor() {
     effect(() => this.userSvc.loadAll());
@@ -84,5 +93,39 @@ export class UsersListComponent {
     }
   }
 
-}
+  setRole(user: UserDto | null, role: string) {
+    if (!user) return;
 
+    const oldRole = user.role;
+    if (role === oldRole) return;
+
+    const ok = confirm(
+      `Êtes-vous sûr de changer le rôle de l'utilisateur ${user.firstName?? "Monsieur/Madame"} ${user.lastName?? "Nom inconnu"} à ${roleEnToFr(role)} ?`
+    );
+
+    if (!ok) {
+      // revert UI value
+      user.role = oldRole;
+      this.users.set([...this.users()]);
+      return;
+    }
+    this.userSvc.updateUserRole(user, role).subscribe({
+      next: (res) => {
+        const current = this.users();
+        const idx = current.findIndex(u => u.id === res.user.id);
+        if (idx !== -1) {
+          current[idx] = res.user;
+          this.users.set([...current]);
+        }
+
+        this.snack.open(res.message, "OK", { duration: 2500 });
+      },
+      error: (err) => {
+        this.snack.open(err?.error?.error ?? "Erreur serveur", "OK", {
+          duration: 3500,
+        });
+        this.selectedUser = null;
+      }
+    });
+  }
+}

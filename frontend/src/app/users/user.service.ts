@@ -44,6 +44,14 @@ export class UserService {
     );
   }
 
+  updateUserRole(user: UserDto, role: string) {
+    return this.http.put<UserResponse>(
+      `${environment.apiUrl}/users/${user.id}/role`,
+      { role },
+      { withCredentials: true }
+    );
+  }
+
   
 
 }
