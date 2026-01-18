@@ -99,7 +99,7 @@ export class UsersListComponent {
     if (role === oldRole) return;
 
     const ok = confirm(
-      `Êtes-vous sûr de changer le rôle de l'utilisateur ${user.firstName?? "Monsieur/Madame"} ${user.lastName?? "Nom inconnu"} à ${roleEnToFr(role)} ?`
+      `Êtes-vous sûr de changer le rôle de l'utilisateur ${user.firstName ?? "Monsieur/Madame"} ${user.lastName ?? "Nom inconnu"} à ${roleEnToFr(role)} ?`
     );
 
     if (!ok) {

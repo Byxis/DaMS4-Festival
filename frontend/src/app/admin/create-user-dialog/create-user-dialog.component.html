@@ -6,7 +6,7 @@
       <mat-label>Prénom (optionnel)</mat-label>
       <input matInput formControlName="firstName" />
       @if (form.controls.firstName.invalid && form.controls.firstName.touched) {
-        <mat-error>Format invalide</mat-error>
+      <mat-error>Format invalide</mat-error>
       }
     </mat-form-field>
 
@@ -14,7 +14,7 @@
       <mat-label>Nom (optionnel)</mat-label>
       <input matInput formControlName="lastName" />
       @if (form.controls.lastName.invalid && form.controls.lastName.touched) {
-        <mat-error>Format invalide</mat-error>
+      <mat-error>Format invalide</mat-error>
       }
     </mat-form-field>
 
@@ -23,9 +23,9 @@
       <input matInput formControlName="email" />
 
       @if (form.controls.email.hasError('required')) {
-        <mat-error>Email requis</mat-error>
+      <mat-error>Email requis</mat-error>
       } @else if (form.controls.email.hasError('email')) {
-        <mat-error>Email invalide</mat-error>
+      <mat-error>Email invalide</mat-error>
       }
     </mat-form-field>
 
@@ -33,12 +33,12 @@
       <mat-label>Rôle</mat-label>
       <mat-select formControlName="role">
         @for (r of roles; track r) {
-          <mat-option [value]="r">{{ r }}</mat-option>
+        <mat-option [value]="r">{{ r }}</mat-option>
         }
       </mat-select>
 
       @if (form.controls.role.hasError('required')) {
-        <mat-error>Rôle requis</mat-error>
+      <mat-error>Rôle requis</mat-error>
       }
     </mat-form-field>
   </form>

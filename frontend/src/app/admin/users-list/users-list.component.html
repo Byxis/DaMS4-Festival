@@ -1,65 +1,60 @@
 @if (users().length > 0) {
-    <mat-card class="users-card">
-      <mat-list>
+<mat-card class="users-card">
+    <mat-list>
 
         <div class="user-row header">
-          <div></div>
-          <div>Prénom</div>
-          <div>Nom</div>
-          <div>Rôle</div>
-          <div>Email</div>
-          <div></div>
+            <div></div>
+            <div>Prénom</div>
+            <div>Nom</div>
+            <div>Rôle</div>
+            <div>Email</div>
+            <div></div>
         </div>
 
         @for (user of users(); track user.id) {
-          <div class="user-row">
+        <div class="user-row">
             <mat-icon class="user-icon">person</mat-icon>
 
             <div>{{ user.firstName }}</div>
             <div>{{ user.lastName }}</div>
 
             @if (authSvc.currentUser()?.id !== user.id) {
-                <div class="role-cell">
-                    <mat-form-field appearance="outline" class="role-select">
-                        <mat-select
-                            [value]="user.role"
-                            (selectionChange)="setRole(user, $event.value)"
-    >
-                            <mat-option value="admin">Administrateur</mat-option>
-                            <mat-option value="editor">Éditeur</mat-option>
-                            <mat-option value="publisher">Éditeur de jeux</mat-option>
-                            <mat-option value="guest">Invité</mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                </div>
+            <div class="role-cell">
+                <mat-form-field appearance="outline" class="role-select">
+                    <mat-select [value]="user.role" (selectionChange)="setRole(user, $event.value)">
+                        <mat-option value="admin">Administrateur</mat-option>
+                        <mat-option value="editor">Éditeur</mat-option>
+                        <mat-option value="publisher">Éditeur de jeux</mat-option>
+                        <mat-option value="guest">Invité</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
             } @else {
-                <div>{{ roleEnToFr(user.role) }} (Toi)</div>
+            <div>{{ roleEnToFr(user.role) }} (Toi)</div>
             }
 
             <div>{{ user.email }}</div>
-            
+
             @if (authSvc.currentUser()?.id !== user.id) {
             <div class="actions-cell">
-              <button mat-icon-button (click)="openEditDialog(user)" class="edit-btn">
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button mat-icon-button (click)="deleteUser(user)" class="delete-btn">
-                <mat-icon>delete</mat-icon>
-              </button>
+                <button mat-icon-button (click)="openEditDialog(user)" class="edit-btn">
+                    <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button (click)="deleteUser(user)" class="delete-btn">
+                    <mat-icon>delete</mat-icon>
+                </button>
             </div>
             }
-          </div>
+        </div>
 
-          <mat-divider></mat-divider>
+        <mat-divider></mat-divider>
         }
 
-      </mat-list>
-    </mat-card>
-  
-  } @else {
-    <mat-card class="empty-card">
-      <mat-card-content>No users found.</mat-card-content>
-    </mat-card>
-  }
-  
+    </mat-list>
+</mat-card>
 
+} @else {
+<mat-card class="empty-card">
+    <mat-card-content>No users found.</mat-card-content>
+</mat-card>
+}
