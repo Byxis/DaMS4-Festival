@@ -2,6 +2,7 @@ import {CommonModule, DatePipe} from '@angular/common';
 import {Component, effect, inject, input} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
+import { MatDialog } from '@angular/material/dialog';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
@@ -12,6 +13,7 @@ import {MatTableModule} from '@angular/material/table';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {Router} from '@angular/router';
 import {FestivalDto} from 'src/app/festivals/dtos/festival-dto';
+import { FestivalNewFormComponent } from 'src/app/festivals/festival-new-form-component/festival-new-form-component';
 import {FestivalService} from 'src/app/festivals/festival-service/festival-service';
 import {TarifZonesList} from 'src/app/festivals/tarif-zones-list/tarif-zones-list';
 
@@ -40,6 +42,8 @@ export class Festival
     private readonly router = inject(Router);
     private readonly svc = inject(FestivalService);
 
+    private readonly dialog = inject(MatDialog);
+
     id = input.required<number>();
     festival = this.svc._currentFestival;
 
@@ -59,9 +63,26 @@ export class Festival
         this.router.navigate(['/festivals']);
     }
 
-    editFestival(): void
+editFestival(): void
     {
-        // Votre code d'édition
+        const currentFestival = this.festival();
+        if (!currentFestival) return;
+
+        const dialogRef = this.dialog.open(FestivalNewFormComponent, {
+            width: '600px',
+            data: {
+                isEditing: true,
+                festivalId: currentFestival.id,
+                festival: currentFestival
+            }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+                // Recharger le festival après modification
+                this.svc.loadFestivalById(this.id());
+            }
+        });
     }
 
     getDateRange(festival: FestivalDto): string
