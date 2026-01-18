@@ -134,6 +134,42 @@ export class ReservationComponent
         };
     });
 
+    readonly tableWarnings = computed(() => {
+        const res = this.reservation();
+        if (!res) return [];
+
+        const assigned = {tables_standard: 0, tables_large: 0, tables_small: 0};
+
+        if (res.games)
+        {
+            res.games.forEach(g => {
+                assigned.tables_standard += g.table_count || 0;
+                assigned.tables_large += g.big_table_count || 0;
+                assigned.tables_small += g.town_table_count || 0;
+            });
+        }
+
+        const warnings: string[] = [];
+
+        const checkStock = (reserved: number, assignedCount: number, label: string) => {
+            if (reserved > assignedCount)
+            {
+                warnings.push(
+                    `Toutes les ${label.toLowerCase()} n'ont pas été attribuées : ${assignedCount}/${reserved}`);
+            }
+            else if (reserved < assignedCount)
+            {
+                warnings.push(`Trop de ${label.toLowerCase()} attribuées : ${assignedCount}/${reserved}`);
+            }
+        };
+
+        checkStock(res.table_count || 0, assigned.tables_standard, 'Tables');
+        checkStock(res.big_table_count || 0, assigned.tables_large, 'Tables grandes');
+        checkStock(res.town_table_count || 0, assigned.tables_small, 'Tables mairies');
+
+        return warnings;
+    });
+
     constructor()
     {
         effect(() => {

@@ -77,6 +77,13 @@
             [festivalId]="festivalId()"></table>
           }
         </div>
+        @if (tableWarnings().length > 0) {
+        <div class="warnings-container">
+          @for (warning of tableWarnings(); track $index) {
+          <div class="warning-text">{{ warning }}</div>
+          }
+        </div>
+        }
       </div>
       <note [note]="reservation()?.note ?? null" [reservation]="reservation()" [festivalId]="festivalId()"></note>
     </div>
