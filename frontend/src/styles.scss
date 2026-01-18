@@ -97,3 +97,15 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+mat-dialog-content {
+  padding-top: 8px !important;
+  overflow: visible !important;
+  
+  mat-form-field:first-of-type {
+    margin-top: 8px;
+  }
+}
+.mat-mdc-dialog-content {
+  padding-top: 8px !important;
+}
