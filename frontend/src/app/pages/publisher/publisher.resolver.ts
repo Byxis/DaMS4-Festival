@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { ResolveFn, Router } from '@angular/router';
-import { PublisherService } from '@publisher/publisher.service';
+import { PublisherService } from 'src/app/publisher/publisher.service';
 
 export const publisherResolver: ResolveFn<number> = async (route) => {
   const publisherService = inject(PublisherService);

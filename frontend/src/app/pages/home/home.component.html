@@ -1,7 +1,7 @@
 <p>Home Page !</p>
 
 @if (this.authSvc.isLoggedIn()) {
-<p>Welcome back, {{ this.authSvc.currentUser()?.login }}!</p>
+<p>Welcome back, {{ this.authSvc.currentUser()?.firstName }}!</p>
 } @if (this.authSvc.isAdmin()) {
 <p>You have administrative privileges.</p>
 }

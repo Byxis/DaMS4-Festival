@@ -1,6 +1,6 @@
 export interface TokenPayload {
     id: number;
-    login: string;
+    email: string;
     role: string;
     iat?: number; // issued at
     exp?: number; // expiration

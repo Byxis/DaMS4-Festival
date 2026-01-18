@@ -1,6 +1,7 @@
+
 import {ScrollingModule} from '@angular/cdk/scrolling';
 import {CommonModule} from '@angular/common';
-import {Component, computed, inject, signal} from '@angular/core';
+import {Component, computed, effect, inject, signal} from '@angular/core';
 import {MatButtonModule, MatIconButton} from '@angular/material/button';
 import {MatDialog} from '@angular/material/dialog';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -11,29 +12,29 @@ import {Router} from '@angular/router';
 import {EntityDTO} from '@publisher/entityDto';
 import {PublisherEditDialog} from '@publisher/publisher-edit-dialog/publisher-edit-dialog.component';
 import {PublisherService} from '@publisher/publisher.service';
-import {computedSorted, SortConfig} from '@shared/utils/sort.utils'
+import {computedSorted, SortConfig} from '@shared/utils/sort.utils';
+import {PublishersImportDialog} from 'src/app/publisher/publisher-import-dialog/publisher-import-dialog';
 
+import {GameService} from '../../games/game-service/game-service';  // Fixed relative import
+
+// Helper functions
 const getContactCount = (p: EntityDTO): number => p.contacts?.length ?? 0;
 const getFirstContactName = (p: EntityDTO): string => {
     if (!p.contacts || p.contacts.length === 0) return '';
     return `${p.contacts[0].name} ${p.contacts[0].family_name}`;
 };
-const getGameCount = (p: EntityDTO): number => 0;
-const getFestivalCount = (p: EntityDTO): number => 0;
+const getGameCount = (p: any): number => p.numberOfGames ?? 0;
+const getFestivalCount = (p: EntityDTO): number => 0;  // TODO
 
 const SORT_STRATEGIES: SortConfig<EntityDTO> = {
     'ID': (a, b) => (a.id ?? 0) - (b.id ?? 0),
     'ID_REVERSE': (a, b) => (b.id ?? 0) - (a.id ?? 0),
-
     'NAME': (a, b) => a.name.localeCompare(b.name),
     'NAME_REVERSE': (a, b) => b.name.localeCompare(a.name),
-
     'GAMES': (a, b) => getGameCount(a) - getGameCount(b),
     'GAMES_REVERSE': (a, b) => getGameCount(b) - getGameCount(a),
-
     'CONTACTS': (a, b) => getContactCount(a) - getContactCount(b),
     'CONTACTS_REVERSE': (a, b) => getContactCount(b) - getContactCount(a),
-
     'FIRST_CONTACT': (a, b) => {
         const valA = getFirstContactName(a);
         const valB = getFirstContactName(b);
@@ -50,7 +51,6 @@ const SORT_STRATEGIES: SortConfig<EntityDTO> = {
         if (!valB) return -1;
         return valB.localeCompare(valA);
     },
-
     'FESTIVALS': (a, b) => getFestivalCount(a) - getFestivalCount(b),
     'FESTIVALS_REVERSE': (a, b) => getFestivalCount(b) - getFestivalCount(a),
 };
@@ -76,6 +76,9 @@ export class PublishersList
     private readonly router = inject(Router);
     private readonly publisherService = inject(PublisherService);
     private readonly dialog = inject(MatDialog);
+    private readonly gameService = inject(GameService);
+
+    readonly errorMessage = computed(() => this.publisherService.errorMessage());
 
     readonly sortKey = signal<string>('NAME');
     readonly searchTerm = signal<string>('');
@@ -95,11 +98,30 @@ export class PublishersList
 
     readonly items = computedSorted(this.basePublishers, this.sortKey, SORT_STRATEGIES);
 
-    // Expose helpers for template
+    // Helpers
     readonly getContactCount = getContactCount;
     readonly getFirstContactName = getFirstContactName;
     readonly getGameCount = getGameCount;
     readonly getFestivalCount = getFestivalCount;
+
+    constructor()
+    {
+        effect(() => {
+            const publishers = this.publisherService._publishers();
+            publishers.forEach((pub: any) => {
+                if (pub.id && !pub.numberOfGames)
+                {
+                    this.gameService.getGameCountByPublisher(pub.id).subscribe({
+                        next: (count) => {
+                            pub.numberOfGames = count;
+                            console.log(`📊 Publisher ${pub.id}: ${count} games`);
+                        },
+                        error: (err) => console.error('Error:', err)
+                    })
+                }
+            })
+        });
+    }
 
     viewPublisher(publisher: EntityDTO): void
     {
@@ -122,6 +144,20 @@ export class PublishersList
         }
     }
 
+    getSortTooltip(column: string, label: string): string
+    {
+        const current = this.sortKey();
+        if (current === column)
+        {
+            return `Trier par ${label} (Croissant)`;
+        }
+        if (current === column + '_REVERSE')
+        {
+            return `Trier par ${label} (Décroissant)`;
+        }
+        return `Trier par ${label}`;
+    }
+
     trackByPublisherId(index: number, publisher: EntityDTO): number
     {
         return publisher.id ?? index;
@@ -138,6 +174,23 @@ export class PublishersList
             if (result?.publisher)
             {
                 this.publisherService.register(result.publisher, result.newLogo);
+            }
+        });
+    }
+
+    openImportEditorDialog(): void
+    {
+        const dialogRef = this.dialog.open(PublishersImportDialog, {
+            width: '800px',
+            maxHeight: '90vh',
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result)
+            {
+                console.log('Éditeur importé:', result);
+                // Trigger reload or update
+                this.publisherService.loadAll();
             }
         });
     }
@@ -165,19 +218,5 @@ export class PublishersList
         {
             this.publisherService.delete(publisher.id);
         }
-    }
-
-    getSortTooltip(column: string, label: string): string
-    {
-        const current = this.sortKey();
-        if (current === column)
-        {
-            return `Trier par ${label} (Croissant)`;
-        }
-        if (current === column + '_REVERSE')
-        {
-            return `Trier par ${label} (Décroissant)`;
-        }
-        return `Trier par ${label}`;
     }
 }
