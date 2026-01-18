@@ -27,6 +27,10 @@ export class AuthService {
   readonly isLoading = this._isLoading.asReadonly();
   readonly error = this._error.asReadonly();
 
+  setCurrentUser(user: UserDto | null): void {
+    this._currentUser.set(user);
+  }
+
   // --- Connexion ---
   login(email: string, password: string) {
     this._isLoading.set(true);
@@ -99,7 +103,7 @@ export class AuthService {
         catchError((err) => {
           if (this._hasBeenLoggedIn()) {
             this._error.set('Session expirée');
-        }
+          }
           this._currentUser.set(null);
           return of(null);
         }),
@@ -137,17 +141,17 @@ export class AuthService {
           }
         }),
         catchError((err) => {
-        console.error("👎 Erreur HTTP", err);
+          console.error("👎 Erreur HTTP", err);
 
-        if (err.status === 409) {
-          this._error.set("Un compte associé à cet e-mail existe déjà");
-        } else {
-          this._error.set("Erreur lors de l'enregistrement");
-        }
+          if (err.status === 409) {
+            this._error.set("Un compte associé à cet e-mail existe déjà");
+          } else {
+            this._error.set("Erreur lors de l'enregistrement");
+          }
 
-        this._currentUser.set(null);
-        return of(null);
-      }),
+          this._currentUser.set(null);
+          return of(null);
+        }),
         finalize(() => this._isLoading.set(false))
       )
       .subscribe();

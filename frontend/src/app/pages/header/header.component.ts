@@ -63,14 +63,7 @@ export class HeaderComponent {
     ref.afterClosed().subscribe((result) => {
       this.userSvc.updateUser(result.user as UserDto).subscribe({
         next: (res) => {
-          const current = [...this.userSvc.users()];
-          const idx = current.findIndex(u => u.id === res.user.id);
-
-          if (idx !== -1) {
-            current[idx] = res.user;
-            this.userSvc.users.set(current);
-          }
-
+          this.authSvc.setCurrentUser(res.user);
           this.snack.open(res.message, "OK", { duration: 2500 });
         },
         error: (err) => {
