@@ -20,23 +20,21 @@ $grid-mobile: 2fr 1fr 1fr 1fr 80px;
 
 
 .game-list-container {
-  padding: 16px;
   max-width: 100%;
-  margin: 0;
+  margin-top: 16px;
   width: 100%;
 
   .header {
-    margin-bottom: 1.5rem;
+    margin-bottom: 0;
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 2rem;
     flex-wrap: wrap;
-    justify-content: space-between;  
 
     mat-card-title,
     h1 {
       margin: 0;
-      font-size: 1.5rem;
+      font-size: 2rem;
       font-weight: 500;
       color: var(--mat-sys-on-surface);
     }
@@ -51,30 +49,6 @@ $grid-mobile: 2fr 1fr 1fr 1fr 80px;
       flex-shrink: 0;
       box-shadow: 0 2px 4px #0003;
       background: transparent;
-      &:hover {
-        box-shadow: 0 4px 8px #0004;
-      }
-
-      button {
-        @include icon-size(40px);
-        @include flex-center;
-        border-radius: 8px;
-        padding: 8px 12px;
-      }
-    }
-  }
-
-  .add-game-menu {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: flex-end;  
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-
-    button {
-      white-space: nowrap;
-      box-shadow: 0 2px 4px #0003;
-
       &:hover {
         box-shadow: 0 4px 8px #0004;
       }
@@ -133,46 +107,36 @@ $grid-mobile: 2fr 1fr 1fr 1fr 80px;
       font-weight: 500;
       color: var(--mat-sys-on-surface-variant);
       font-size: 0.875rem;
-      padding-right: 16px;
+      padding-right: 0px;
       border-right: 1px solid transparent;
 
       .header-cell {
-        display: flex;
-        align-items: center;
-        justify-content: flex-start; 
+        @include flex-center;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         gap: 0.5rem;
         min-width: 100px;
-        padding: 1rem; 
-      }
+        
+        &.actions-cell {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          padding-right: 0;
 
-     
-      > .header-cell.actions-cell {
-        justify-content: center;
-        padding: 1rem; 
+          button {
+            width: 40px;     
+            height: 40px;    
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-        button {
-          border-radius: 8px;
-          padding: 6px 10px;
-          background-color: transparent !important;
-          color: var(--mat-sys-primary) !important;
-          box-shadow: 0 2px 4px #0003;
-          &:hover { box-shadow: 0 4px 8px #0004; opacity: 0.95; }
-          mat-icon { @include icon-size(1.25rem); }
-        }
-
-    
-        button .mat-ripple-element,
-        button .mat-button-focus-overlay,
-        button::after {
-          background-color: transparent !important;
-        }
-
-       
-        button.mat-icon-button {
-          background-color: transparent !important;
-          color: var(--mat-sys-primary) !important;
+            mat-icon {
+              font-size: 20px;
+              width: 20px;
+              height: 20px;
+            }
+          }
         }
       }
     }
@@ -208,7 +172,6 @@ $grid-mobile: 2fr 1fr 1fr 1fr 80px;
       }
 
       .cell {
-        padding: 1rem; 
         display: flex;
         align-items: center;
         overflow: hidden;
@@ -278,6 +241,22 @@ $grid-mobile: 2fr 1fr 1fr 1fr 80px;
             padding: 0;
             mat-icon {
               @include icon-size(1.25rem);
+            }
+          }
+
+          .edit-btn {
+            background-color: var(--mat-sys-primary);
+            color: var(--mat-sys-on-primary);
+            &:hover {
+              opacity: 0.9;
+            }
+          }
+          
+          .delete-btn {
+            background-color: var(--mat-sys-error-container);
+            color: var(--mat-sys-on-error-container);
+            &:hover {
+              opacity: 0.9;
             }
           }
         }
@@ -368,42 +347,6 @@ $grid-mobile: 2fr 1fr 1fr 1fr 80px;
   }
 }
 
-.cell.logo-cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 60px;
-  height: 60px;
-  overflow: hidden;
-
-  .game-logo {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    border-radius: 4px;
-    display: block;  
-  }
-
-  .logo-placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 50px;
-    height: 50px;
-    background-color: #e0e0e0;
-    border-radius: 4px;
-
-    mat-icon {
-      font-size: 1.5rem;
-      width: 1.5rem;
-      height: 1.5rem;
-      color: #999;
-    }
-  }
-}
 
 
-.game-table .table-header .header-cell.logo-cell {
-  font-size: 0;
-  overflow: hidden;
-}
+
