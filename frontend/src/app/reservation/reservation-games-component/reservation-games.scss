@@ -97,9 +97,12 @@
 }
 
 .name-cell {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  
+  .game-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
   
   .game-name {
      font-weight: 500;

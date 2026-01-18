@@ -14,7 +14,7 @@
                 <th>Grandes tables</th>
                 <th>Tables Mairies</th>
                 <th>Prises</th>
-                <th>Surface estimée</th>
+                <th>Surface</th>
                 <th>Statut</th>
             </tr>
         </thead>
@@ -29,8 +29,10 @@
                     }
                 </td>
                 <td class="name-cell">
-                    <span class="game-name">{{ game.name }}</span>
-                    <span class="game-type">{{ game.type }}</span>
+                    <div class="game-info">
+                        <span class="game-name">{{ game.name }}</span>
+                        <span class="game-type">{{ game.type }}</span>
+                    </div>
                 </td>
                 <td>
                     <input type="number" min="0" [value]="getGameValue(game.id!, 'amount')"

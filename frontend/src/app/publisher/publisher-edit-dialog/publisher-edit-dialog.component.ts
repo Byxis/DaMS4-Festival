@@ -54,6 +54,11 @@ export class PublisherEditDialog
                 return of(null);
             }
 
+            if (this.data && control.value === this.data.name)
+            {
+                return of(null);
+            }
+
             return this.publisherService.checkPublisherExists(control.value).pipe(map((response: any) => {
                 if (response.existsInPublisher)
                 {
