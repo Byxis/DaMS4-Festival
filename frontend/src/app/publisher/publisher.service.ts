@@ -1,9 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '@env/environment';
-import { catchError, of } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 import { PublisherDTO } from './publisherDto';
 import { ContactDTO } from './contactDto';
+import { MatDialog } from '@angular/material/dialog';
+import { PublishersImportDialog } from './publisher-import-dialog/publisher-import-dialog';
 
 @Injectable({
   providedIn: 'root',
@@ -21,6 +23,11 @@ export class PublisherService {
   readonly isError = this.isErrorSignal.asReadonly();
 
   private readonly FORCE_UPDATE: boolean = false;
+
+   errorMessage = signal<string | null>(null); 
+   private readonly dialog = inject(MatDialog);
+
+    
 
   constructor() {
     this.loadAll();
@@ -68,7 +75,14 @@ export class PublisherService {
             this.uploadLogo(newPublisher.id, formData);
           }
         },
-        error: (err) => console.error('Error creating publisher:', err),
+        error: (err) => {
+                if (err.status === 409) {
+                    this.errorMessage.set('Publisher already exists');
+                } else {
+                    this.errorMessage.set('Error creating publisher');
+                     console.log('Error message set to:', this.errorMessage()); 
+                }
+            },
       });
   }
 
@@ -76,9 +90,32 @@ export class PublisherService {
     return !!(publisher && publisher.name && publisher.name.trim().length > 0);
   }
 
+ 
+
   addPublisherToList(publisher: PublisherDTO) {
     this.publishers.update((publishers) => [...publishers, publisher]);
   }
+
+  checkPublisherExists(name: string): Observable<{ 
+  existsInEditors: boolean; 
+  editor: any; 
+  existsInPublisher: boolean;
+}> {
+  return this.http.get<{ 
+    existsInEditors: boolean; 
+    editor: any; 
+    existsInPublisher: boolean;
+  }>(
+    `${environment.apiUrl}/publishers/check-exists/${name}`,
+    { withCredentials: true }
+  ).pipe(
+    catchError(() => of({ 
+      existsInEditors: false, 
+      editor: null, 
+      existsInPublisher: false 
+    }))
+  );
+}
 
   update(
     publisherId: number,
@@ -265,4 +302,29 @@ export class PublisherService {
         error: (err) => console.error('Error deleting logo:', err),
       });
   }
+
+  getExistingEditors() {
+  return this.http.get<any[]>(
+    `${environment.apiUrl}/publishers/getAllExistingPublishers`,
+    { withCredentials: true }
+  );
+}
+
+
+  importEditor(editorId: number) {
+    return this.http.post(`${environment.apiUrl}/publishers/import/${editorId}`, 
+      {},
+      {withCredentials: true}
+    );
+  }
+
+  importEditorByName(editorName: string) {
+  return this.http.post(
+    `${environment.apiUrl}/publishers/import-by-name`,
+    { editorName },
+    { withCredentials: true }
+  );
+}
+
+ 
 }

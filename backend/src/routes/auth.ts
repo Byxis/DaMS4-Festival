@@ -9,18 +9,35 @@ import {
 } from "../middleware/token-management.js";
 import { JWT_SECRET } from "../config/env.js";
 import type { TokenPayload } from "../types/token-payload.js";
+import rateLimit from 'express-rate-limit';
 
 const router = Router();
 
-router.post("/login", async (req, res) => {
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,  // 15 minutes
+    limit: 5,                  // Limit each IP to 5 requests
+    message: {error: 'Too many login attempts, please try again later.'},
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const registerLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,  // 15 minutes
+    limit: 2,                  // Limit each IP to 2 requests
+    message: {error: 'Too many register attempts, please try again later.'},
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+router.post('/login', loginLimiter, async (req, res) => {
     // --- LOGIN ---
-    const { login, password } = req.body;
-    if (!login || !password)
+    const { email, password } = req.body;
+    if (!email || !password)
         // si pas de login ou password dans la requête => ERREUR : fin du login
         return res.status(400).json({ error: "Identifiants manquants" });
 
-    const { rows } = await pool.query("SELECT * FROM users WHERE login=$1", [
-        login,
+    const { rows } = await pool.query("SELECT * FROM users WHERE email=$1", [
+        email,
     ]); // on récupère le user dans la BD
     const user = rows[0];
     if (!user) return res.status(401).json({ error: "Utilisateur inconnu" }); // pas dans la base => ERREUR : fin du login
@@ -31,12 +48,12 @@ router.post("/login", async (req, res) => {
 
     const accessToken = createAccessToken({
         id: user.id,
-        login: user.login,
+        email: user.email,
         role: user.role,
     }); // création du token d'accès
     const refreshToken = createRefreshToken({
         id: user.id,
-        login: user.login,
+        email: user.email,
         role: user.role,
     }); // création du refresh token
 
@@ -58,7 +75,11 @@ router.post("/login", async (req, res) => {
 
     res.json({
         message: "Authentification réussie",
-        user: { login: user.login, role: user.role },
+        user: { 
+            email: user.email,
+            firstName: user.first_name,
+            lastName: user.last_name, 
+            role: user.role },
     }); //connexion successful
 });
 
@@ -70,27 +91,80 @@ router.post("/logout", (_req, res) => {
 });
 
 router.post("/register", async (req, res) => {
-    const { login, password } = req.body;
-    if (!login || !password)
+    const { email, password, firstName, lastName } = req.body;
+
+    if (!email || !password || !firstName || !lastName) {
         return res.status(400).json({ error: "Champs manquants" });
+    }
+
     const hashed = await bcrypt.hash(password, 10);
+
     try {
+        // Check if user already exists
         const { rows } = await pool.query(
-            `INSERT INTO users (login, password_hash, role)
-            VALUES ($1, $2, 'user')
-            RETURNING id, login, role`,
-            [login, hashed]
+            "SELECT * FROM users WHERE email = $1",
+            [email]
         );
-        res.status(201).json({ message: "Utilisateur créé", user: rows[0] });
-    } catch (err: any) {
-        if (err.code === "23505")
-            // doublon PostgreSQL
-            return res.status(409).json({ error: "Login déjà utilisé" });
+
+        const existingUser = rows[0];
+
+        // User exists AND already registered
+        if (existingUser && existingUser.password_hash) {
+            return res.status(409).json({ error: "Compte déjà existant" });
+        }
+
+        // User exists but invited by admin –> complete account
+        if (existingUser && !existingUser.password_hash) {
+            const { rows: updatedRows } = await pool.query(
+                `UPDATE users
+                 SET password_hash = $1,
+                     first_name = $2,
+                     last_name = $3
+                 WHERE email = $4
+                 RETURNING id, email, first_name, last_name, role`,
+                [hashed, firstName, lastName, email]
+            );
+
+            const user = updatedRows[0];
+
+            return res.status(200).json({
+                message: "Compte complété",
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    firstName: user.first_name,
+                    lastName: user.last_name,
+                    role: user.role, // role set by admin preserved
+                },
+            });
+        }
+
+        // New user –> create guest
+        const { rows: newRows } = await pool.query(
+            `INSERT INTO users (email, password_hash, first_name, last_name, role)
+             VALUES ($1, $2, $3, $4, 'guest')
+             RETURNING id, email, first_name, last_name, role`,
+            [email, hashed, firstName, lastName]
+        );
+
+        const user = newRows[0];
+
+        res.status(201).json({
+            message: "Utilisateur créé",
+            user: {
+                id: user.id,
+                email: user.email,
+                firstName: user.first_name,
+                lastName: user.last_name,
+                role: user.role,
+            },
+        });
+
+    } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Erreur serveur" });
     }
 });
-
 router.get("/whoami", verifyToken, (req, res) => {
     res.json({ user: req.user });
 });
@@ -103,7 +177,7 @@ router.post("/refresh", (req, res) => {
         const decoded = jwt.verify(refresh, JWT_SECRET) as TokenPayload;
         const newAccess = createAccessToken({
             id: decoded.id,
-            login: decoded.login,
+            email: decoded.email,
             role: decoded.role,
         });
         res.cookie("access_token", newAccess, {

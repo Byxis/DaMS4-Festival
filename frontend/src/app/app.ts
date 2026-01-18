@@ -1,9 +1,18 @@
 import { Component, effect, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MatToolbar, MatToolbarRow } from '@angular/material/toolbar';
-import { MatIcon } from '@angular/material/icon';
+import { MatIcon, MatIconModule } from '@angular/material/icon';
 import { AuthService } from '@auth/auth.service';
-import { MatButton } from '@angular/material/button';
+import { MatButton, MatButtonModule } from '@angular/material/button';
+import { Game } from './games/game/game';
+import { GameList } from './games/game-list/game-list';
+import { GameForm } from './games/game-form/game-form';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { HeaderComponent } from './pages/header/header.component';
+
+
+export class AppModule {}
 
 @Component({
   selector: 'app-root',
@@ -12,9 +21,17 @@ import { MatButton } from '@angular/material/button';
     RouterLink,
     MatToolbar,
     MatToolbarRow,
+    MatInputModule,
+    MatFormFieldModule,
+    MatButtonModule, 
+    MatIconModule,
     RouterLinkActive,
     MatIcon,
     MatButton,
+    GameList, 
+    GameForm,
+    RouterOutlet,
+    HeaderComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss',
@@ -33,6 +50,6 @@ export class App {
   }
 
   goToLoginPage() {
-    this.router.navigate(['login']);
+    this.router.navigate(['/login']);
   }
 }

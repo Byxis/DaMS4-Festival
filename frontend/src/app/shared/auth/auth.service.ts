@@ -2,7 +2,8 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { UserDto } from 'src/app/shared/types/user-dto';
 import { environment } from '@env/environment';
-import { catchError, finalize, of, tap } from 'rxjs';
+import { catchError, finalize, last, of, tap } from 'rxjs';
+import { Router } from '@angular/router';
 @Injectable({
   providedIn: 'root',
 })
@@ -13,28 +14,34 @@ export class AuthService {
   private readonly _currentUser = signal<UserDto | null>(null);
   private readonly _isLoading = signal(false);
   private readonly _error = signal<string | null>(null);
+  private readonly _hasBeenLoggedIn = signal(false);
+
 
   // --- État exposé (readonly, computed) ---
   readonly currentUser = this._currentUser.asReadonly();
   readonly isLoggedIn = computed(() => this._currentUser() != null);
   readonly isAdmin = computed(() => this.currentUser()?.role === 'admin');
+  readonly isGuest = computed(() => this.currentUser()?.role === 'guest');
+  readonly isPublisher = computed(() => this.currentUser()?.role === 'publisher');
+  readonly isEditor = computed(() => this.currentUser()?.role === 'editor');
   readonly isLoading = this._isLoading.asReadonly();
   readonly error = this._error.asReadonly();
 
   // --- Connexion ---
-  login(login: string, password: string) {
+  login(email: string, password: string) {
     this._isLoading.set(true);
     this._error.set(null);
     this.http
       .post<{ user: UserDto }>(
         `${environment.apiUrl}/auth/login`,
-        { login, password },
+        { email, password },
         { withCredentials: true }
       )
       .pipe(
         tap((res) => {
           if (res?.user) {
             this._currentUser.set(res.user);
+            this._hasBeenLoggedIn.set(true);
             console.log(`👍 Utilisateur connecté : ${JSON.stringify(res.user)}`); // DEBUG
           } else {
             this._error.set('Identifiants invalides');
@@ -89,7 +96,9 @@ export class AuthService {
           console.log(`ℹ️ Utilisateur actuel : ${JSON.stringify(res?.user ?? null)}`); // DEBUG
         }),
         catchError((err) => {
-          this._error.set('Session expirée');
+          if (this._hasBeenLoggedIn()) {
+            this._error.set('Session expirée');
+        }
           this._currentUser.set(null);
           return of(null);
         }),
@@ -107,13 +116,13 @@ export class AuthService {
       .pipe(catchError(() => of(null)));
   }
 
-  register(login: string, password: string) {
+  register(email: string, password: string, firstName: string, lastName: string) {
     this._isLoading.set(true);
     this._error.set(null);
     this.http
       .post<{ user: UserDto }>(
         `${environment.apiUrl}/auth/register`,
-        { login, password },
+        { firstName, lastName, email, password },
         { withCredentials: true }
       )
       .pipe(
@@ -127,13 +136,31 @@ export class AuthService {
           }
         }),
         catchError((err) => {
-          console.error('👎 Erreur HTTP', err);
+        console.error("👎 Erreur HTTP", err);
+
+        if (err.status === 409) {
+          this._error.set("Un compte associé à cet e-mail existe déjà");
+        } else {
           this._error.set("Erreur lors de l'enregistrement");
-          this._currentUser.set(null);
-          return of(null);
-        }),
+        }
+
+        this._currentUser.set(null);
+        return of(null);
+      }),
         finalize(() => this._isLoading.set(false))
       )
       .subscribe();
   }
+
+  redirectAfterAuth(router: Router) {
+    const user = this._currentUser();
+    if (!user) return;
+
+    if (this.isGuest()) {
+      router.navigate(['/await-confirmation']);
+    } else {
+      router.navigate(['/']);
+    }
+  }
+
 }

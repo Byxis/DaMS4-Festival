@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -7,6 +7,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { PublisherDTO } from '../publisherDto';
+import { map, Observable, of } from 'rxjs';
+import { PublisherService } from '../publisher.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+
 
 @Component({
   selector: 'publisher-edit-dialog',
@@ -26,16 +30,40 @@ import { PublisherDTO } from '../publisherDto';
 export class PublisherEditDialog {
   private fb = inject(FormBuilder);
   private dialogRef = inject(MatDialogRef<PublisherEditDialog>);
+  public publisherService = inject(PublisherService); 
   data = inject<PublisherDTO | null>(MAT_DIALOG_DATA);
+  private snackBar = inject(MatSnackBar);
 
   form = this.fb.group({
-    name: [this.data?.name ?? '', Validators.required],
+    name: [this.data?.name ?? '', Validators.required , this.publisherNameValidator()],
   });
 
   currentLogoUrl: string | null = this.data?.logoUrl ?? null;
   newLogoFile: File | null = null;
   newLogoPreview: string | null = null;
   logoToDelete: boolean = false;
+  
+  
+
+ private publisherNameValidator() {
+  return (control: AbstractControl): Observable<ValidationErrors | null> => {
+    if (!control.value) {
+      return of(null);
+    }
+
+    return this.publisherService.checkPublisherExists(control.value).pipe(
+      map((response: any) => {  
+        if (response.existsInPublisher) {
+          return { 'publisherExists': true };  
+        }
+        if (response.existsInEditors) {
+          return { 'canImport': response.editor };  
+        }
+        return null;  
+      })
+    );
+  };
+}
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -50,6 +78,34 @@ export class PublisherEditDialog {
       reader.readAsDataURL(this.newLogoFile);
     }
   }
+
+importExistingEditor(editorName: string | null | undefined): void {
+  if (!editorName || editorName.trim() === "") {
+    console.error('❌ Nom d\'éditeur vide');
+    return;
+  }
+
+  this.publisherService.importEditorByName(editorName).subscribe({
+    next: (result: any) => {
+      console.log(' Publisher importé:', result);
+      
+      this.publisherService.addPublisherToList({
+        ...result.publisher,
+        numberOfGames: result.gamesCount,
+        contacts: [],
+        logoUrl: undefined
+      });
+      
+      this.dialogRef.close(true);  
+       
+    },
+    error: (err: any) => {
+      console.error(' Erreur import:', err);
+      alert('Erreur : ' + (err.error?.error || 'Import échoué'));
+    }
+  });
+}
+
 
   deleteLogo(): void {
     this.logoToDelete = true;
