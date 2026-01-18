@@ -24,13 +24,8 @@
       <div class="header-cell hide-tablet hide-mobile">Stock tables</div>
       <div class="header-cell hide-tablet hide-mobile">Grandes tables</div>
       <div class="header-cell hide-tablet hide-mobile">Tables mairies</div>
+      <div class="header-cell hide-tablet hide-mobile">Prises électriques</div>
       <div class="header-cell hide-tablet hide-mobile">Surface m²</div>
-      <div class="header-cell sortable hide-mobile" (click)="sortBy('outlets')">
-        Prises
-        <mat-icon class="sort-icon" [class.active]="sortColumn() === 'outlets'">{{
-          sortColumn() === 'outlets' && sortDirection() === 'desc' ? 'arrow_upward' : 'arrow_downward'
-        }}</mat-icon>
-      </div>
       <div class="header-cell sortable" (click)="sortBy('gameZones')">
         Zones
         <mat-icon class="sort-icon" [class.active]="sortColumn() === 'gameZones'">{{
@@ -76,8 +71,10 @@
             <div class="cell center hide-tablet hide-mobile">{{ getTotalTables(zone) }}</div>
             <div class="cell center hide-tablet hide-mobile">{{ getTotalBigTables(zone) }}</div>
             <div class="cell center hide-tablet hide-mobile">{{ getTotalTownTables(zone) }}</div>
+            <div class="cell center hide-tablet hide-mobile">
+              {{ zone.electricalOutlet }} ({{ zone.electricalOutletPrice }}€)
+            </div>
             <div class="cell center hide-tablet hide-mobile">{{ calculateSurface(zone) }}</div>
-            <div class="cell center hide-mobile">{{ zone.electricalOutlet }}</div>
             <div class="cell center">{{ getGameZoneCount(zone) }}</div>
             <div class="cell center price-cell">{{ zone.price }} €</div>
 

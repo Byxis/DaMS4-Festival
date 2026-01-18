@@ -1,11 +1,10 @@
 <div class="festival-detail-container">
     @if (festival(); as f) {
 
-    <!-- SECTION 1: Main Info + Media Sidecar -->
-    <div class="header-section">
-
-        <!-- Left: Main Info -->
-        <div class="main-info">
+    <!-- SECTION 1: Festival Info + Logo -->
+    <div class="top-section">
+        <!-- Festival Info -->
+        <div class="festival-info">
             <div class="title-row">
                 <h1>{{ f.name }}</h1>
                 <button mat-icon-button color="primary" title="Edit Festival" (click)="editFestival()">
@@ -13,64 +12,72 @@
                 </button>
             </div>
 
-            <!-- Date Range -->
-            <div class="info-item">
-                <mat-icon class="info-icon">event</mat-icon>
-                <div class="info-content">
-                    <span class="info-label">Dates</span>
-                    <span class="info-value">{{ getDateRange(f) }}</span>
+            <div class="info-row">
+                <div class="info-item">
+                    <mat-icon class="info-icon">event</mat-icon>
+                    <div class="info-content">
+                        <span class="info-label">Date :</span>
+                        <span class="info-value">{{ getDateRange(f) }}</span>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <mat-icon class="info-icon">location_on</mat-icon>
+                    <div class="info-content">
+                        <span class="info-label">Lieu :</span>
+                        <a href="#" class="info-value location-link">{{ f.location }}</a>
+                    </div>
                 </div>
             </div>
 
-            <!-- Location -->
-            <div class="info-item">
-                <mat-icon class="info-icon">location_on</mat-icon>
-                <div class="info-content">
-                    <span class="info-label">Lieu</span>
-                    <a href="#" class="info-value location-link">{{ f.location }}</a>
-                </div>
-            </div>
+            <mat-divider class="info-divider"></mat-divider>
 
             <!-- Festival Stats -->
-            <div class="stats-row">
-                <div class="stat-card">
-                    <mat-icon>table_bar</mat-icon>
-                    <span class="stat-value">{{ usedStock().tables }} / {{ f.table_count }}</span>
-                    <span class="stat-label">Tables</span>
-                </div>
-                <div class="stat-card">
-                    <mat-icon>table_restaurant</mat-icon>
-                    <span class="stat-value">{{ usedStock().bigTables }} / {{ f.big_table_count }}</span>
-                    <span class="stat-label">Grandes Tables</span>
-                </div>
-                <div class="stat-card">
-                    <mat-icon>desk</mat-icon>
-                    <span class="stat-value">{{ usedStock().townTables }} / {{ f.town_table_count }}</span>
-                    <span class="stat-label">Tables Municipales</span>
+            <div class="stock-inline">
+                <h3>Espace de table disponible</h3>
+                <div class="stock-row">
+                    <div class="stock-item-inline">
+                        <mat-icon>table_bar</mat-icon>
+                        <span class="stock-label">Tables</span>
+                        <span class="stock-value">{{ usedStock().tables }} / {{ f.table_count }}</span>
+                    </div>
+                    <div class="stock-item-inline">
+                        <mat-icon>table_restaurant</mat-icon>
+                        <span class="stock-label">Grandes Tables</span>
+                        <span class="stock-value">{{ usedStock().bigTables }} / {{ f.big_table_count }}</span>
+                    </div>
+                    <div class="stock-item-inline">
+                        <mat-icon>desk</mat-icon>
+                        <span class="stock-label">Tables Municipales</span>
+                        <span class="stock-value">{{ usedStock().townTables }} / {{ f.town_table_count }}</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Right: Media Sidecar -->
-        <div class="media-sidecar">
+        <!-- Logo -->
+        <div class="logo-section">
             @if (f.logoUrl) {
-            <div class="poster-container">
+            <div class="poster-wrapper">
                 <img [src]="f.logoUrl" [alt]="f.name" class="festival-poster">
             </div>
             } @else {
             <div class="poster-placeholder">
                 <mat-icon>image_not_supported</mat-icon>
-                <span>No poster available</span>
+                <span>Aucune image disponible</span>
             </div>
             }
         </div>
-
     </div>
 
     <mat-divider class="section-divider"></mat-divider>
 
-    <!-- SECTION 2: Tarif Zones List Component -->
-    <tarif-zones-list [festivalId]="id()"></tarif-zones-list>
+    <!-- SECTION 2: Zones uniquement -->
+    <div class="content-section">
+        <div class="zones-container">
+            <tarif-zones-list [festivalId]="id()"></tarif-zones-list>
+        </div>
+    </div>
 
     <mat-divider class="section-divider"></mat-divider>
 
@@ -95,9 +102,6 @@
 
     } @else {
     <!-- Loading State -->
-    <mat-toolbar color="primary">
-        <h1>Festival Details</h1>
-    </mat-toolbar>
     <div class="loading-container">
         <mat-spinner diameter="60"></mat-spinner>
         <p>Chargement des détails du festival...</p>

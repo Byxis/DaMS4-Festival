@@ -3,6 +3,7 @@ import {Component, computed, effect, inject, input, signal} from '@angular/core'
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import {MatOptionModule} from '@angular/material/core';
+import {MatDialog} from '@angular/material/dialog';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
@@ -16,6 +17,7 @@ import {Router} from '@angular/router';
 import {PublisherService} from '@publisher/publisher.service';
 import {computedSorted, SortConfig} from '@shared/utils/sort.utils';
 import {FestivalDto} from 'src/app/festivals/dtos/festival-dto';
+import {FestivalNewFormComponent} from 'src/app/festivals/festival-new-form-component/festival-new-form-component';
 import {FestivalService} from 'src/app/festivals/festival-service/festival-service';
 import {TarifZonesList} from 'src/app/festivals/tarif-zones-list/tarif-zones-list';
 import {ReservationComponent} from 'src/app/reservation/reservation-component/reservation.component';
@@ -97,13 +99,13 @@ const SORT_STRATEGIES: SortConfig<FestivalItem> = {
 })
 export class Festival
 {
-    id = input.required<number>();
-
-    private readonly svc = inject(FestivalService);
     private readonly router = inject(Router);
+    private readonly svc = inject(FestivalService);
+    private readonly dialog = inject(MatDialog);
     readonly reservationService = inject(ReservationService);
     readonly publisherService = inject(PublisherService);
 
+    id = input.required<number>();
     festival = this.svc._currentFestival;
 
     readonly sortBy = signal<'STATUS'|'STATUS_REVERSE'|'NAME'|'FIRST_INTERACTION'|'LAST_UPDATE'>('STATUS');
@@ -163,8 +165,23 @@ export class Festival
             this.reservationService.loadByFestival(this.id());
         });
     }
+    editFestival(): void
+    {
+        const currentFestival = this.festival();
+        if (!currentFestival) return;
 
-    editFestival(): void {}
+        const dialogRef = this.dialog.open(
+            FestivalNewFormComponent,
+            {width: '600px', data: {isEditing: true, festivalId: currentFestival.id, festival: currentFestival}});
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result)
+            {
+                // Recharger le festival après modification
+                this.svc.loadFestivalById(this.id());
+            }
+        });
+    }
 
     getDateRange(festival: FestivalDto): string
     {
