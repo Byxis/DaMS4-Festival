@@ -5,5 +5,6 @@ export interface ZoneTarifDTO{
     name : string;
     price : number;
     electricalOutlet: number;
+    electricalOutletPrice: number;
     game_zones? : ZoneGameDTO[];
 }

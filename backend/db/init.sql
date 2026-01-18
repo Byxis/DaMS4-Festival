@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS tarif_zone(
     name TEXT NOT NULL,
     price INTEGER NOT NULL,
     numberOutlets INTEGER DEFAULT 0,
+    electricalOutletPrice INTEGER DEFAULT 0,
     maxTable INTEGER NOT NULL
 );
 

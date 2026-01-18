@@ -8,5 +8,6 @@ export interface Tarif_Zone {
     game_zones?: Game_Zone[];
     price: number;
     numberOutlets: number;
+    electricalOutletPrice:number;
     maxTable: number;
 }

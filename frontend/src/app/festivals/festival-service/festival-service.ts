@@ -258,9 +258,7 @@ export class FestivalService {
       .subscribe();
   }
 
-
-  /* ---------- TARIF ZONES ---------- */
-
+ /* ---------- TARIF ZONES ---------- */
   /**
    * Add a tarif zone to a festival
    */
@@ -274,8 +272,30 @@ export class FestivalService {
       .pipe(
         tap(response => {
           console.log('Tarif zone created:', response);
-          // Reload the current festival to get updated zones
-          this.loadFestivalById(festivalId);
+          
+          // Update current festival
+          if (this.currentFestival()?.id === festivalId) {
+            this.currentFestival.update(festival => {
+              if (!festival) return null;
+              return {
+                ...festival,
+                tarif_zones: [...(festival.tarif_zones || []), response]
+              };
+            });
+          }
+
+          // Update in festivals list
+          this.festivals.update(festivals =>
+            festivals.map(f => {
+              if (f.id === festivalId) {
+                return {
+                  ...f,
+                  tarif_zones: [...(f.tarif_zones || []), response]
+                };
+              }
+              return f;
+            })
+          );
         }),
         catchError(err => {
           console.error('Error creating tarif zone:', err);
@@ -298,7 +318,34 @@ export class FestivalService {
       .pipe(
         tap(response => {
           console.log('Tarif zone updated:', response);
-          this.loadFestivalById(festivalId);
+          
+          // Update current festival
+          if (this.currentFestival()?.id === festivalId) {
+            this.currentFestival.update(festival => {
+              if (!festival) return null;
+              return {
+                ...festival,
+                tarif_zones: festival.tarif_zones?.map(tz =>
+                  tz.id === tarifZoneId ? response : tz
+                ) || []
+              };
+            });
+          }
+
+          // Update in festivals list
+          this.festivals.update(festivals =>
+            festivals.map(f => {
+              if (f.id === festivalId) {
+                return {
+                  ...f,
+                  tarif_zones: f.tarif_zones?.map(tz =>
+                    tz.id === tarifZoneId ? response : tz
+                  ) || []
+                };
+              }
+              return f;
+            })
+          );
         }),
         catchError(err => {
           console.error('Error updating tarif zone:', err);
@@ -307,6 +354,7 @@ export class FestivalService {
       )
       .subscribe();
   }
+  
  /**
    * Delete a tarif zone
    */
@@ -319,7 +367,30 @@ export class FestivalService {
       .pipe(
         tap(() => {
           console.log('Tarif zone deleted:', tarifZoneId);
-          this.loadFestivalById(festivalId);
+          
+          // Update current festival
+          if (this.currentFestival()?.id === festivalId) {
+            this.currentFestival.update(festival => {
+              if (!festival) return null;
+              return {
+                ...festival,
+                tarif_zones: festival.tarif_zones?.filter(tz => tz.id !== tarifZoneId) || []
+              };
+            });
+          }
+
+          // Update in festivals list
+          this.festivals.update(festivals =>
+            festivals.map(f => {
+              if (f.id === festivalId) {
+                return {
+                  ...f,
+                  tarif_zones: f.tarif_zones?.filter(tz => tz.id !== tarifZoneId) || []
+                };
+              }
+              return f;
+            })
+          );
         }),
         catchError(err => {
           console.error('Error deleting tarif zone:', err);
@@ -328,7 +399,6 @@ export class FestivalService {
       )
       .subscribe();
   }
-
 
 
   /* ---------- GAME ZONES ---------- */

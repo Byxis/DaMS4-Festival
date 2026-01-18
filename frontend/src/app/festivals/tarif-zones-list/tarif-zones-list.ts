@@ -124,7 +124,7 @@ export class TarifZonesList
     {
         // 1 table = 2m²
         const totalTables = this.getTotalTables(zone) + this.getTotalBigTables(zone) + this.getTotalTownTables(zone);
-        return totalTables * 2;
+        return totalTables * 4;
     }
 
     toggleZone(zoneId: number): void

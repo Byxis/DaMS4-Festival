@@ -281,7 +281,7 @@ router.post(
     requireAdmin,
     async (req: Request, res: Response) => {
         const { id } = req.params;
-        const { name, price, numberOutlets, maxTable } = req.body;
+        const { name, price, numberOutlets, electricalOutletPrice, maxTable } = req.body;
 
         if (!name) {
             return res.status(400).json({ error: "Name is required" });
@@ -298,8 +298,8 @@ router.post(
             }
 
             const { rows } = await pool.query<Tarif_Zone>(
-                "INSERT INTO tarif_zone (festival_id, name, price, numberOutlets, maxTable) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-                [id, name, price || 0, numberOutlets || 0, maxTable || 0]
+                "INSERT INTO tarif_zone (festival_id, name, price, numberOutlets, electricalOutletPrice, maxTable) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+                [id, name, price || 0, numberOutlets || 0, electricalOutletPrice || 100, maxTable || 0]
             );
             res.status(201).json(rows[0]);
         } catch (err: any) {
@@ -341,7 +341,7 @@ router.put(
     requireAdmin,
     async (req: Request, res: Response) => {
         const { tarifZoneId } = req.params;
-        const { name, price, numberOutlets, maxTable } = req.body;
+        const { name, price, numberOutlets, electricalOutletPrice, maxTable } = req.body;
 
         if (!name && price === undefined && numberOutlets === undefined && maxTable === undefined) {
             return res
@@ -351,8 +351,8 @@ router.put(
 
         try {
             const { rows } = await pool.query<Tarif_Zone>(
-                "UPDATE tarif_zone SET name = COALESCE($1, name), price = COALESCE($2, price), numberOutlets = COALESCE($3, numberOutlets), maxTable = COALESCE($4, maxTable) WHERE id = $5 RETURNING *",
-                [name, price, numberOutlets, maxTable, tarifZoneId]
+                "UPDATE tarif_zone SET name = COALESCE($1, name), price = COALESCE($2, price), numberOutlets = COALESCE($3, numberOutlets), electricalOutletPrice = COALESCE($4, electricalOutletPrice), maxTable = COALESCE($5, maxTable) WHERE id = $6 RETURNING *",
+                [name, price, numberOutlets, electricalOutletPrice, maxTable, tarifZoneId]
             );
             if (rows.length === 0) {
                 return res.status(404).json({ error: "Tarif zone not found" });

@@ -44,7 +44,8 @@ export class ZoneTarifFormComponent {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       price: ['', [Validators.required, Validators.min(0)]],
-      electricalOutlet: ['', [Validators.required, Validators.min(0)]]
+      electricalOutlet: ['', [Validators.required, Validators.min(0)]],
+      electricalOutletPrice : [100, [Validators.required, Validators.min(0)]]
     });
   }
   submit(): void {
