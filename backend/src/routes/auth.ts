@@ -42,6 +42,10 @@ router.post('/login', loginLimiter, async (req, res) => {
     const user = rows[0];
     if (!user) return res.status(401).json({ error: "Utilisateur inconnu" }); // pas dans la base => ERREUR : fin du login
 
+    if (!user.password_hash) {
+        return res.status(401).json({ error: "Compte non activé" });
+    } // user exists but no password set (invited by admin but not registered) => ERREUR : fin du login
+
     const match = await bcrypt.compare(password, user.password_hash); // on vérifie le password
     if (!match)
         return res.status(401).json({ error: "Mot de passe incorrect" }); // si pas de match => ERREUR : fin du login
@@ -108,7 +112,7 @@ router.post("/register", async (req, res) => {
 
         const existingUser = rows[0];
 
-        // User exists AND already registered
+        // User exists and already registered
         if (existingUser && existingUser.password_hash) {
             return res.status(409).json({ error: "Compte déjà existant" });
         }

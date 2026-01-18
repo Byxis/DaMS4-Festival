@@ -8,6 +8,8 @@ import { RouterModule, Router } from "@angular/router";
 import { AuthService } from "@auth/auth.service";
 import { UserProfileDialogComponent } from "../user-profile-dialog/user-profile-dialog.component";
 import { UserDto } from "../../shared/types/user-dto";
+import { roleEnToFr } from 'src/app/shared/utils/roles';
+
 
 @Component({
   selector: 'app-header',
@@ -24,6 +26,7 @@ import { UserDto } from "../../shared/types/user-dto";
 export class HeaderComponent {
   authSvc = inject(AuthService);
   private readonly router = inject(Router);
+  roleEnToFr = roleEnToFr;
   private readonly dialog = inject(MatDialog);
 
   logout() {

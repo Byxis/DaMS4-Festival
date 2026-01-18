@@ -71,8 +71,8 @@
         {{user.email}}
       </div>
 
-      <div class="role" >
-        Vous êtes {{ user.role }}
+      <div class="role">
+        Vous êtes {{ roleEnToFr(user.role) }}
       </div>
 
       <button class="edit-btn" (click)="openUserProfileDialog(user)">

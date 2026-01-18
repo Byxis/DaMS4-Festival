@@ -1,0 +1,113 @@
+.users-card {
+    padding: 10px 14px;
+    border-radius: 14px;
+}
+
+.user-row {
+    display: grid;
+    grid-template-columns: 44px 1fr 1fr 200px 2fr 44px;
+    gap: 8px;
+    align-items: center;
+    padding: 12px 8px;
+}
+
+.user-row.header {
+    font-weight: 600;
+    opacity: 0.8;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.user-icon {
+    font-size: 28px;
+    color: var(--mdc-theme-primary);
+}
+
+.actions-cell {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.actions-cell button {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 999px;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.actions-cell button mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+}
+
+.actions-cell .edit-btn {
+    background-color: var(--mat-sys-primary);
+    color: var(--mat-sys-on-primary);
+}
+
+.actions-cell .delete-btn {
+    background-color: var(--mat-sys-error-container);
+    color: var(--mat-sys-on-error-container);
+}
+
+.actions-cell .edit-btn:hover,
+.actions-cell .delete-btn:hover {
+    opacity: 0.9;
+}
+
+.role-cell {
+    display: flex;
+    align-items: center;
+}
+
+.role-select {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+}
+
+.role-select .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+}
+
+.role-select .mat-mdc-text-field-wrapper {
+    padding: 0;
+}
+
+.role-select .mat-mdc-form-field-flex {
+    height: 32px;
+    align-items: center;
+}
+
+.role-select .mat-mdc-select-value {
+    font-size: 13px;
+}
+
+.role-select .mdc-notched-outline__leading,
+.role-select .mdc-notched-outline__trailing {
+    border-width: 1px;
+}
+
+.empty-card {
+    margin-top: 16px;
+    opacity: 0.8;
+}
+
+.add-btn mat-icon {
+    font-size: 22px;
+}
+
+.actions-cell {
+    display: flex;
+    justify-content: flex-end;
+}

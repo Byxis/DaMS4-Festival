@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "angular": "^1.8.3",
-     "csv-parser": "^3.2.0"
+    "csv-parser": "^3.2.0",
+    "express-rate-limit": "^8.2.1"
   },
   "devDependencies": {
     "@types/multer": "^2.0.0"

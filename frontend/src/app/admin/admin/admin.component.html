@@ -1,7 +1,33 @@
-@if (this.users().length > 0) {
-<p>Here is the list of all users:</p>
-@for (user of this.users(); track user.id) {
-<user-card [user]="user"></user-card>
-} } @else {
-<p>No users found.</p>
-}
+<div class="admin-page">
+
+  <h1 class="page-title">Administration</h1>
+
+  <div class="section-header">
+    <h2 class="section-title">Liste des utilisateurs</h2>
+
+    <button mat-icon-button aria-label="Add user" class="add-user-button" (click)="openCreateDialog()">
+      <mat-icon>person_add</mat-icon>
+    </button>
+
+  </div>
+  <div class="filters-row">
+
+    <mat-chip-listbox class="filters" aria-label="Filtres utilisateurs" [value]="userSvc.roleFilter()"
+      (change)="userSvc.roleFilter.set($event.value)">
+      <mat-chip-option value="all">Tous</mat-chip-option>
+      <mat-chip-option value="admin">Admins</mat-chip-option>
+      <mat-chip-option value="editor">Éditeurs</mat-chip-option>
+      <mat-chip-option value="publisher">Éditeurs de jeux</mat-chip-option>
+      <mat-chip-option value="guest">Invités</mat-chip-option>
+    </mat-chip-listbox>
+
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Rechercher</mat-label>
+      <input matInput [value]="userSvc.searchTerm()" (input)="userSvc.searchTerm.set(($event.target).value)"
+        placeholder="Nom, prénom, email..." />
+      <mat-icon matPrefix>search</mat-icon>
+    </mat-form-field>
+
+  </div>
+  <app-users-list></app-users-list>
+</div>
