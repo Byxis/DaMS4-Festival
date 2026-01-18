@@ -1,9 +1,19 @@
 <div class="reservation-games-container">
-    <h3>Jeux réservés</h3>
-
     @if (isLoading()) {
     <div class="loading">Chargement des jeux...</div>
     } @else {
+
+    <div class="filter-bar">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search-field">
+            <mat-icon matPrefix>search</mat-icon>
+            <input matInput placeholder="Rechercher un jeu..." [value]="filterText()" (input)="updateFilter($event)">
+        </mat-form-field>
+
+        <mat-checkbox [checked]="showUndefinedOnly()" (change)="showUndefinedOnly.set($event.checked)" color="primary">
+            Afficher les jeux sans statut
+        </mat-checkbox>
+    </div>
+
     <table class="games-table">
         <thead>
             <tr>
@@ -14,12 +24,13 @@
                 <th>Grandes tables</th>
                 <th>Tables Mairies</th>
                 <th>Prises</th>
-                <th>Surface</th>
+                <th>Surface total</th>
+                <th class="zone-header">Zone</th>
                 <th>Statut</th>
             </tr>
         </thead>
         <tbody>
-            @for (game of publisherGames(); track game.id) {
+            @for (game of displayedGames(); track game.id) {
             <tr [class.reserved]="isReserved(game.id!)">
                 <td class="logo-cell">
                     @if (game.logoUrl) {
@@ -36,26 +47,44 @@
                 </td>
                 <td>
                     <input type="number" min="0" [value]="getGameValue(game.id!, 'amount')"
-                        (change)="updateGame(game.id!, 'amount', $event)" class="qty-input" />
+                        (input)="updateGame(game.id!, 'amount', $event)" class="qty-input" />
                 </td>
                 <td>
                     <input type="number" min="0" [value]="getGameValue(game.id!, 'table_count')"
-                        (change)="updateGame(game.id!, 'table_count', $event)" class="qty-input" />
+                        (input)="updateGame(game.id!, 'table_count', $event)" class="qty-input" />
                 </td>
                 <td>
                     <input type="number" min="0" [value]="getGameValue(game.id!, 'big_table_count')"
-                        (change)="updateGame(game.id!, 'big_table_count', $event)" class="qty-input" />
+                        (input)="updateGame(game.id!, 'big_table_count', $event)" class="qty-input" />
                 </td>
                 <td>
                     <input type="number" min="0" [value]="getGameValue(game.id!, 'town_table_count')"
-                        (change)="updateGame(game.id!, 'town_table_count', $event)" class="qty-input" />
+                        (input)="updateGame(game.id!, 'town_table_count', $event)" class="qty-input" />
                 </td>
                 <td>
                     <input type="number" min="0" [value]="getGameValue(game.id!, 'electrical_outlets')"
-                        (change)="updateGame(game.id!, 'electrical_outlets', $event)" class="qty-input" />
+                        (input)="updateGame(game.id!, 'electrical_outlets', $event)" class="qty-input" />
                 </td>
                 <td>
-                    {{ calculateSurface(game.id!) }} m²
+                    <div style="display: flex; gap: 0.5rem; align-items: center">
+                        <span style="white-space: nowrap">{{ calculateSurface(game.id!) }} m²</span>
+                        <input type="number" min="0" [value]="getGameValue(game.id!, 'floor_space') || ''"
+                            (input)="updateGame(game.id!, 'floor_space', $event)" class="qty-input" placeholder="supp."
+                            style="width: 60px" />
+                    </div>
+                </td>
+                <td>
+                    <div class="zone-selector" (click)="$event.stopPropagation()">
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="compact-form-field">
+                            <mat-select [value]="getGameValue(game.id!, 'zone_id')"
+                                (selectionChange)="updateGameZone(game.id!, $event.value)" placeholder="-">
+                                <mat-option [value]="undefined">Aucune</mat-option>
+                                @for (zone of gameZones(); track zone.id) {
+                                <mat-option [value]="zone.id">{{zone.name}}</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
                 </td>
                 <td>
                     <button mat-button [matMenuTriggerFor]="statusMenu" class="status-button"

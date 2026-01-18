@@ -16,6 +16,8 @@ import {TarifZoneEditDialog} from '../tarif-zone-edit-dialog/tarif-zone-edit-dia
 type SortColumn = 'id'|'name'|'price'|'outlets'|'gameZones';
 type SortDirection = 'asc'|'desc';
 
+import {ReservationService} from '../../reservation/reservation.service';
+
 @Component({
     selector: 'tarif-zones-list',
     imports: [
@@ -34,6 +36,7 @@ type SortDirection = 'asc'|'desc';
 export class TarifZonesList
 {
     private readonly festivalService = inject(FestivalService);
+    private readonly reservationService = inject(ReservationService);
     private readonly dialog = inject(MatDialog);
 
     festivalId = input.required<number>();
@@ -47,7 +50,32 @@ export class TarifZonesList
         const festival = this.festivalService._currentFestival();
         if (!festival || !festival.tarif_zones) return [];
 
-        let zones = [...festival.tarif_zones];
+        // Calculate usage from reservations
+        const reservations = this.reservationService._reservations();
+        const usageMap = new Map<number, {t: number, b: number, tw: number}>();
+
+        reservations.forEach(r => {
+            r.games?.forEach(g => {
+                if (g.zone_id)
+                {
+                    const current = usageMap.get(g.zone_id) || {t: 0, b: 0, tw: 0};
+                    current.t += g.table_count || 0;
+                    current.b += g.big_table_count || 0;
+                    current.tw += g.town_table_count || 0;
+                    usageMap.set(g.zone_id, current);
+                }
+            });
+        });
+
+        // Map zones with updated game zones
+        let zones = festival.tarif_zones.map(
+            tz => ({
+                ...tz,
+                game_zones: tz.game_zones?.map(gz => {
+                    const usage = usageMap.get(gz.id!) || {t: 0, b: 0, tw: 0};
+                    return {...gz, reserved_table: usage.t, reserved_big_table: usage.b, reserved_town_table: usage.tw};
+                })
+            }));
 
         // Filter by search term
         const term = this.searchTerm().toLowerCase().trim();

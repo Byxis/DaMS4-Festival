@@ -128,6 +128,8 @@ CREATE TABLE IF NOT EXISTS reservation_games (
     big_table_count INT DEFAULT 0,
     town_table_count INT DEFAULT 0,
     electrical_outlets INT DEFAULT 0,
+    floor_space INT DEFAULT 0,
+    zone_id INTEGER REFERENCES game_zone(id) ON DELETE SET NULL,
     status TEXT DEFAULT 'ASKED' CHECK (status IN ('ASKED', 'CONFIRMED', 'RECEIVED', 'CANCELLED'))
 );
 

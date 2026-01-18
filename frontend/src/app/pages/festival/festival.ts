@@ -32,11 +32,11 @@ const SORT_STRATEGIES: SortConfig<FestivalItem> = {
     NAME: (a: FestivalItem, b: FestivalItem) => a.key.name.localeCompare(b.key.name),
     STATUS: (a: FestivalItem, b: FestivalItem) => {
         const statusOrder = [
-            'TO_BE_CONTACTED',
-            'CONTACTED',
-            'IN_DISCUSSION',
-            'FACTURED',
             'CONFIRMED',
+            'FACTURED',
+            'IN_DISCUSSION',
+            'CONTACTED',
+            'TO_BE_CONTACTED',
             'ABSENT',
         ];
         const idxA = statusOrder.indexOf(a.key.status);
@@ -46,11 +46,11 @@ const SORT_STRATEGIES: SortConfig<FestivalItem> = {
     },
     STATUS_REVERSE: (a: FestivalItem, b: FestivalItem) => {
         const statusOrderReverse = [
-            'CONFIRMED',
-            'FACTURED',
-            'IN_DISCUSSION',
-            'CONTACTED',
             'TO_BE_CONTACTED',
+            'CONTACTED',
+            'IN_DISCUSSION',
+            'FACTURED',
+            'CONFIRMED',
             'ABSENT',
         ];
         const rIdxA = statusOrderReverse.indexOf(a.key.status);
@@ -134,6 +134,26 @@ export class Festival
         });
     });
 
+    readonly usedStock = computed(() => {
+        const reservations = this.reservationService._reservations();
+        let tables = 0;
+        let bigTables = 0;
+        let townTables = 0;
+
+        reservations.forEach(r => {
+            if (r.games)
+            {
+                r.games.forEach(g => {
+                    tables += g.table_count || 0;
+                    bigTables += g.big_table_count || 0;
+                    townTables += g.town_table_count || 0;
+                });
+            }
+        });
+
+        return {tables, bigTables, townTables};
+    });
+
     readonly items = computedSorted(this.baseItems, this.sortBy, SORT_STRATEGIES);
 
     constructor()
@@ -144,15 +164,7 @@ export class Festival
         });
     }
 
-    goBack(): void
-    {
-        this.router.navigate(['/festivals']);
-    }
-
-    editFestival(): void
-    {
-        // Votre code d'édition
-    }
+    editFestival(): void {}
 
     getDateRange(festival: FestivalDto): string
     {

@@ -48,7 +48,7 @@
       <button mat-button [matMenuTriggerFor]="statusMenu" class="status-button" (click)="$event.stopPropagation()"
         [style.backgroundColor]="getStatusBackgroundColor(selectedStatus())"
         [style.color]="getStatusColor(selectedStatus())" [style.borderColor]="getStatusColor(selectedStatus())">
-        <span class="status-text">Status : {{ currentStatusLabel() }}</span>
+        <span class="status-text">Statut : {{ currentStatusLabel() }}</span>
         <mat-icon class="status-icon">expand_more</mat-icon>
       </button>
       <mat-menu #statusMenu="matMenu" panelClass="status-menu-panel">
@@ -77,14 +77,18 @@
           }
         </div>
       </div>
-      <reservation-games [publisherId]="publisherId()" [festivalId]="festivalId()"
-        [reservation]="reservation()"></reservation-games>
       <note [note]="reservation()?.note ?? null" [reservation]="reservation()" [festivalId]="festivalId()"></note>
     </div>
     <div class="details-sidebar">
       <updates [interactions]="reservation()?.interactions"></updates>
       <facture [games]="reservation()?.games"></facture>
     </div>
+    <h3 class="tables-title">
+      <mat-icon class="tables-icon">sports_esports</mat-icon>
+      Jeux réservés
+    </h3>
+    <reservation-games [publisherId]="publisherId()" [festivalId]="festivalId()"
+      [reservation]="reservation()"></reservation-games>
   </div>
   } }
 </div>

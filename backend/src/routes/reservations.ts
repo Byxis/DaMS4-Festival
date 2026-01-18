@@ -41,7 +41,7 @@ router.get("/:id/reservations", async (req: Request, res: Response) => {
                 r.note,
                 r.status,
                 COALESCE(json_agg(DISTINCT jsonb_build_object('id', ri.id, 'reservation_id', ri.reservation_id, 'description', ri.description, 'interaction_date', ri.interaction_date)) FILTER (WHERE ri.id IS NOT NULL), '[]'::json) as interactions,
-                COALESCE(json_agg(DISTINCT jsonb_build_object('id', rg.id, 'reservation_id', rg.reservation_id, 'game_id', rg.game_id, 'amount', rg.amount, 'table_count', rg.table_count, 'big_table_count', rg.big_table_count, 'town_table_count', rg.town_table_count, 'electrical_outlets', rg.electrical_outlets, 'status', rg.status)) FILTER (WHERE rg.id IS NOT NULL), '[]'::json) as games
+                COALESCE(json_agg(DISTINCT jsonb_build_object('id', rg.id, 'reservation_id', rg.reservation_id, 'game_id', rg.game_id, 'amount', rg.amount, 'table_count', rg.table_count, 'big_table_count', rg.big_table_count, 'town_table_count', rg.town_table_count, 'electrical_outlets', rg.electrical_outlets, 'status', rg.status, 'zone_id', rg.zone_id, 'floor_space', rg.floor_space)) FILTER (WHERE rg.id IS NOT NULL), '[]'::json) as games
             FROM reservations r
             LEFT JOIN reservation_interactions ri ON r.id = ri.reservation_id
             LEFT JOIN reservation_games rg ON r.id = rg.reservation_id
@@ -124,7 +124,7 @@ router.get("/:id/reservations/:reservationId", async (req: Request, res: Respons
                 r.note,
                 r.status,
                 COALESCE(json_agg(DISTINCT jsonb_build_object('id', ri.id, 'reservation_id', ri.reservation_id, 'description', ri.description, 'interaction_date', ri.interaction_date)) FILTER (WHERE ri.id IS NOT NULL), '[]'::json) as interactions,
-                COALESCE(json_agg(DISTINCT jsonb_build_object('id', rg.id, 'reservation_id', rg.reservation_id, 'game_id', rg.game_id, 'amount', rg.amount, 'table_count', rg.table_count, 'big_table_count', rg.big_table_count, 'town_table_count', rg.town_table_count, 'status', rg.status)) FILTER (WHERE rg.id IS NOT NULL), '[]'::json) as games
+                COALESCE(json_agg(DISTINCT jsonb_build_object('id', rg.id, 'reservation_id', rg.reservation_id, 'game_id', rg.game_id, 'amount', rg.amount, 'table_count', rg.table_count, 'big_table_count', rg.big_table_count, 'town_table_count', rg.town_table_count, 'status', rg.status, 'zone_id', rg.zone_id, 'floor_space', rg.floor_space)) FILTER (WHERE rg.id IS NOT NULL), '[]'::json) as games
             FROM reservations r
             LEFT JOIN reservation_interactions ri ON r.id = ri.reservation_id
             LEFT JOIN reservation_games rg ON r.id = rg.reservation_id
@@ -291,6 +291,8 @@ router.post("/:id/reservations/:reservationId/games", requireAdmin, async (req: 
         town_table_count,
         electrical_outlets,
         status,
+        zone_id,
+        floor_space,
     } = req.body;
 
     if (!game_id)
@@ -300,17 +302,30 @@ router.post("/:id/reservations/:reservationId/games", requireAdmin, async (req: 
 
     try
     {
-        const existing = await pool.query(
-            `SELECT id FROM reservation_games WHERE reservation_id = $1 AND game_id = $2`, [reservationId, game_id]);
+        const existingInfo = await pool.query(
+            `SELECT g.name, rg.status, rg.id as reservation_game_id 
+             FROM games g 
+             LEFT JOIN reservation_games rg ON rg.game_id = g.id AND rg.reservation_id = $1 
+             WHERE g.id = $2`,
+            [reservationId, game_id]);
+
+        const gameName = existingInfo.rows[0]?.name || 'Jeu inconnu';
+        const oldStatus = existingInfo.rows[0]?.status;
+        const exists = !!existingInfo.rows[0]?.reservation_game_id;
+
+        // Determine effective new status
+        // If status param is provided, use it. If not, if exists keep it, else default 'ASKED'.
+        const actualNewStatus = status !== undefined ? status : (exists ? oldStatus : "ASKED");
+        const statusChanged = actualNewStatus !== oldStatus;
 
         let result;
-        if (existing.rowCount && existing.rowCount > 0)
+        if (exists)
         {
             // Update
             result = await pool.query(
                 `UPDATE reservation_games 
-                     SET amount = $1, table_count = $2, big_table_count = $3, town_table_count = $4, electrical_outlets = $5, status = $6
-                     WHERE reservation_id = $7 AND game_id = $8
+                     SET amount = $1, table_count = $2, big_table_count = $3, town_table_count = $4, electrical_outlets = $5, status = $6, zone_id = $7, floor_space = $8
+                     WHERE reservation_id = $9 AND game_id = $10
                      RETURNING *`,
                 [
                     amount ?? 0,
@@ -318,7 +333,9 @@ router.post("/:id/reservations/:reservationId/games", requireAdmin, async (req: 
                     big_table_count ?? 0,
                     town_table_count ?? 0,
                     electrical_outlets ?? 0,
-                    status ?? "ASKED",
+                    actualNewStatus,
+                    zone_id ?? null,
+                    floor_space ?? 0,
                     reservationId,
                     game_id,
                 ]);
@@ -327,8 +344,8 @@ router.post("/:id/reservations/:reservationId/games", requireAdmin, async (req: 
         {
             result = await pool.query(
                 `INSERT INTO reservation_games 
-                     (reservation_id, game_id, amount, table_count, big_table_count, town_table_count, electrical_outlets, status)
-                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                     (reservation_id, game_id, amount, table_count, big_table_count, town_table_count, electrical_outlets, status, zone_id, floor_space)
+                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                      RETURNING *`,
                 [
                     reservationId,
@@ -338,8 +355,21 @@ router.post("/:id/reservations/:reservationId/games", requireAdmin, async (req: 
                     big_table_count ?? 0,
                     town_table_count ?? 0,
                     electrical_outlets ?? 0,
-                    status ?? "ASKED",
+                    actualNewStatus,
+                    zone_id ?? null,
+                    floor_space ?? 0,
                 ]);
+        }
+
+        if (statusChanged)
+        {
+            const description = exists ? `Statut du jeu "${gameName}" modifié : ${oldStatus} -> ${actualNewStatus}` :
+                                         `Jeu "${gameName}" ajouté avec le statut : ${actualNewStatus}`;
+
+            await pool.query(
+                `INSERT INTO reservation_interactions (reservation_id, description, interaction_date)
+                 VALUES ($1, $2, NOW())`,
+                [reservationId, description]);
         }
 
         res.status(200).json(result.rows[0]);

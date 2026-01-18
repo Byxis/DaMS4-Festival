@@ -1,11 +1,16 @@
 
 import {CommonModule} from '@angular/common';
-import {Component, computed, effect, inject, input, signal} from '@angular/core';
+import {Component, computed, effect, inject, input, signal, ViewEncapsulation} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatIconModule} from '@angular/material/icon';
+import {MatInputModule} from '@angular/material/input';
 import {MatMenuModule} from '@angular/material/menu';
+import {MatSelectModule} from '@angular/material/select';
 import {environment} from '@env/environment';
 
+import {ZoneGameDTO} from '../../festivals/dtos/zone-game-dto';
+import {FestivalService} from '../../festivals/festival-service/festival-service';
 import {GameService} from '../../games/game-service/game-service';
 import {GameDto} from '../../games/game/game-dto';
 import {ReservationService} from '../reservation.service';
@@ -14,14 +19,24 @@ import {Reservation, ReservationGame, ReservationGameStatus} from '../reservatio
 @Component({
     selector: 'reservation-games',
     standalone: true,
-    imports: [CommonModule, MatIconModule, MatButtonModule, MatMenuModule],
+    imports: [
+        CommonModule,
+        MatIconModule,
+        MatButtonModule,
+        MatMenuModule,
+        MatInputModule,
+        MatCheckboxModule,
+        MatSelectModule
+    ],
     templateUrl: './reservation-games.html',
     styleUrl: './reservation-games.scss',
+    encapsulation: ViewEncapsulation.None,
 })
 export class ReservationGamesComponent
 {
     private readonly gameService = inject(GameService);
     private readonly reservationService = inject(ReservationService);
+    private readonly festivalService = inject(FestivalService);
 
     readonly publisherId = input.required<number>();
     readonly festivalId = input.required<number>();
@@ -30,7 +45,15 @@ export class ReservationGamesComponent
     readonly publisherGames = signal<GameDto[]>([]);
     readonly isLoading = signal(false);
 
+    readonly filterText = signal('');
+    readonly showUndefinedOnly = signal(false);
+
     readonly gameStatuses = Object.values(ReservationGameStatus);
+
+    readonly gameZones = computed<ZoneGameDTO[]>(() => {
+        const fest = this.festivalService._currentFestival();
+        return fest?.tarif_zones?.flatMap(tz => tz.game_zones || []) || [];
+    });
 
     readonly reservedGamesMap = computed(() => {
         const res = this.reservation();
@@ -40,6 +63,33 @@ export class ReservationGamesComponent
             res.games.forEach(g => map.set(g.game_id, g));
         }
         return map;
+    });
+
+    readonly displayedGames = computed(() => {
+        const allGames = this.publisherGames();
+        const search = this.filterText().toLowerCase().trim();
+        const showUndefined = this.showUndefinedOnly();
+        const reservedMap = this.reservedGamesMap();
+
+        return allGames.filter(game => {
+            if (search && !game.name.toLowerCase().includes(search))
+            {
+                return false;
+            }
+
+            const reserved = reservedMap.get(game.id!);
+            const hasStatus = !!(reserved && reserved.status);
+
+            if (!showUndefined)
+            {
+                if (!hasStatus)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        });
     });
 
     constructor()
@@ -80,6 +130,11 @@ export class ReservationGamesComponent
         return 0;
     }
 
+    updateGameZone(gameId: number, zoneId: number)
+    {
+        this.updateGameValue(gameId, 'zone_id', zoneId);
+    }
+
     updateGame(gameId: number, field: keyof ReservationGame, event: Event)
     {
         const input = event.target as HTMLInputElement;
@@ -90,6 +145,12 @@ export class ReservationGamesComponent
     setGameStatus(gameId: number, status: string)
     {
         this.updateGameValue(gameId, 'status', status);
+    }
+
+    updateFilter(event: Event)
+    {
+        const input = event.target as HTMLInputElement;
+        this.filterText.set(input.value);
     }
 
     private updateGameValue(gameId: number, field: keyof ReservationGame, value: any)
@@ -107,24 +168,30 @@ export class ReservationGamesComponent
             big_table_count: 0,
             town_table_count: 0,
             electrical_outlets: 0,
+            floor_space: 0,
             status: ReservationGameStatus.ASKED
         } as ReservationGame;
 
         const updated: Partial<ReservationGame> = {...current, game_id: gameId, [field]: value};
 
         this.reservationService.upsertGame(festivalId, reservationId, updated).subscribe({
-            next: (res) => console.log('Game updated', res),
+            next: (res) => {
+                console.log('Game updated', res);
+                this.festivalService.loadFestivalById(festivalId);
+            },
             error: (err) => console.error('Error updating game', err)
         });
     }
 
     calculateSurface(gameId: number): number
     {
+        const floorSpace = Number(this.getGameValue(gameId, 'floor_space')) || 0;
+
         const tStandard = Number(this.getGameValue(gameId, 'table_count')) || 0;
         const tBig = Number(this.getGameValue(gameId, 'big_table_count')) || 0;
         const tTown = Number(this.getGameValue(gameId, 'town_table_count')) || 0;
 
-        return (tStandard * 4) + (tBig * 6) + (tTown * 4);
+        return ((tStandard + tBig + tTown) * 4) + floorSpace;
     }
 
     getGameStatusLabel(status: string|null|undefined): string

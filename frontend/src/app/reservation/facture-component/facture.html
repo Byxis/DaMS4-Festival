@@ -14,20 +14,28 @@
       <thead>
         <tr>
           <th>Zone</th>
-          <th>Nombre</th>
-          <th>Prix/unit</th>
+          <th>Surface (m²)</th>
+          <th>Prix / m²</th>
+          <th>Prises</th>
+          <th>Prix / prise</th>
           <th>Total</th>
         </tr>
       </thead>
       <tbody>
-        @for (zone of zoneSummary().zones; track zone.key) { @if (zone.count > 0) {
+        @for (row of zoneSummary().rows; track row.name) {
         <tr class="facture-row">
-          <td class="zone-label">{{ zone.label }}</td>
-          <td class="zone-count">{{ zone.count }}</td>
-          <td class="zone-price">{{ formatPrice(zone.price) }}</td>
-          <td class="zone-total">{{ formatPrice(zone.total) }}</td>
+          <td class="zone-label">{{ row.name }}</td>
+          <td class="zone-count">{{ row.surface }}</td>
+          <td class="zone-price">{{ formatPrice(row.priceM2) }}</td>
+          <td class="zone-count">{{ row.outlets }}</td>
+          <td class="zone-price">{{ formatPrice(row.priceOutlet) }}</td>
+          <td class="zone-total">{{ formatPrice(row.total) }}</td>
         </tr>
-        } }
+        } @empty {
+        <tr class="facture-row">
+          <td colspan="6" style="text-align: center; font-style: italic;">Aucune zone définie</td>
+        </tr>
+        }
       </tbody>
     </table>
     <div class="facture-footer">

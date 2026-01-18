@@ -6,7 +6,7 @@ export interface Reservation {
     big_table_count: number;
     town_table_count: number;
     electrical_outlets: number;
-    note: string | null;
+    note: string|null;
     status: string;
     interactions?: ReservationInteraction[];
     games?: ReservationGame[];
@@ -15,7 +15,7 @@ export interface Reservation {
 export interface ReservationInteraction {
     id: number;
     reservation_id: number;
-    description: string | null;
+    description: string|null;
     interaction_date: string;
 }
 
@@ -29,6 +29,8 @@ export interface ReservationGame {
     town_table_count: number;
     electrical_outlets: number;
     status: string;
+    zone_id?: number;
+    floor_space?: number;
 }
 
 export enum ReservationStatus {
