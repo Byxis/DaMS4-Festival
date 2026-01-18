@@ -1,23 +1,27 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ContactList } from '@publisher/contact-list/contact-list';
-import { ContactDialog } from '@publisher/contact-dialog/contact-dialog.component';
-import { ContactDTO } from '@publisher/contactDto';
+import { ContactList } from 'src/app/publisher/contact-list/contact-list';
+import { ContactDialog } from 'src/app/publisher/contact-dialog/contact-dialog.component';
+import { ContactDTO } from 'src/app/publisher/contactDto';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { Router } from '@angular/router';
-import { PublisherService } from '@publisher/publisher.service';
-import { PublisherEditDialog } from '@publisher/publisher-edit-dialog/publisher-edit-dialog.component';
+import { PublisherService } from 'src/app/publisher/publisher.service';
+import { PublisherEditDialog } from 'src/app/publisher/publisher-edit-dialog/publisher-edit-dialog.component';
+import { PublisherDTO } from 'src/app/publisher/publisherDto';
+import { GameList } from 'src/app/games/game-list/game-list';
+import { GameService } from 'src/app/games/game-service/game-service';
 
 @Component({
   selector: 'publisher',
-  imports: [ContactList, MatIcon, MatButton],
+  imports: [ContactList, MatIcon, MatButton, GameList],
   templateUrl: './publisher.html',
   styleUrl: './publisher.scss',
 })
 export class Publisher {
   private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
+  private readonly gameService = inject(GameService);
   private readonly publisherService = inject(PublisherService);
 
   readonly publisherId = input.required<number>({ alias: 'publisher' });
@@ -30,6 +34,10 @@ export class Publisher {
   readonly isLoading = computed(() => this.publisherService.isLoading());
 
   readonly contacts = computed(() => this.publisher().contacts ?? []);
+
+   readonly numberOfGames = signal<number>(0);
+
+   
 
   openContactAddDialog(): void {
     const dialogRef = this.dialog.open(ContactDialog, {
@@ -95,4 +103,6 @@ export class Publisher {
       }
     });
   }
+
+  
 }

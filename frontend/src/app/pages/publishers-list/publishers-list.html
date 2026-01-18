@@ -11,10 +11,106 @@
       />
       <mat-icon matPrefix>search</mat-icon>
     </mat-form-field>
-  </div>
+    </div>
+
+    
 
   @if (isLoading()) {
-  <div class="skeleton-container">
+    <div class="skeleton-container">
+      <div class="publishers-table">
+        <div class="table-header">
+          <div
+            class="header-cell id-cell sortable"
+            (click)="sortBy('id')"
+            [matTooltip]="getSortTooltip('id', 'ID')"
+          >
+            ID
+            <mat-icon class="sort-icon" [class.active]="sortColumn() === 'id'">{{
+              sortColumn() === 'id' && sortDirection() === 'desc' ? 'arrow_upward' : 'arrow_downward'
+            }}</mat-icon>
+          </div>
+          <div class="header-cell logo-cell">Logo</div>
+          <div
+            class="header-cell name-cell sortable"
+            (click)="sortBy('name')"
+            [matTooltip]="getSortTooltip('name', 'Nom')"
+          >
+            Nom
+            <mat-icon class="sort-icon" [class.active]="sortColumn() === 'name'">{{
+              sortColumn() === 'name' && sortDirection() === 'desc'
+                ? 'arrow_upward'
+                : 'arrow_downward'
+            }}</mat-icon>
+          </div>
+          <div
+            class="header-cell sortable"
+            (click)="sortBy('games')"
+            [matTooltip]="getSortTooltip('games', 'Jeux')"
+          >
+            Jeux
+            <mat-icon class="sort-icon" [class.active]="sortColumn() === 'games'">{{
+              sortColumn() === 'games' && sortDirection() === 'desc'
+                ? 'arrow_upward'
+                : 'arrow_downward'
+            }}</mat-icon>
+          </div>
+          <div
+            class="header-cell sortable"
+            (click)="sortBy('contacts')"
+            [matTooltip]="getSortTooltip('contacts', 'Contacts')"
+          >
+            Contacts
+            <mat-icon class="sort-icon" [class.active]="sortColumn() === 'contacts'">{{
+              sortColumn() === 'contacts' && sortDirection() === 'desc'
+                ? 'arrow_upward'
+                : 'arrow_downward'
+            }}</mat-icon>
+          </div>
+          <div
+            class="header-cell first-contact-cell sortable"
+            (click)="sortBy('firstContact')"
+            [matTooltip]="getSortTooltip('firstContact', 'Premier Contact')"
+          >
+            Premier Contact
+            <mat-icon class="sort-icon" [class.active]="sortColumn() === 'firstContact'">{{
+              sortColumn() === 'firstContact' && sortDirection() === 'desc'
+                ? 'arrow_upward'
+                : 'arrow_downward'
+            }}</mat-icon>
+          </div>
+          <div
+            class="header-cell sortable"
+            (click)="sortBy('festivals')"
+            [matTooltip]="getSortTooltip('festivals', 'Festivals')"
+          >
+            Festivals
+            <mat-icon class="sort-icon" [class.active]="sortColumn() === 'festivals'">{{
+              sortColumn() === 'festivals' && sortDirection() === 'desc'
+                ? 'arrow_upward'
+                : 'arrow_downward'
+            }}</mat-icon>
+          </div>
+        </div>
+        @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+          <div class="table-row skeleton-row">
+            <div class="cell id-cell"><div class="skeleton skeleton-id"></div></div>
+            <div class="cell logo-cell"><div class="skeleton skeleton-logo"></div></div>
+            <div class="cell name-cell"><div class="skeleton skeleton-name"></div></div>
+            <div class="cell"><div class="skeleton skeleton-count"></div></div>
+            <div class="cell"><div class="skeleton skeleton-count"></div></div>
+            <div class="cell first-contact-cell"><div class="skeleton skeleton-contact"></div></div>
+            <div class="cell"><div class="skeleton skeleton-count"></div></div>
+            <div class="cell actions-cell"></div>
+          </div>
+        }
+      </div>
+    </div>
+  } @else if (isError()) {
+    <div class="error-container">
+      <mat-icon>error</mat-icon>
+     
+    </div>
+  } @else {
     <div class="publishers-table">
       <div class="table-header">
         <div
@@ -35,9 +131,7 @@
         >
           Nom
           <mat-icon class="sort-icon" [class.active]="sortColumn() === 'name'">{{
-            sortColumn() === 'name' && sortDirection() === 'desc'
-              ? 'arrow_upward'
-              : 'arrow_downward'
+            sortColumn() === 'name' && sortDirection() === 'desc' ? 'arrow_upward' : 'arrow_downward'
           }}</mat-icon>
         </div>
         <div
@@ -88,185 +182,107 @@
               : 'arrow_downward'
           }}</mat-icon>
         </div>
-      </div>
-      @for (i of [1, 2, 3, 4, 5, 6]; track i) {
-      <div class="table-row skeleton-row">
-        <div class="cell id-cell"><div class="skeleton skeleton-id"></div></div>
-        <div class="cell logo-cell"><div class="skeleton skeleton-logo"></div></div>
-        <div class="cell name-cell"><div class="skeleton skeleton-name"></div></div>
-        <div class="cell"><div class="skeleton skeleton-count"></div></div>
-        <div class="cell"><div class="skeleton skeleton-count"></div></div>
-        <div class="cell first-contact-cell"><div class="skeleton skeleton-contact"></div></div>
-        <div class="cell"><div class="skeleton skeleton-count"></div></div>
-        <div class="cell actions-cell"></div>
-      </div>
-      }
-    </div>
-  </div>
-  } @else if (isError()) {
-  <div class="error-container">
-    <mat-icon>error</mat-icon>
-    <p>Erreur lors du chargement des éditeurs. Veuillez réessayer plus tard.</p>
-  </div>
-  } @else {
-  <div class="publishers-table">
-    <div class="table-header">
-      <div
-        class="header-cell id-cell sortable"
-        (click)="sortBy('id')"
-        [matTooltip]="getSortTooltip('id', 'ID')"
-      >
-        ID
-        <mat-icon class="sort-icon" [class.active]="sortColumn() === 'id'">{{
-          sortColumn() === 'id' && sortDirection() === 'desc' ? 'arrow_upward' : 'arrow_downward'
-        }}</mat-icon>
-      </div>
-      <div class="header-cell logo-cell">Logo</div>
-      <div
-        class="header-cell name-cell sortable"
-        (click)="sortBy('name')"
-        [matTooltip]="getSortTooltip('name', 'Nom')"
-      >
-        Nom
-        <mat-icon class="sort-icon" [class.active]="sortColumn() === 'name'">{{
-          sortColumn() === 'name' && sortDirection() === 'desc' ? 'arrow_upward' : 'arrow_downward'
-        }}</mat-icon>
-      </div>
-      <div
-        class="header-cell sortable"
-        (click)="sortBy('games')"
-        [matTooltip]="getSortTooltip('games', 'Jeux')"
-      >
-        Jeux
-        <mat-icon class="sort-icon" [class.active]="sortColumn() === 'games'">{{
-          sortColumn() === 'games' && sortDirection() === 'desc' ? 'arrow_upward' : 'arrow_downward'
-        }}</mat-icon>
-      </div>
-      <div
-        class="header-cell sortable"
-        (click)="sortBy('contacts')"
-        [matTooltip]="getSortTooltip('contacts', 'Contacts')"
-      >
-        Contacts
-        <mat-icon class="sort-icon" [class.active]="sortColumn() === 'contacts'">{{
-          sortColumn() === 'contacts' && sortDirection() === 'desc'
-            ? 'arrow_upward'
-            : 'arrow_downward'
-        }}</mat-icon>
-      </div>
-      <div
-        class="header-cell first-contact-cell sortable"
-        (click)="sortBy('firstContact')"
-        [matTooltip]="getSortTooltip('firstContact', 'Premier Contact')"
-      >
-        Premier Contact
-        <mat-icon class="sort-icon" [class.active]="sortColumn() === 'firstContact'">{{
-          sortColumn() === 'firstContact' && sortDirection() === 'desc'
-            ? 'arrow_upward'
-            : 'arrow_downward'
-        }}</mat-icon>
-      </div>
-      <div
-        class="header-cell sortable"
-        (click)="sortBy('festivals')"
-        [matTooltip]="getSortTooltip('festivals', 'Festivals')"
-      >
-        Festivals
-        <mat-icon class="sort-icon" [class.active]="sortColumn() === 'festivals'">{{
-          sortColumn() === 'festivals' && sortDirection() === 'desc'
-            ? 'arrow_upward'
-            : 'arrow_downward'
-        }}</mat-icon>
-      </div>
-      <div class="header-cell actions-cell">
-        <button
-          mat-icon-button
-          (click)="this.openCreateDialog()"
-          class="highlighted"
-          aria-label="Ajouter un éditeur"
-          matTooltip="Ajouter un nouvel éditeur"
-        >
-          <mat-icon>add_circle_outline</mat-icon>
-        </button>
-      </div>
-    </div>
-    @if (publishers().length !== 0) {
-    <cdk-virtual-scroll-viewport
-      itemSize="73"
-      minBufferPx="219"
-      maxBufferPx="438"
-      class="table-viewport"
-    >
-      <div
-        *cdkVirtualFor="let publisher of publishers(); trackBy: trackByPublisherId"
-        class="table-row"
-        (click)="viewPublisher(publisher)"
-      >
-        <div class="cell id-cell center">
-          <span class="id-badge">{{ publisher.id }}</span>
-        </div>
-        <div class="cell logo-cell center">
-          @if (publisher.logoUrl) {
-          <img [src]="publisher.logoUrl" [alt]="publisher.name + ' logo'" class="publisher-logo" />
-          } @else {
-          <div class="logo-placeholder">
-            <mat-icon>business</mat-icon>
-          </div>
-          }
-        </div>
-        <div class="cell name-cell">
-          <span class="publisher-name">{{ publisher.name }}</span>
-        </div>
-        <div class="cell center">
-          <div class="cell-content">
-            <mat-icon class="cell-icon">videogame_asset</mat-icon>
-            <span>{{ getGameCount(publisher) }}</span>
-          </div>
-        </div>
-        <div class="cell center">
-          <div class="cell-content">
-            <mat-icon class="cell-icon">contacts</mat-icon>
-            <span>{{ getContactCount(publisher) }}</span>
-          </div>
-        </div>
-        <div class="cell first-contact-cell center">
-          <div class="cell-content">
-            <mat-icon class="cell-icon">person</mat-icon>
-            <span>{{ getFirstContactName(publisher) }}</span>
-          </div>
-        </div>
-        <div class="cell center">
-          <div class="cell-content">
-            <mat-icon class="cell-icon">event</mat-icon>
-            <span>{{ getFestivalCount(publisher) }}</span>
-          </div>
-        </div>
-        <div class="cell actions-cell center">
+        <div class="header-cell actions-cell">
           <button
             mat-icon-button
-            (click)="editPublisher($event, publisher)"
-            class="edit-btn"
-            matTooltip="Modifier l'éditeur"
+            (click)="this.openCreateDialog()"
+            class="highlighted"
+            aria-label="Ajouter un éditeur"
+            matTooltip="Ajouter un nouvel éditeur"
           >
-            <mat-icon>edit</mat-icon>
+            <mat-icon>add_circle_outline</mat-icon>
           </button>
-          <button
-            mat-icon-button
-            (click)="deletePublisher($event, publisher)"
-            class="delete-btn"
-            matTooltip="Supprimer l'éditeur"
-          >
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
+        
+        
+      <button
+        mat-icon-button
+        color="accent"
+        (click)="this.openImportEditorDialog()"
+        matTooltip="Importer un éditeur existant"
+      >
+        <mat-icon>cloud_download</mat-icon>
+       
+      </button>
+  </div>
       </div>
-    </cdk-virtual-scroll-viewport>
-    } @else {
+      @if (publishers().length === 0) {
     <div class="empty-container">
       <mat-icon>business</mat-icon>
       <p>Aucun éditeur disponible.</p>
     </div>
+      }
+      @else {
+      <cdk-virtual-scroll-viewport
+        itemSize="73"
+        minBufferPx="219"
+        maxBufferPx="438"
+        class="table-viewport"
+      >
+        <div
+          *cdkVirtualFor="let publisher of publishers(); trackBy: trackByPublisherId"
+          class="table-row"
+          (click)="viewPublisher(publisher)"
+        >
+          <div class="cell id-cell center">
+            <span class="id-badge">{{ publisher.id }}</span>
+          </div>
+          <div class="cell logo-cell center">
+            @if (publisher.logoUrl) {
+              <img [src]="publisher.logoUrl" [alt]="publisher.name + ' logo'" class="publisher-logo" />
+            } @else {
+              <div class="logo-placeholder">
+                <mat-icon>business</mat-icon>
+              </div>
+            }
+          </div>
+          <div class="cell name-cell">
+            <span class="publisher-name">{{ publisher.name }}</span>
+          </div>
+          <div class="cell center">
+            <div class="cell-content">
+              <mat-icon class="cell-icon">videogame_asset</mat-icon>
+              <span>{{ getGameCount(publisher) }}</span>
+            </div>
+          </div>
+          <div class="cell center">
+            <div class="cell-content">
+              <mat-icon class="cell-icon">contacts</mat-icon>
+              <span>{{ getContactCount(publisher) }}</span>
+            </div>
+          </div>
+          <div class="cell first-contact-cell center">
+            <div class="cell-content">
+              <mat-icon class="cell-icon">person</mat-icon>
+              <span>{{ getFirstContactName(publisher) }}</span>
+            </div>
+          </div>
+          <div class="cell center">
+            <div class="cell-content">
+              <mat-icon class="cell-icon">event</mat-icon>
+              <span>{{ getFestivalCount(publisher) }}</span>
+            </div>
+          </div>
+          <div class="cell actions-cell center">
+            <button
+              mat-icon-button
+              (click)="editPublisher($event, publisher)"
+              class="edit-btn"
+              matTooltip="Modifier l'éditeur"
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              (click)="deletePublisher($event, publisher)"
+              class="delete-btn"
+              matTooltip="Supprimer l'éditeur"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </cdk-virtual-scroll-viewport>
     }
-  </div>
+    </div>
   }
 </div>
