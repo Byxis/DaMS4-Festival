@@ -32,14 +32,8 @@
         </div>
 
         <div class="cell logo-cell center">
-          @if (game.logo && !logoErrors.has(game.id!)) {
-
-          @if (typeof game.logo === 'string' && game.logo.startsWith('http')) {
-          <img [src]="game.logo" [alt]="game.name + ' logo'" (error)="logoErrors.add(game.id!)" class="game-logo">
-          } @else if (typeof game.logo === 'string') {
-          <img [src]="'https://localhost:4000/api/games/' + game.id + '/logo'" [alt]="game.name + ' logo'"
-            (error)="logoErrors.add(game.id!)" crossorigin="anonymous" class="game-logo">
-          }
+          @if (game.logoUrl && !logoErrors.has(game.id!)) {
+          <img [src]="game.logoUrl" [alt]="game.name + ' logo'" (error)="logoErrors.add(game.id!)" class="game-logo">
           } @else {
           <div class="logo-placeholder">
             <mat-icon>business</mat-icon>

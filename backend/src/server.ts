@@ -6,7 +6,6 @@ import express from "express";
 import fs from "fs";
 import https from "https";
 import morgan from "morgan";
-import multer from "multer";
 
 import {ensureAdmin} from "./db/initAdmin.js";
 import {requireAdmin} from "./middleware/auth-admin.js";
@@ -21,7 +20,7 @@ import usersRouter from "./routes/users.js";
 
 // Création de l’application Express
 const app = express();
-const upload = multer({dest: "./uploads/logos"});
+
 await ensureAdmin();
 
 // Ajout manuel des principaux en-têtes HTTP de sécurité
@@ -75,7 +74,6 @@ app.use("/api/admin", verifyToken, requireAdmin, (req, res) => {
 });
 app.use("/api/publishers", verifyToken, publisherRouter);
 
-app.post("/api/games/:id/logo", verifyToken, upload.single("logo"), game);
 app.use('/api/games', game);
 
 // Chargement du certificat et clé générés par mkcert (étape 0)

@@ -25,11 +25,7 @@
 
     <button class="logo-name-button" (click)="navigateToPublisher()" [disabled]="!publisher()">
       @if (this.publisher()?.logoUrl) {
-      <img
-        [src]="this.publisher()?.logoUrl"
-        alt="{{ this.publisher()?.name }} logo"
-        class="logo-img"
-      />
+      <img [src]="this.publisher()?.logoUrl" alt="{{ this.publisher()?.name }} logo" class="logo-img" />
       } @else {
       <mat-icon class="logo-fallback-icon">business</mat-icon>
       }
@@ -39,40 +35,27 @@
     <div class="items-row">
       @for (item of items(); track $index) {
       <div class="item" (click)="$event.stopPropagation()" [class.locked]="item.locked">
-        <mat-checkbox
-          [checked]="item.checked"
-          [disabled]="item.locked"
-          (change)="toggleItemCheck($index)"
-        ></mat-checkbox>
+        <mat-checkbox [checked]="item.checked" [disabled]="item.locked"
+          (change)="toggleItemCheck($index)"></mat-checkbox>
         <span class="item-label" (click)="!item.locked && toggleItemCheck($index)">{{
           item.label
-        }}</span>
+          }}</span>
       </div>
       }
     </div>
 
     <div class="status-container">
-      <button
-        mat-button
-        [matMenuTriggerFor]="statusMenu"
-        class="status-button"
-        (click)="$event.stopPropagation()"
+      <button mat-button [matMenuTriggerFor]="statusMenu" class="status-button" (click)="$event.stopPropagation()"
         [style.backgroundColor]="getStatusBackgroundColor(selectedStatus())"
-        [style.color]="getStatusColor(selectedStatus())"
-        [style.borderColor]="getStatusColor(selectedStatus())"
-      >
+        [style.color]="getStatusColor(selectedStatus())" [style.borderColor]="getStatusColor(selectedStatus())">
         <span class="status-text">Status : {{ currentStatusLabel() }}</span>
         <mat-icon class="status-icon">expand_more</mat-icon>
       </button>
       <mat-menu #statusMenu="matMenu" panelClass="status-menu-panel">
         @for (status of statuses; track status) {
-        <button
-          mat-menu-item
-          (click)="setStatus(status)"
-          [style.color]="getStatusColor(status)"
+        <button mat-menu-item (click)="setStatus(status)" [style.color]="getStatusColor(status)"
           [style.backgroundColor]="getStatusBackgroundColor(status)"
-          [style.fontWeight]="selectedStatus() === status ? '700' : '500'"
-        >
+          [style.fontWeight]="selectedStatus() === status ? '700' : '500'">
           {{ getStatusLabel(status) }}
         </button>
         }
@@ -89,20 +72,14 @@
         </h3>
         <div class="tables-container">
           @for (tableConfig of tableConfigs; track tableConfig.key) {
-          <table
-            [tableConfig]="tableConfig"
-            [count]="tableInputs()[tableConfig.key]"
-            [reservation]="reservation()"
-            [festivalId]="festivalId()"
-          ></table>
+          <table [tableConfig]="tableConfig" [count]="tableInputs()[tableConfig.key]" [reservation]="reservation()"
+            [festivalId]="festivalId()"></table>
           }
         </div>
       </div>
-      <note
-        [note]="reservation()?.note ?? null"
-        [reservation]="reservation()"
-        [festivalId]="festivalId()"
-      ></note>
+      <reservation-games [publisherId]="publisherId()" [festivalId]="festivalId()"
+        [reservation]="reservation()"></reservation-games>
+      <note [note]="reservation()?.note ?? null" [reservation]="reservation()" [festivalId]="festivalId()"></note>
     </div>
     <div class="details-sidebar">
       <updates [interactions]="reservation()?.interactions"></updates>

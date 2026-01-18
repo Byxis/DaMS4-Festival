@@ -1,0 +1,87 @@
+<div class="reservation-games-container">
+    <h3>Jeux réservés</h3>
+
+    @if (isLoading()) {
+    <div class="loading">Chargement des jeux...</div>
+    } @else {
+    <table class="games-table">
+        <thead>
+            <tr>
+                <th>Logo</th>
+                <th>Jeu</th>
+                <th>Quantité</th>
+                <th>Tables</th>
+                <th>Grandes tables</th>
+                <th>Tables Mairies</th>
+                <th>Prises</th>
+                <th>Surface estimée</th>
+                <th>Statut</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (game of publisherGames(); track game.id) {
+            <tr [class.reserved]="isReserved(game.id!)">
+                <td class="logo-cell">
+                    @if (game.logoUrl) {
+                    <img [src]="game.logoUrl" alt="logo" class="game-logo" />
+                    } @else {
+                    <mat-icon>sports_esports</mat-icon>
+                    }
+                </td>
+                <td class="name-cell">
+                    <span class="game-name">{{ game.name }}</span>
+                    <span class="game-type">{{ game.type }}</span>
+                </td>
+                <td>
+                    <input type="number" min="0" [value]="getGameValue(game.id!, 'amount')"
+                        (change)="updateGame(game.id!, 'amount', $event)" class="qty-input" />
+                </td>
+                <td>
+                    <input type="number" min="0" [value]="getGameValue(game.id!, 'table_count')"
+                        (change)="updateGame(game.id!, 'table_count', $event)" class="qty-input" />
+                </td>
+                <td>
+                    <input type="number" min="0" [value]="getGameValue(game.id!, 'big_table_count')"
+                        (change)="updateGame(game.id!, 'big_table_count', $event)" class="qty-input" />
+                </td>
+                <td>
+                    <input type="number" min="0" [value]="getGameValue(game.id!, 'town_table_count')"
+                        (change)="updateGame(game.id!, 'town_table_count', $event)" class="qty-input" />
+                </td>
+                <td>
+                    <input type="number" min="0" [value]="getGameValue(game.id!, 'electrical_outlets')"
+                        (change)="updateGame(game.id!, 'electrical_outlets', $event)" class="qty-input" />
+                </td>
+                <td>
+                    {{ calculateSurface(game.id!) }} m²
+                </td>
+                <td>
+                    <button mat-button [matMenuTriggerFor]="statusMenu" class="status-button"
+                        (click)="$event.stopPropagation()"
+                        [style.backgroundColor]="getGameStatusBackgroundColor(getGameValue(game.id!, 'status'))"
+                        [style.color]="getGameStatusColor(getGameValue(game.id!, 'status'))"
+                        [style.borderColor]="getGameStatusColor(getGameValue(game.id!, 'status'))">
+                        <span class="status-text">{{ getGameStatusLabel(getGameValue(game.id!, 'status')) }}</span>
+                        <mat-icon class="status-icon">expand_more</mat-icon>
+                    </button>
+                    <mat-menu #statusMenu="matMenu" panelClass="status-menu-panel">
+                        @for (status of gameStatuses; track status) {
+                        <button mat-menu-item (click)="setGameStatus(game.id!, status)"
+                            [style.color]="getGameStatusColor(status)"
+                            [style.backgroundColor]="getGameStatusBackgroundColor(status)"
+                            [style.fontWeight]="getGameValue(game.id!, 'status') === status ? '700' : '500'">
+                            {{ getGameStatusLabel(status) }}
+                        </button>
+                        }
+                    </mat-menu>
+                </td>
+            </tr>
+            } @empty {
+            <tr>
+                <td colspan="10" class="empty-cell">Aucun jeu trouvé pour cet éditeur.</td>
+            </tr>
+            }
+        </tbody>
+    </table>
+    }
+</div>

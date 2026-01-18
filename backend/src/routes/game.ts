@@ -1,10 +1,8 @@
-import bcrypt from "bcryptjs";
 import {Router} from "express";
 import type {Request, Response} from "express";
 import fs from "fs";
-import fetch from "node-fetch";
+import multer from "multer";
 import path from "path";
-import {DOMParser} from 'xmldom';
 
 import pool from "../db/database.js";
 import {requireAdmin} from "../middleware/auth-admin.js";
@@ -15,9 +13,6 @@ import {verifyToken} from "../middleware/token-management.js";
  * All routes that modify data require admin privileges (and are marked with !).
  *
  * Endpoints:
- * - GET /api/games/search - Search games by name for a specific publisher
- * - GET /api/games/:gameName - Check if a game name is available for a publisher
- *
  * - GET /api/games/numberOfGameExisting/:publisherId - Check if a publisher has games in the games table
  * - GET /api/games/numberOfPresentedGame/:publisherId - Count games presented by a publisher
  * - GET /api/games/gamesByEditorID/:publisherId - Retrieve all games from an editor (not yet added to publisher)
@@ -28,42 +23,36 @@ import {verifyToken} from "../middleware/token-management.js";
  */
 
 const router = Router();
-// GET /api/games/search - Retrieve game by his name
-router.get("/search", async (req, res) => {
-    const gameName = (req.query.gameName || '').toString().trim();
-    const publisherId = req.query.publisherId ? Number(req.query.publisherId) : null;
-    if (!publisherId || Number.isNaN(publisherId))
-    {
-        return res.status(400).json({error: "publisherId is required"});
-    }
-    try
-    {
-        const q = `
-      SELECT g.id,
-             g.name,
-             g.minimum_number_of_player,
-             g.maximum_number_of_player,
-             g.type_of_games_id,
-             g.logo,
-             p.name AS editor_name,
-             t.description AS type
-      FROM games_publisher g
-      LEFT JOIN publisher p ON p.id = g.publisher_id
-      LEFT JOIN type_of_games t ON t.id = g.type_of_games_id
-      WHERE g.publisher_id = $1
-      AND g.name ILIKE $2
-      ORDER BY g.id;
-    `;
-        const params = [publisherId, `%${gameName}%`];
-        const result = await pool.query(q, params);
-        res.status(200).json(result.rows);
-    }
-    catch (e)
-    {
-        console.error(e);
-        res.status(500).json({error: "Erreur lors de la recherche par game's name"});
-    }
+
+const upload = multer({
+    storage: multer.diskStorage({
+        destination: "./uploads/logos",
+        filename: (req: Request, file: Express.Multer.File, cb: (error: Error|null, filename: string) => void) => {
+            cb(null, `temp-${Date.now()}${path.extname(file.originalname)}`);
+        },
+    }),
+    fileFilter: (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+        const allowedTypes = /jpeg|jpg|png|gif|webp/;
+        const ext = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+        const mime = allowedTypes.test(file.mimetype);
+        if (ext && mime)
+        {
+            return cb(null, true);
+        }
+        return cb(new Error("Invalid file type. Only JPEG, JPG, PNG, GIF, or WEBP images are allowed."));
+    },
+    limits: {fileSize: 10 * 1024 * 1024},
 });
+
+function getLogoUrl(row: any): string|null
+{
+    if (!row.logo) return null;
+    if (row.logo.startsWith('http://') || row.logo.startsWith('https://'))
+    {
+        return row.logo;
+    }
+    return `/games/${row.id}/logo`;
+}
 
 // GET /api/games/:gameName - Check is the name is available before creation
 router.get("/:gameName", async (req: Request, res: Response) => {
@@ -190,7 +179,8 @@ router.get("/gamesByEditorID/:publisherId", async (req: Request, res: Response) 
       ORDER BY g.name;
       `,
             [publisherName, publisherId]);
-        res.status(200).json(result.rows);
+        const rows = result.rows.map(row => ({...row, logoUrl: getLogoUrl(row)}));
+        res.status(200).json(rows);
     }
     catch (e)
     {
@@ -227,7 +217,7 @@ router.get("/filterByPublisherID/:publisherID", async (req, res) => {
     `;
         const params = [publisherID];
         const result = await pool.query(q, params);
-        const rows = result.rows.map(row => ({...row, logoUrl: row.logo ? `/games/${row.id}/logo` : null}));
+        const rows = result.rows.map(row => ({...row, logoUrl: getLogoUrl(row)}));
         res.status(200).json(rows);
     }
     catch (e)
@@ -330,7 +320,7 @@ router.delete("/:id", verifyToken, requireAdmin, async (req: Request, res: Respo
 /* ---------- /api/games/:id/logo ----------*/
 
 //! POST /api/games/:id/logo - Upload a logo for a specific game
-router.post("/:id/logo", async (req: Request, res: Response) => {
+router.post("/:id/logo", verifyToken, requireAdmin, upload.single("logo"), async (req: Request, res: Response) => {
     const {id} = req.params;
     if (!id || !/^\d+$/.test(id))
     {
