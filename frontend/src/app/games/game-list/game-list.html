@@ -88,8 +88,23 @@
             <span>{{ game.maximum_number_of_player }}</span>
           </div>
 
-        
-         
+          <div class="cell actions-cell">
+            <button
+              mat-icon-button
+              (click)="openEditGameDialog(game); $event.stopPropagation()"
+              aria-label="Modifier le jeu"
+              matTooltip="Modifier">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              color="warn"
+              (click)="confirmDeleteGame(game); $event.stopPropagation()"
+              aria-label="Supprimer le jeu"
+              matTooltip="Supprimer">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
         </div>
       }
     </div>

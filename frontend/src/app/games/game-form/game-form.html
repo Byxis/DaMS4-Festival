@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>Créer un nouveau jeu</h2>
+<h2 mat-dialog-title>{{ isEditMode ? 'Modifier le jeu' : 'Créer un nouveau jeu' }}</h2>
 
 <mat-dialog-content>
   <form [formGroup]="form">
@@ -85,6 +85,6 @@
 <mat-dialog-actions>
   <button mat-button (click)="cancel()">Annuler</button>
   <button mat-raised-button color="primary" (click)="submit()" [disabled]="!form.valid">
-    Créer
+    {{ isEditMode ? 'Enregistrer' : 'Créer' }}
   </button>
 </mat-dialog-actions>

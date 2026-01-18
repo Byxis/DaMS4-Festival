@@ -110,11 +110,6 @@
       <mat-icon>error</mat-icon>
      
     </div>
-  } @else if (publishers().length === 0) {
-    <div class="empty-container">
-      <mat-icon>business</mat-icon>
-      <p>Aucun éditeur disponible.</p>
-    </div>
   } @else {
     <div class="publishers-table">
       <div class="table-header">
@@ -210,6 +205,13 @@
       </button>
   </div>
       </div>
+      @if (publishers().length === 0) {
+    <div class="empty-container">
+      <mat-icon>business</mat-icon>
+      <p>Aucun éditeur disponible.</p>
+    </div>
+      }
+      @else {
       <cdk-virtual-scroll-viewport
         itemSize="73"
         minBufferPx="219"
@@ -280,6 +282,7 @@
           </div>
         </div>
       </cdk-virtual-scroll-viewport>
+    }
     </div>
   }
 </div>
