@@ -37,24 +37,28 @@
                 <h3>Espace de table disponible</h3>
                 <div class="stock-row">
                     <div class="stock-item-inline">
-                        <mat-icon>table_bar</mat-icon>
                         <span class="stock-label">Tables</span>
-                        <span class="stock-value">{{ usedStock().tables }} / {{ f.table_count }}</span>
+                        <span class="stock-value">{{ usedStock().tables }} / {{ f.table_count }}
+                            <mat-icon>table_bar</mat-icon>
+                        </span>
                     </div>
                     <div class="stock-item-inline">
-                        <mat-icon>table_restaurant</mat-icon>
                         <span class="stock-label">Grandes Tables</span>
-                        <span class="stock-value">{{ usedStock().bigTables }} / {{ f.big_table_count }}</span>
+                        <span class="stock-value">{{ usedStock().bigTables }} / {{ f.big_table_count
+                            }} <mat-icon>table_restaurant</mat-icon>
+                        </span>
                     </div>
                     <div class="stock-item-inline">
-                        <mat-icon>desk</mat-icon>
                         <span class="stock-label">Tables Municipales</span>
-                        <span class="stock-value">{{ usedStock().townTables }} / {{ f.town_table_count }}</span>
+                        <span class="stock-value">{{ usedStock().townTables }} / {{ f.town_table_count }}
+                            <mat-icon>desk</mat-icon>
+                        </span>
                     </div>
                 </div>
             </div>
 
             <div class="stock-inline">
+                <br>
                 <h3>Superficie des tables (m²)</h3>
                 <div class="stock-row">
                     <div class="stock-item-inline">

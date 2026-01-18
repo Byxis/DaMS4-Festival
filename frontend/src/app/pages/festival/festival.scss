@@ -185,7 +185,6 @@
     }
   }
   
-    // Add Stats Row Styles if they were missing or implied //
     .stats-row {
         display: flex;
         gap: 1.5rem;
@@ -230,7 +229,7 @@
 
 .logo-section {
   width: 400px;
-  height: 400px;
+  height: 500px;
   flex-shrink: 0;
 
   .poster-wrapper {
