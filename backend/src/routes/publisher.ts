@@ -8,6 +8,7 @@ import fsPromises from "fs/promises";
 import multer from "multer";
 import type { Contact } from "../types/contact.js";
 import { requireAdmin } from "../middleware/auth-admin.js";
+import fetch from 'node-fetch'; 
 
 /**
  * Routes for managing publishers and their contacts, including logo uploads.
@@ -91,9 +92,11 @@ router.get("/", async (_req: Request, res: Response) => {
             .filter((f: string) => f.startsWith(`${publisher.id}.`));
 
         if (logoFiles.length > 0) {
-            publisher.logoUrl = `/publishers/${publisher.id}/logo`;
+            publisher.logoUrl = `/publishers/${publisher.id}/logo`;;
         }
     });
+
+   
     res.json(publisherRows);
 });
 
@@ -203,6 +206,49 @@ router.post("/import/:editorId", requireAdmin, async (req: Request, res: Respons
     }
 
     const newPublisher = inserPublisher[0];
+    if (!newPublisher || !newPublisher.id) {
+      await client.query("ROLLBACK");
+      return res.status(500).json({ error: "Failed to create publisher" });
+    }
+
+      if (editor.logo) {
+  try {
+    console.log(`📸 Logo éditeur URL: ${editor.logo}`);
+    
+   
+    const response = await fetch(editor.logo);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch logo: ${response.statusText}`);
+    }
+    
+    const buffer = await response.arrayBuffer();
+    
+    // Détermine l'extension
+    const urlPath = new URL(editor.logo).pathname;
+    let ext = path.extname(urlPath);
+    
+    if (!ext) {
+      const contentType = response.headers.get('content-type');
+      const mimeToExt: { [key: string]: string } = {
+        'image/jpeg': '.jpg',
+        'image/png': '.png',
+        'image/gif': '.gif',
+        'image/webp': '.webp'
+      };
+      ext = mimeToExt[contentType || ''] || '.png';
+    }
+    
+    const destFile = `./uploads/logos/${newPublisher.id}${ext}`;
+    
+    console.log(`📋 Destination: ${destFile}`);
+    
+    fs.writeFileSync(destFile, Buffer.from(buffer));
+   
+  } catch (err) {
+    console.error(" Error downloading logo:", err);
+  }
+}
 
     const { rows: gamesRows } = await client.query(
       "SELECT name, minimum_number_of_player, maximum_number_of_player, logo, type_of_games_id FROM games WHERE editor_id = $1",
@@ -286,6 +332,48 @@ router.post("/import-by-name", requireAdmin, async (req: Request, res: Response)
 
     const newPublisher = inserPublisher[0];
 
+     if (!newPublisher || !newPublisher.id) {
+      await client.query("ROLLBACK");
+      return res.status(500).json({ error: "Failed to create publisher" });
+    }
+
+      if (editor.logo) {
+  try {
+    console.log(`📸 Logo éditeur URL: ${editor.logo}`);
+
+    const response = await fetch(editor.logo);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch logo: ${response.statusText}`);
+    }
+    
+    const buffer = await response.arrayBuffer();
+    
+
+    const urlPath = new URL(editor.logo).pathname;
+    let ext = path.extname(urlPath);
+    
+    if (!ext) {
+      const contentType = response.headers.get('content-type');
+      const mimeToExt: { [key: string]: string } = {
+        'image/jpeg': '.jpg',
+        'image/png': '.png',
+        'image/gif': '.gif',
+        'image/webp': '.webp'
+      };
+      ext = mimeToExt[contentType || ''] || '.png';
+    }
+    
+    const destFile = `./uploads/logos/${newPublisher.id}${ext}`;
+    
+    console.log(`📋 Destination: ${destFile}`);
+    
+    fs.writeFileSync(destFile, Buffer.from(buffer));
+   
+  } catch (err) {
+    console.error(" Error downloading logo:", err);
+  }
+}
 
     const { rows: gamesRows } = await client.query(
       "SELECT name, minimum_number_of_player, maximum_number_of_player, logo, type_of_games_id FROM games WHERE editor_id = $1",
@@ -556,8 +644,10 @@ router.get("/:id/logo", async (req: Request, res: Response) => {
     if (files.length === 0) {
         return res.status(404).json({ error: "Logo not found" });
     }
-
+    
     res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
     res.sendFile(path.resolve(`./uploads/logos/${files[0]}`));
 });
 

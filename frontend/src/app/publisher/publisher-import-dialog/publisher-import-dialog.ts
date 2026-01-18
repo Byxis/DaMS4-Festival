@@ -10,6 +10,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { PublisherService } from '../publisher.service';
 import { FormsModule } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { environment } from '@env/environment';
 
 @Component({
   selector: 'publishers-import-dialog',
@@ -74,12 +75,16 @@ importEditor(editor: any): void {
   this.publisherService.importEditor(editor.id).subscribe({
     next: (result: any) => {
      
+     
       this.publisherService.addPublisherToList({
         ...result.publisher,
         numberOfGames: result.gamesCount,  
         contacts: [],
-        logoUrl: undefined
+       logoUrl: result.logoUrl
+          ? `${environment.apiUrl}${result.logoUrl}`
+          : undefined
       });
+      this.publisherService.loadAll();
   
       this.editors = this.editors.filter(e => e.id !== editor.id);
       this.filterEditors(); 

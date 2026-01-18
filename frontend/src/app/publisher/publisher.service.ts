@@ -39,8 +39,12 @@ export class PublisherService {
       .subscribe({
         next: (data) => {
           for (const publisher of data) {
-            if (publisher.logoUrl) {
-              publisher.logoUrl = `${environment.apiUrl}${publisher.logoUrl}`;
+             if (publisher.logoUrl) {
+              if (!publisher.logoUrl.startsWith('http')) {
+                publisher.logoUrl = `${environment.apiUrl}${publisher.logoUrl}`;
+                 
+              }
+              console.log(`✅ Logo URL défini: ${publisher.logoUrl}`); 
             }
           }
           this.publishers.set(data);
