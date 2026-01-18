@@ -25,7 +25,6 @@ export const routes: Routes =
         {path: 'login', component: LoginPage},
         {path: 'register', component: RegisterPage},
         {path: 'await-confirmation', component: AwaitConfirmationPage, canActivate: [authGuard]},
-        {path: 'home', component: HomePage, canActivate: [authGuard, guestBlockGuard]},
         {path: 'admin', component: AdminComponent, canActivate: [authGuard, adminGuard, guestBlockGuard]},
         {path: 'festivals', component: FestivalsPage, canActivate: [authGuard, guestBlockGuard, viewFestivalsGuard]},
         {path: 'festivals/:id', component: Festival, canActivate: [authGuard, guestBlockGuard, viewFestivalsGuard]},
@@ -36,7 +35,7 @@ export const routes: Routes =
             resolve: {publisher: publisherResolver},
             canActivate: [authGuard, guestBlockGuard, viewPublishersGuard],
         },
-        {path: '', pathMatch: 'full', redirectTo: 'home'},
+        {path: '', pathMatch: 'full', redirectTo: 'festivals'},
         {path: '**', component: NotFoundComponent},
     ]
 

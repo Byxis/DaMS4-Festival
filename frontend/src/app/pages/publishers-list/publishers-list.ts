@@ -15,7 +15,7 @@ import {PublisherService} from '@publisher/publisher.service';
 import {computedSorted, SortConfig} from '@shared/utils/sort.utils';
 import {PublishersImportDialog} from 'src/app/publisher/publisher-import-dialog/publisher-import-dialog';
 
-import {GameService} from '../../games/game-service/game-service';  // Fixed relative import
+import {GameService} from '../../games/game-service/game-service';
 
 // Helper functions
 const getContactCount = (p: EntityDTO): number => p.contacts?.length ?? 0;
@@ -98,6 +98,16 @@ export class PublishersList
 
     readonly items = computedSorted(this.basePublishers, this.sortKey, SORT_STRATEGIES);
 
+    // Aliases for template compatibility
+    readonly publishers = this.items;
+    readonly sortColumn = computed(() => {
+        const key = this.sortKey();
+        return key.replace('_REVERSE', '').toLowerCase();
+    });
+    readonly sortDirection = computed(() => {
+        return this.sortKey().endsWith('_REVERSE') ? 'desc' : 'asc';
+    });
+
     // Helpers
     readonly getContactCount = getContactCount;
     readonly getFirstContactName = getFirstContactName;
@@ -106,21 +116,7 @@ export class PublishersList
 
     constructor()
     {
-        effect(() => {
-            const publishers = this.publisherService._publishers();
-            publishers.forEach((pub: any) => {
-                if (pub.id && !pub.numberOfGames)
-                {
-                    this.gameService.getGameCountByPublisher(pub.id).subscribe({
-                        next: (count) => {
-                            pub.numberOfGames = count;
-                            console.log(`📊 Publisher ${pub.id}: ${count} games`);
-                        },
-                        error: (err) => console.error('Error:', err)
-                    })
-                }
-            })
-        });
+        // Effect removed to prevent flooding backend with requests for each publisher
     }
 
     viewPublisher(publisher: EntityDTO): void
@@ -133,14 +129,18 @@ export class PublishersList
 
     sortBy(column: string): void
     {
+        // Convert camelCase or lowercase inputs to UPPERCASE keys used in SORT_STRATEGIES
+        let key = column.toUpperCase();
+        if (column === 'firstContact') key = 'FIRST_CONTACT';
+
         const current = this.sortKey();
-        if (current === column)
+        if (current === key)
         {
-            this.sortKey.set(column + '_REVERSE');
+            this.sortKey.set(key + '_REVERSE');
         }
         else
         {
-            this.sortKey.set(column);
+            this.sortKey.set(key);
         }
     }
 

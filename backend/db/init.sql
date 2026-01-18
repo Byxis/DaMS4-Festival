@@ -7,11 +7,11 @@ CREATE TABLE IF NOT EXISTS users (
     role TEXT DEFAULT 'guest'
 );
 
-CREATE TABLE IF NOT EXISTS entities (
+-- REFERENCE TABLES (loaded from CSV) --
+CREATE TABLE IF NOT EXISTS editors (
     id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    logo TEXT,
-    type TEXT DEFAULT 'PUBLISHER' CHECK (type IN ('PUBLISHER', 'GUEST'))
+    name TEXT UNIQUE NOT NULL,
+    logo TEXT
 );
 
 CREATE TABLE IF NOT EXISTS type_of_games (
@@ -26,9 +26,17 @@ CREATE TABLE IF NOT EXISTS games (
     minimum_number_of_player INTEGER,
     maximum_number_of_player INTEGER,
     logo TEXT,
-    editor_id INTEGER REFERENCES entities(id),
+    editor_id INTEGER REFERENCES editors(id), -- Reference to Reference Table
     type_of_games_id INTEGER REFERENCES type_of_games(id)
 ); 
+
+-- APP TABLES --
+CREATE TABLE IF NOT EXISTS entities (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    logo TEXT,
+    type TEXT DEFAULT 'PUBLISHER' CHECK (type IN ('PUBLISHER', 'GUEST'))
+);
 
 CREATE OR REPLACE VIEW publisher AS 
     SELECT id, name, logo
@@ -53,7 +61,7 @@ CREATE TABLE IF NOT EXISTS contact (
 
 CREATE TABLE IF NOT EXISTS games_publisher (
     id SERIAL PRIMARY KEY,
-    publisher_id INTEGER REFERENCES entities(id) ON DELETE CASCADE,
+    publisher_id INTEGER REFERENCES entities(id) ON DELETE CASCADE, -- Reference to App Table
     name TEXT NOT NULL,
     type TEXT DEFAULT 'other',
     minimum_number_of_player INTEGER,
@@ -137,11 +145,16 @@ CREATE TRIGGER trigger_insert_other
 INSTEAD OF INSERT ON other
 FOR EACH ROW EXECUTE FUNCTION insert_into_other_func();
 
--- Load Data
-COPY entities(id, name, logo) FROM '/tmp/editorsData.csv' WITH (FORMAT csv, HEADER);
+-- Load Data (Reference Tables Only)
+COPY editors(id, name, logo) FROM '/tmp/editorsData.csv' WITH (FORMAT csv, HEADER);
 COPY type_of_games(id, description) FROM '/tmp/typesOfGamesData.csv' WITH (FORMAT csv, HEADER);
 COPY games(id, name, minimum_number_of_player, maximum_number_of_player, editor_id, type_of_games_id, logo) 
 FROM '/tmp/GamesDATA.csv' WITH (FORMAT csv, HEADER);
+
+-- Fix sequences after data load
+SELECT setval('editors_id_seq', (SELECT MAX(id) FROM editors) + 1);
+SELECT setval('games_id_seq', (SELECT MAX(id) FROM games) + 1);
+
 
 -- Fix sequences after data load
 SELECT setval('entities_id_seq', (SELECT MAX(id) FROM entities) + 1);

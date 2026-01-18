@@ -118,7 +118,6 @@ router.get("/numberOfGameExisting/:publisherId", async (req: Request, res: Respo
                 await pool.query(`SELECT COUNT(*) as count FROM games WHERE editor_id = $1`, [editorId]);
             gameCount = parseInt(gamesResult.rows[0].count, 10);
         }
-        console.log("hasGames :", gameCount > 0);
         res.status(200).json({hasGames: gameCount > 0});
     }
     catch (e)
@@ -142,7 +141,6 @@ router.get("/numberOfPresentedGame/:publisherId", async (req: Request, res: Resp
         const numberOfGame =
             await pool.query(`SELECT COUNT(*) as count FROM games_publisher WHERE publisher_id = $1`, [publisherId]);
         const gameCount = parseInt(numberOfGame.rows[0].count, 10);
-        console.log("gameCount : ", gameCount);
         res.status(200).json({
             gameCount: gameCount,
         });
