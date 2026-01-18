@@ -262,4 +262,13 @@ export class Festival
             }
         });
     }
+
+    updateSurface(type: 'table_surface'|'big_table_surface'|'town_table_surface', event: Event)
+    {
+        const input = event.target as HTMLInputElement;
+        const val = parseFloat(input.value);
+        if (isNaN(val) || val < 0) return;
+
+        this.svc.updateFestival(this.id(), {[type]: val});
+    }
 }

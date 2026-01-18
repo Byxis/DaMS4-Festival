@@ -62,8 +62,12 @@ export class FactureComponent
                     if (processedGames.has(gameKey)) return;
                     processedGames.add(gameKey);
 
-                    const surface =
-                        ((game.table_count ?? 0) + (game.big_table_count ?? 0) + (game.town_table_count ?? 0)) * 4 +
+                    const surfaceStandard = festival?.table_surface ?? 4;
+                    const surfaceBig = festival?.big_table_surface ?? 4;
+                    const surfaceTown = festival?.town_table_surface ?? 4;
+
+                    const surface = ((game.table_count ?? 0) * surfaceStandard) +
+                        ((game.big_table_count ?? 0) * surfaceBig) + ((game.town_table_count ?? 0) * surfaceTown) +
                         (game.floor_space ?? 0);
                     const outlets = game.electrical_outlets ?? 0;
                     const surfaceCost = surface * tarifZone.price;

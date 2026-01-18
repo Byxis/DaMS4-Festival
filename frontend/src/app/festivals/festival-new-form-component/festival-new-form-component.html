@@ -41,34 +41,48 @@
         <input matInput formControlName="town_table_count" type="number" placeholder="20">
       </mat-form-field>
 
+      <div class="surface-header">Superficie des tables (m²)</div>
+
+      <div class="surface-inputs">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Standard</mat-label>
+          <input matInput formControlName="table_surface" type="number" step="0.5" placeholder="4">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Grande</mat-label>
+          <input matInput formControlName="big_table_surface" type="number" step="0.5" placeholder="4">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Municipale</mat-label>
+          <input matInput formControlName="town_table_surface" type="number" step="0.5" placeholder="4">
+        </mat-form-field>
+      </div>
+
       <!-- Logo Upload Section -->
       <div class="logo-section">
         @if(hasLogoToDisplay()) {
-          <div class="logo-preview">
-            <img [src]="logoPreview" alt="Logo preview">
-            <button mat-icon-button (click)="removeLogo()" type="button" color="warn">
-              <mat-icon>close</mat-icon>
-            </button>
-          </div>
-          @if(hasExistingLogo) {
-            <p class="logo-hint">Logo actuel du festival</p>
-          }
+        <div class="logo-preview">
+          <img [src]="logoPreview" alt="Logo preview">
+          <button mat-icon-button (click)="removeLogo()" type="button" color="warn">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        @if(hasExistingLogo) {
+        <p class="logo-hint">Logo actuel du festival</p>
+        }
         } @else {
-          <div class="logo-upload">
-            <input 
-              type="file" 
-              accept="image/*" 
-              (change)="onLogoSelected($event)"
-              #fileInput
-              style="display: none">
-            <button mat-stroked-button type="button" (click)="fileInput.click()">
-              <mat-icon>upload</mat-icon>
-              {{ isEditing ? 'Changer le logo' : 'Uploader un logo' }}
-            </button>
-          </div>
-          @if(deleteLogo) {
-            <p class="logo-hint warning">Le logo sera supprimé lors de la mise à jour</p>
-          }
+        <div class="logo-upload">
+          <input type="file" accept="image/*" (change)="onLogoSelected($event)" #fileInput style="display: none">
+          <button mat-stroked-button type="button" (click)="fileInput.click()">
+            <mat-icon>upload</mat-icon>
+            {{ isEditing ? 'Changer le logo' : 'Uploader un logo' }}
+          </button>
+        </div>
+        @if(deleteLogo) {
+        <p class="logo-hint warning">Le logo sera supprimé lors de la mise à jour</p>
+        }
         }
       </div>
 

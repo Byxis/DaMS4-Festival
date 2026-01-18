@@ -161,6 +161,27 @@
         font-weight: 700;
         color: var(--mat-sys-primary);
       }
+
+      .surface-field {
+        width: 100%;
+        margin-top: 0;
+
+        .mat-mdc-text-field-wrapper {
+            padding: 0 8px;
+            background-color: transparent;
+        }
+
+        input.mat-mdc-input-element {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            color: var(--mat-sys-primary);
+        }
+
+        .mat-mdc-form-field-subscript-wrapper {
+            display: none;
+        }
+      }
     }
   }
   
@@ -193,6 +214,8 @@
                 font-weight: 700;
                 color: var(--mat-sys-on-surface);
             }
+
+
 
             .stat-label {
                 font-size: 0.8rem;

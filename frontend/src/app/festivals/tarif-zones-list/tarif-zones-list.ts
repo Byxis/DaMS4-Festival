@@ -150,9 +150,16 @@ export class TarifZonesList
 
     calculateSurface(zone: ZoneTarifDTO): number
     {
-        // 1 table = 2m²
-        const totalTables = this.getTotalTables(zone) + this.getTotalBigTables(zone) + this.getTotalTownTables(zone);
-        return totalTables * 4;
+        const totalStandard = this.getTotalTables(zone);
+        const totalBig = this.getTotalBigTables(zone);
+        const totalTown = this.getTotalTownTables(zone);
+
+        const festival = this.festivalService._currentFestival();
+        const surfaceStandard = festival?.table_surface ?? 4;
+        const surfaceBig = festival?.big_table_surface ?? 4;
+        const surfaceTown = festival?.town_table_surface ?? 4;
+
+        return (totalStandard * surfaceStandard) + (totalBig * surfaceBig) + (totalTown * surfaceTown);
     }
 
     toggleZone(zoneId: number): void

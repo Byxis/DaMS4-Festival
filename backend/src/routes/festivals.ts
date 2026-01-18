@@ -76,7 +76,7 @@ router.get("/", async (_req: Request, res: Response) => {
     try
     {
         const {rows: festivalRows} = await pool.query<Festival>(
-            "SELECT id, name, location, start_date, end_date, table_count, big_table_count, town_table_count FROM festivals");
+            "SELECT id, name, location, start_date, end_date, table_count, big_table_count, town_table_count, table_surface, big_table_surface, town_table_surface FROM festivals");
 
         // Add logo URL if logo exists
         festivalRows.forEach((festival) => {
@@ -109,6 +109,9 @@ router.post("/", requireAdmin, async (req: Request, res: Response) => {
         table_count,
         big_table_count,
         town_table_count,
+        table_surface,
+        big_table_surface,
+        town_table_surface,
     } = req.body;
 
     if (!name || !location || !start_date || !end_date)
@@ -119,7 +122,7 @@ router.post("/", requireAdmin, async (req: Request, res: Response) => {
     try
     {
         const {rows} = await pool.query<Festival>(
-            "INSERT INTO festivals (name, location, start_date, end_date, table_count, big_table_count, town_table_count) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
+            "INSERT INTO festivals (name, location, start_date, end_date, table_count, big_table_count, town_table_count, table_surface, big_table_surface, town_table_surface) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
             [
                 name,
                 location,
@@ -128,6 +131,9 @@ router.post("/", requireAdmin, async (req: Request, res: Response) => {
                 table_count || 0,
                 big_table_count || 0,
                 town_table_count || 0,
+                table_surface || 4,
+                big_table_surface || 4,
+                town_table_surface || 4,
             ]);
         res.status(201).json(rows[0]);
     }
@@ -230,9 +236,12 @@ router.put("/:id", requireAdmin, async (req: Request, res: Response) => {
         table_count,
         big_table_count,
         town_table_count,
+        table_surface,
+        big_table_surface,
+        town_table_surface,
     } = req.body;
 
-    if (!name && !location && !start_date && !end_date)
+    if (Object.keys(req.body).length === 0)
     {
         return res.status(400).json({error: "At least one field is required"});
     }
@@ -240,7 +249,7 @@ router.put("/:id", requireAdmin, async (req: Request, res: Response) => {
     try
     {
         const {rows} = await pool.query<Festival>(
-            "UPDATE festivals SET name = COALESCE($1, name), location = COALESCE($2, location), start_date = COALESCE($3, start_date), end_date = COALESCE($4, end_date), table_count = COALESCE($5, table_count), big_table_count = COALESCE($6, big_table_count), town_table_count = COALESCE($7, town_table_count) WHERE id = $8 RETURNING *",
+            "UPDATE festivals SET name = COALESCE($1, name), location = COALESCE($2, location), start_date = COALESCE($3, start_date), end_date = COALESCE($4, end_date), table_count = COALESCE($5, table_count), big_table_count = COALESCE($6, big_table_count), town_table_count = COALESCE($7, town_table_count), table_surface = COALESCE($8, table_surface), big_table_surface = COALESCE($9, big_table_surface), town_table_surface = COALESCE($10, town_table_surface) WHERE id = $11 RETURNING *",
             [
                 name,
                 location,
@@ -249,6 +258,9 @@ router.put("/:id", requireAdmin, async (req: Request, res: Response) => {
                 table_count,
                 big_table_count,
                 town_table_count,
+                table_surface,
+                big_table_surface,
+                town_table_surface,
                 id,
             ]);
         if (rows.length === 0)

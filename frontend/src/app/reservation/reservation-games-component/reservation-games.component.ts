@@ -230,7 +230,12 @@ export class ReservationGamesComponent
         const tBig = Number(this.getGameValue(gameId, 'big_table_count')) || 0;
         const tTown = Number(this.getGameValue(gameId, 'town_table_count')) || 0;
 
-        return ((tStandard + tBig + tTown) * 4) + floorSpace;
+        const festival = this.festivalService._currentFestival();
+        const surfaceStandard = festival?.table_surface ?? 4;
+        const surfaceBig = festival?.big_table_surface ?? 4;
+        const surfaceTown = festival?.town_table_surface ?? 4;
+
+        return (tStandard * surfaceStandard) + (tBig * surfaceBig) + (tTown * surfaceTown) + floorSpace;
     }
 
     getGameStatusLabel(status: string|null|undefined): string

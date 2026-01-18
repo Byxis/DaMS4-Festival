@@ -53,6 +53,36 @@
                     </div>
                 </div>
             </div>
+
+            <div class="stock-inline">
+                <h3>Superficie des tables (m²)</h3>
+                <div class="stock-row">
+                    <div class="stock-item-inline">
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="surface-field">
+                            <mat-label>Standard</mat-label>
+                            <input matInput type="number" step="0.5" [value]="f.table_surface ?? 4"
+                                (change)="updateSurface('table_surface', $event)">
+                            <span matTextSuffix>m²</span>
+                        </mat-form-field>
+                    </div>
+                    <div class="stock-item-inline">
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="surface-field">
+                            <mat-label>Grandes</mat-label>
+                            <input matInput type="number" step="0.5" [value]="f.big_table_surface ?? 4"
+                                (change)="updateSurface('big_table_surface', $event)">
+                            <span matTextSuffix>m²</span>
+                        </mat-form-field>
+                    </div>
+                    <div class="stock-item-inline">
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="surface-field">
+                            <mat-label>Municipales</mat-label>
+                            <input matInput type="number" step="0.5" [value]="f.town_table_surface ?? 4"
+                                (change)="updateSurface('town_table_surface', $event)">
+                            <span matTextSuffix>m²</span>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Logo -->

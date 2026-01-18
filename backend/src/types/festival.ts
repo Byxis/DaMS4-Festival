@@ -1,4 +1,4 @@
-import type { Tarif_Zone } from "./tarif_zone.js";
+import type {Tarif_Zone} from "./tarif_zone.js";
 
 export interface Festival {
     id: number;
@@ -9,6 +9,9 @@ export interface Festival {
     table_count: number;
     big_table_count: number;
     town_table_count: number;
-    logoUrl? : string;
+    table_surface: number;
+    big_table_surface: number;
+    town_table_surface: number;
+    logoUrl?: string;
     tarif_zones: Tarif_Zone[];
 }

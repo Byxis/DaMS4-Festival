@@ -20,6 +20,9 @@ export interface FestivalDto {
     table_count: number
     big_table_count: number
     town_table_count: number
+    table_surface?: number
+    big_table_surface?: number
+    town_table_surface?: number
     logoUrl?: string
     tarif_zones?: ZoneTarifDTO[];
 }
