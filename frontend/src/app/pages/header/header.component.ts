@@ -9,6 +9,8 @@ import { AuthService } from "@auth/auth.service";
 import { UserProfileDialogComponent } from "../user-profile-dialog/user-profile-dialog.component";
 import { UserDto } from "../../shared/types/user-dto";
 import { roleEnToFr } from 'src/app/shared/utils/roles';
+import { UserService } from "@users/user.service";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 
 @Component({
@@ -25,9 +27,11 @@ import { roleEnToFr } from 'src/app/shared/utils/roles';
 })
 export class HeaderComponent {
   authSvc = inject(AuthService);
+  userSvc = inject(UserService);
   private readonly router = inject(Router);
-  roleEnToFr = roleEnToFr;
+  private readonly snack = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
+  roleEnToFr = roleEnToFr;
 
   logout() {
     this.authSvc.logout();
@@ -49,17 +53,32 @@ export class HeaderComponent {
     await navigator.clipboard.writeText(email);
   }
 
-  openUserProfileDialog(user: UserDto) {
+  openUserProfileDialog(user: UserDto): void {
     if (!user) return;
 
-    this.dialog.open(UserProfileDialogComponent, {
-      width: '360px',
-      maxWidth: '95vw',
-      autoFocus: false,
-      restoreFocus: false,
+    const ref = this.dialog.open(UserProfileDialogComponent, {
       data: user,
     });
+
+    ref.afterClosed().subscribe((result) => {
+      this.userSvc.updateUser(result.user as UserDto).subscribe({
+        next: (res) => {
+          const current = [...this.userSvc.users()];
+          const idx = current.findIndex(u => u.id === res.user.id);
+
+          if (idx !== -1) {
+            current[idx] = res.user;
+            this.userSvc.users.set(current);
+          }
+
+          this.snack.open(res.message, "OK", { duration: 2500 });
+        },
+        error: (err) => {
+          this.snack.open(err?.error?.error ?? "Erreur serveur", "OK", {
+            duration: 3500,
+          });
+        }
+      });
+    });
   }
-
-
 }

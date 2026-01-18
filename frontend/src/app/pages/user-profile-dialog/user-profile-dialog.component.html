@@ -6,25 +6,10 @@
     <button
       type="button"
       class="avatar-btn"
-      (click)="fileInput.click()"
       aria-label="Change logo"
     >
-      @if (logoPreview) {
-        <img [src]="logoPreview" class="avatar-img" />
-      } @else {
-        <mat-icon class="avatar-icon">account_circle</mat-icon>
-      }
+      <mat-icon class="avatar-icon">account_circle</mat-icon>
     </button>
-
-    <input
-      #fileInput
-      type="file"
-      hidden
-      accept="image/*"
-      (change)="onLogoSelected($event)"
-    />
-
-    <div class="hint">Cliquez pour changer le logo</div>
   </div>
 
   <!-- ROWS -->
@@ -49,7 +34,7 @@
         </div>
       </div>
     </div>
-<p>DEBUG: {{ user.firstName }} {{ user.lastName }}</p>
+
     <div class="row">
       <div class="label">Email</div>
 
@@ -61,7 +46,7 @@
     <div class="row">
       <div class="label">Rôle</div>
       <div class="value">
-        <span>{{ user.role }}</span>
+        <span>{{ roleEnToFr(user.role) }}</span>
       </div>
     </div>
   </div>

@@ -9,7 +9,7 @@ import { UserResponse } from 'src/app/shared/types/user-response';
   providedIn: 'root',
 })
 export class UserService {
-  
+
   private readonly http = inject(HttpClient);
 
   readonly users = signal<UserDto[]>([]);
@@ -72,6 +72,12 @@ export class UserService {
     );
   }
 
-  
+  updateUser(user: Partial<UserDto>) {
+    return this.http.put<UserResponse>(
+      `${environment.apiUrl}/users/${user.id}/credentials`,
+      user,
+      { withCredentials: true }
+    );
+  }
 
 }

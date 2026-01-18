@@ -11,6 +11,36 @@ router.get("/", async (_req, res) => {
     res.json(rows);
 });
 
+router.put("/:id/credentials", async (req, res) => {
+    const { id } = req.params;
+  const { firstName, lastName } = req.body;
+
+  const safeFirstName = (firstName ?? "").trim();
+  const safeLastName = (lastName ?? "").trim();
+
+  try {
+    const result = await pool.query(
+      `UPDATE users
+       SET first_name=$1, last_name=$2
+       WHERE id=$3
+       RETURNING id, first_name as "firstName", last_name as "lastName", email, role`,
+      [safeFirstName, safeLastName, id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Utilisateur introuvable" });
+    }
+
+    return res.status(200).json({
+      message: "Profil modifié",
+      user: result.rows[0],
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Erreur serveur" });
+  }
+});
+
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
   const { firstName, lastName, email, role } = req.body;

@@ -80,6 +80,7 @@ router.post('/login', loginLimiter, async (req, res) => {
     res.json({
         message: "Authentification réussie",
         user: { 
+            id: user.id,
             email: user.email,
             firstName: user.first_name,
             lastName: user.last_name, 
