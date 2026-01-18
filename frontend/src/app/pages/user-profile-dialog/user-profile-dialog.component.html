@@ -1,0 +1,76 @@
+<h2 mat-dialog-title>Profil</h2>
+
+<mat-dialog-content class="content" [formGroup]="form">
+
+  <div class="avatar-section">
+    <button
+      type="button"
+      class="avatar-btn"
+      (click)="fileInput.click()"
+      aria-label="Change logo"
+    >
+      @if (logoPreview) {
+        <img [src]="logoPreview" class="avatar-img" />
+      } @else {
+        <mat-icon class="avatar-icon">account_circle</mat-icon>
+      }
+    </button>
+
+    <input
+      #fileInput
+      type="file"
+      hidden
+      accept="image/*"
+      (change)="onLogoSelected($event)"
+    />
+
+    <div class="hint">Cliquez pour changer le logo</div>
+  </div>
+
+  <!-- ROWS -->
+  <div class="info">
+
+    <div class="row">
+      <div class="label">Nom</div>
+
+      <div class="value selectable">
+        <div class="name-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Prénom</mat-label>
+            <input matInput formControlName="firstName" />
+            <mat-error>Prénom invalide</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Nom</mat-label>
+            <input matInput formControlName="lastName" />
+            <mat-error>Nom invalide</mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+<p>DEBUG: {{ user.firstName }} {{ user.lastName }}</p>
+    <div class="row">
+      <div class="label">Email</div>
+
+      <div class="value">
+        <span>{{ user.email }}</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="label">Rôle</div>
+      <div class="value">
+        <span>{{ user.role }}</span>
+      </div>
+    </div>
+  </div>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Fermer</button>
+  <button mat-flat-button color="primary" (click)="submit()">
+    Enregistrer les modifications
+  </button>
+</mat-dialog-actions>

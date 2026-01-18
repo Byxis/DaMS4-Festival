@@ -1,0 +1,78 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.avatar-icon {
+  font-size: 72px;
+  width: 72px;
+  height: 72px;
+}
+
+.avatar-img {
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.hint {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 12px;
+  opacity: 0.65;
+}
+
+.value {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.value span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.copy-btn {
+  width: 32px;
+  height: 32px;
+}
+
+.selectable {
+  user-select: text;
+  cursor: text;
+}

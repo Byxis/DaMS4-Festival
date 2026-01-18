@@ -63,17 +63,21 @@
     <div class="profile-card">
       <mat-icon class="avatar">account_circle</mat-icon>
 
-      <div class="name">
+      <div class="value selectable" (click)="copyName(user)">
         {{user.firstName}} {{user.lastName}}
       </div>
 
-      <div class="email">
+      <div class="value selectable" (click)="copyEmail(user)">
         {{user.email}}
       </div>
 
-      <div class="role">
+      <div class="role" >
         Vous êtes {{ user.role }}
       </div>
+
+      <button class="edit-btn" (click)="openUserProfileDialog(user)">
+        Modifier le profil
+      </button>
 
       <button class="logout-btn" (click)="logout()">
         Déconnexion
