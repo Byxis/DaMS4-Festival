@@ -124,7 +124,7 @@ router.get("/:id/reservations/:reservationId", async (req: Request, res: Respons
                 r.note,
                 r.status,
                 COALESCE(json_agg(DISTINCT jsonb_build_object('id', ri.id, 'reservation_id', ri.reservation_id, 'description', ri.description, 'interaction_date', ri.interaction_date)) FILTER (WHERE ri.id IS NOT NULL), '[]'::json) as interactions,
-                COALESCE(json_agg(DISTINCT jsonb_build_object('id', rg.id, 'reservation_id', rg.reservation_id, 'game_id', rg.game_id, 'amount', rg.amount, 'table_count', rg.table_count, 'big_table_count', rg.big_table_count, 'town_table_count', rg.town_table_count, 'status', rg.status, 'zone_id', rg.zone_id, 'floor_space', rg.floor_space)) FILTER (WHERE rg.id IS NOT NULL), '[]'::json) as games
+                COALESCE(json_agg(DISTINCT jsonb_build_object('id', rg.id, 'reservation_id', rg.reservation_id, 'game_id', rg.game_id, 'amount', rg.amount, 'table_count', rg.table_count, 'big_table_count', rg.big_table_count, 'town_table_count', rg.town_table_count, 'electrical_outlets', rg.electrical_outlets, 'status', rg.status, 'zone_id', rg.zone_id, 'floor_space', rg.floor_space)) FILTER (WHERE rg.id IS NOT NULL), '[]'::json) as games
             FROM reservations r
             LEFT JOIN reservation_interactions ri ON r.id = ri.reservation_id
             LEFT JOIN reservation_games rg ON r.id = rg.reservation_id
@@ -304,7 +304,7 @@ router.post("/:id/reservations/:reservationId/games", requireAdmin, async (req: 
     {
         const existingInfo = await pool.query(
             `SELECT g.name, rg.status, rg.id as reservation_game_id 
-             FROM games g 
+             FROM games_publisher g 
              LEFT JOIN reservation_games rg ON rg.game_id = g.id AND rg.reservation_id = $1 
              WHERE g.id = $2`,
             [reservationId, game_id]);
@@ -312,16 +312,12 @@ router.post("/:id/reservations/:reservationId/games", requireAdmin, async (req: 
         const gameName = existingInfo.rows[0]?.name || 'Jeu inconnu';
         const oldStatus = existingInfo.rows[0]?.status;
         const exists = !!existingInfo.rows[0]?.reservation_game_id;
-
-        // Determine effective new status
-        // If status param is provided, use it. If not, if exists keep it, else default 'ASKED'.
         const actualNewStatus = status !== undefined ? status : (exists ? oldStatus : "ASKED");
         const statusChanged = actualNewStatus !== oldStatus;
 
         let result;
         if (exists)
         {
-            // Update
             result = await pool.query(
                 `UPDATE reservation_games 
                      SET amount = $1, table_count = $2, big_table_count = $3, town_table_count = $4, electrical_outlets = $5, status = $6, zone_id = $7, floor_space = $8

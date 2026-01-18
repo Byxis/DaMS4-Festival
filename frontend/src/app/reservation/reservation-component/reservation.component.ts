@@ -6,6 +6,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatMenuModule} from '@angular/material/menu';
 import {Router} from '@angular/router';
 import {FestivalService} from '@festivals/festival-service/festival-service';
+import {OtherService} from '@other/other.service';
 import {PublisherService} from '@publisher/publisher.service';
 
 import {FactureComponent} from '../facture-component/facture.component';
@@ -37,17 +38,26 @@ import {UpdatesComponent} from '../updates-component/updates.component';
 export class ReservationComponent
 {
     private readonly publisherService = inject(PublisherService);
+    private readonly otherService = inject(OtherService);
     private readonly festivalService = inject(FestivalService);
     private readonly reservationService = inject(ReservationService);
     private readonly router = inject(Router);
 
-    readonly publisherId = input.required<number>();
+    readonly entityId = input.required<number>();
+    readonly entityType = input<'PUBLISHER'|'OTHER'>('PUBLISHER');
     readonly festivalId = input.required<number>();
     readonly reservationId = input<number|undefined>(undefined);
 
-    readonly publisher = computed(() => {
-        const id = this.publisherId();
-        return this.publisherService._publishers().find((p) => p.id === id);
+    readonly entity = computed(() => {
+        const id = this.entityId();
+        if (this.entityType() === 'PUBLISHER')
+        {
+            return this.publisherService._publishers().find((p) => p.id === id);
+        }
+        else
+        {
+            return this.otherService._others().find((o) => o.id === id);
+        }
     });
 
     readonly festival = computed(() => {
@@ -62,20 +72,22 @@ export class ReservationComponent
             return this.reservationService._reservations().find((r) => r.id === id);
         }
 
-        const publisherId = this.publisherId();
+        const entityId = this.entityId();
         const festivalId = this.festivalId();
         return this.reservationService._reservations().find(
-            (r) => r.entity_id === publisherId && r.festival_id === festivalId);
+            (r) => r.entity_id === entityId && r.festival_id === festivalId);
     });
 
     readonly isLoading = computed(() => {
         return (
-            this.publisherService.isLoading() || this.festivalService.isLoading() ||
+            this.publisherService.isLoading() || this.otherService.isLoading() || this.festivalService.isLoading() ||
             this.reservationService.isLoading());
     });
 
     readonly isError = computed(() => {
-        return (this.publisherService.isError() || this.festivalService.isError() || this.reservationService.isError());
+        return (
+            this.publisherService.isError() || this.otherService.isError() || this.festivalService.isError() ||
+            this.reservationService.isError());
     });
 
     readonly isExpanded = signal(false);
@@ -84,9 +96,8 @@ export class ReservationComponent
 
     private lastReservationId: number|undefined;
     private lastReservationStatus: string|undefined;
-    private lastPublisherId: number|undefined;
+    private lastEntityId: number|undefined;
     private createdReservationId: number|undefined;
-    private hasAddedCreationInteraction = false;
 
     readonly items = signal([
         {label: 'Contacté ?', checked: false, locked: false},
@@ -137,14 +148,14 @@ export class ReservationComponent
 
         effect(() => {
             const reservation = this.reservation();
-            const publisherId = this.publisherId();
+            const entityId = this.entityId();
 
             if (reservation?.id !== this.lastReservationId || reservation?.status !== this.lastReservationStatus ||
-                publisherId !== this.lastPublisherId)
+                entityId !== this.lastEntityId)
             {
                 this.lastReservationId = reservation?.id;
                 this.lastReservationStatus = reservation?.status;
-                this.lastPublisherId = publisherId;
+                this.lastEntityId = entityId;
 
                 if (reservation)
                 {
@@ -162,7 +173,6 @@ export class ReservationComponent
                         {label: 'Payé ?', checked: false, locked: false},
                         {label: 'Absent', checked: false, locked: false},
                     ]);
-                    this.hasAddedCreationInteraction = false;
                 }
             }
         }, {allowSignalWrites: true});
@@ -233,13 +243,13 @@ export class ReservationComponent
 
         const reservationId = this.getActualReservationId();
         const festivalId = this.festivalId();
-        const publisherId = this.publisherId();
+        const entityId = this.entityId();
 
         if (!reservationId)
         {
             this.reservationService
                 .create(festivalId, {
-                    entity_id: publisherId,
+                    entity_id: entityId,
                     status: newStatus,
                 })
                 .subscribe((newRes) => {
@@ -302,14 +312,14 @@ export class ReservationComponent
 
         const reservationId = this.getActualReservationId();
         const festivalId = this.festivalId();
-        const publisherId = this.publisherId();
+        const entityId = this.entityId();
         console.log('reservationId', reservationId);
 
         if (!reservationId)
         {
             this.reservationService
                 .create(festivalId, {
-                    entity_id: publisherId,
+                    entity_id: entityId,
                     status,
                 })
                 .subscribe((newRes) => {
@@ -386,10 +396,10 @@ export class ReservationComponent
         return bgColorMap[status] || 'transparent';
     }
 
-    navigateToPublisher()
+    navigateToEntity()
     {
-        const id = this.publisherId();
-        if (id)
+        const id = this.entityId();
+        if (id && this.entityType() === 'PUBLISHER')
         {
             this.router.navigate(['/publishers', id]);
         }

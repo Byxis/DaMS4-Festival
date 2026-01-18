@@ -161,8 +161,9 @@ router.get("/:id", async (req: Request, res: Response) => {
         }
 
         // Get tarif zones
-        const {rows: tarifZoneRows} =
-            await pool.query<Tarif_Zone>("SELECT * FROM tarif_zone WHERE festival_id = $1", [id]);
+        const {rows: tarifZoneRows} = await pool.query<Tarif_Zone>(
+            "SELECT id, festival_id, name, price, numberOutlets AS \"numberOutlets\", electricalOutletPrice AS \"electricalOutletPrice\", maxTable AS \"maxTable\" FROM tarif_zone WHERE festival_id = $1",
+            [id]);
         festival.tarif_zones = tarifZoneRows;
 
         // Get game zones for each tarif zone
@@ -287,7 +288,7 @@ router.post("/:id/tarif-zones", requireAdmin, async (req: Request, res: Response
         }
 
         const {rows} = await pool.query<Tarif_Zone>(
-            "INSERT INTO tarif_zone (festival_id, name, price, numberOutlets, electricalOutletPrice, maxTable) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+            "INSERT INTO tarif_zone (festival_id, name, price, numberOutlets, electricalOutletPrice, maxTable) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, festival_id, name, price, numberOutlets AS \"numberOutlets\", electricalOutletPrice AS \"electricalOutletPrice\", maxTable AS \"maxTable\"",
             [id, name, price || 0, numberOutlets || 0, electricalOutletPrice || 0, maxTable || 0]);
         res.status(201).json(rows[0]);
     }
@@ -334,7 +335,7 @@ router.put("/:id/tarif-zones/:tarifZoneId", requireAdmin, async (req: Request, r
     try
     {
         const {rows} = await pool.query<Tarif_Zone>(
-            "UPDATE tarif_zone SET name = COALESCE($1, name), price = COALESCE($2, price), numberOutlets = COALESCE($3, numberOutlets), electricalOutletPrice = COALESCE($4, electricalOutletPrice), maxTable = COALESCE($5, maxTable) WHERE id = $6 RETURNING *",
+            "UPDATE tarif_zone SET name = COALESCE($1, name), price = COALESCE($2, price), numberOutlets = COALESCE($3, numberOutlets), electricalOutletPrice = COALESCE($4, electricalOutletPrice), maxTable = COALESCE($5, maxTable) WHERE id = $6 RETURNING id, festival_id, name, price, numberOutlets AS \"numberOutlets\", electricalOutletPrice AS \"electricalOutletPrice\", maxTable AS \"maxTable\"",
             [name, price, numberOutlets, electricalOutletPrice, maxTable, tarifZoneId]);
         if (rows.length === 0)
         {

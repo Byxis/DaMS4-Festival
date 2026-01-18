@@ -13,6 +13,7 @@ import {verifyToken} from "./middleware/token-management.js";
 import authRouter from "./routes/auth.js";
 import festivalsRouter from "./routes/festivals.js";
 import game from "./routes/game.js";
+import othersRouter from "./routes/others.js";
 import publicRouter from "./routes/public.js";
 import publisherRouter from "./routes/publisher.js";
 import reservationsRouter from "./routes/reservations.js";
@@ -73,6 +74,7 @@ app.use("/api/admin", verifyToken, requireAdmin, (req, res) => {
     res.json({message: "Bienvenue admin"});
 });
 app.use("/api/publishers", verifyToken, publisherRouter);
+app.use("/api/others", verifyToken, othersRouter);
 
 app.use('/api/games', game);
 

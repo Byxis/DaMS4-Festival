@@ -94,10 +94,21 @@
             </mat-form-field>
         </div>
 
-        @for (item of items(); track item.publisher.id) {
-        <reservation [reservationId]="item.reservation?.id" [festivalId]="this.id()"
-            [publisherId]="item.publisher.id!" />
+        @for (item of items(); track item.entity.id) {
+        <reservation [reservationId]="item.reservation?.id" [festivalId]="this.id()" [entityId]="item.entity.id!"
+            [entityType]="item.type" />
         }
+    </div>
+
+    <div class="footer-actions">
+        <button mat-fab extended color="accent" (click)="importOtherEntity()">
+            <mat-icon>file_upload</mat-icon>
+            Importer une autre entité
+        </button>
+        <button mat-fab extended color="primary" (click)="addOtherEntity()">
+            <mat-icon>add</mat-icon>
+            Ajouter une autre entité
+        </button>
     </div>
 
     } @else {

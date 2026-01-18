@@ -3,6 +3,7 @@ import {CommonModule} from '@angular/common';
 import {Component, computed, effect, inject, input, signal, ViewEncapsulation} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCheckboxModule} from '@angular/material/checkbox';
+import {MatDialog} from '@angular/material/dialog';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {MatMenuModule} from '@angular/material/menu';
@@ -11,6 +12,8 @@ import {environment} from '@env/environment';
 
 import {ZoneGameDTO} from '../../festivals/dtos/zone-game-dto';
 import {FestivalService} from '../../festivals/festival-service/festival-service';
+import {GameForm} from '../../games/game-form/game-form';
+import {GameManagerDialog} from '../../games/game-manager-dialog/game-manager-dialog';
 import {GameService} from '../../games/game-service/game-service';
 import {GameDto} from '../../games/game/game-dto';
 import {ReservationService} from '../reservation.service';
@@ -37,8 +40,10 @@ export class ReservationGamesComponent
     private readonly gameService = inject(GameService);
     private readonly reservationService = inject(ReservationService);
     private readonly festivalService = inject(FestivalService);
+    private readonly dialog = inject(MatDialog);
 
     readonly publisherId = input.required<number>();
+    readonly entityName = input<string|undefined>('');
     readonly festivalId = input.required<number>();
     readonly reservation = input.required<Reservation|undefined>();
 
@@ -98,19 +103,53 @@ export class ReservationGamesComponent
             const pubId = this.publisherId();
             if (pubId)
             {
-                this.isLoading.set(true);
-                this.gameService.searchGameByPublisherIDInDBObservable(pubId).subscribe({
-                    next: (games) => {
-                        this.publisherGames.set(games);
-                        this.isLoading.set(false);
-                    },
-                    error: (err) => {
-                        console.error('Error fetching publisher games', err);
-                        this.isLoading.set(false);
-                    }
-                });
+                this.loadGames(pubId);
             }
         }, {allowSignalWrites: true});
+    }
+
+    loadGames(id: number)
+    {
+        this.isLoading.set(true);
+        this.gameService.searchGameByPublisherIDInDBObservable(id).subscribe({
+            next: (games) => {
+                this.publisherGames.set(games);
+                this.isLoading.set(false);
+            },
+            error: (err) => {
+                console.error('Error fetching publisher games', err);
+                this.isLoading.set(false);
+            }
+        });
+    }
+
+    addGame()
+    {
+        const dialogRef =
+            this.dialog.open(GameForm, {data: {publisherId: this.publisherId(), publisherName: this.entityName()}});
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result)
+            {
+                this.gameService.add({...result, publisher_id: this.publisherId()}).subscribe({
+                    next: (newGame) => {
+                        this.loadGames(this.publisherId());
+                    },
+                    error: (err) => console.error('Error creating game', err)
+                });
+            }
+        });
+    }
+
+    manageGames()
+    {
+        const dialogRef = this.dialog.open(
+            GameManagerDialog,
+            {data: {publisherId: this.publisherId(), entityName: this.entityName()}, width: '600px'});
+
+        dialogRef.afterClosed().subscribe(() => {
+            this.loadGames(this.publisherId());
+        });
     }
 
     isReserved(gameId: number): boolean

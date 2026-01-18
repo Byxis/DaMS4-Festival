@@ -14,6 +14,10 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatTableModule} from '@angular/material/table';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {Router} from '@angular/router';
+import {OtherImportDialog} from '@other/other-import-dialog/other-import-dialog';
+import {OtherNewDialog} from '@other/other-new-dialog/other-new-dialog';
+import {OtherService} from '@other/other.service';
+import {EntityDTO} from '@publisher/entityDto';
 import {PublisherService} from '@publisher/publisher.service';
 import {computedSorted, SortConfig} from '@shared/utils/sort.utils';
 import {FestivalDto} from 'src/app/festivals/dtos/festival-dto';
@@ -25,7 +29,8 @@ import {ReservationService} from 'src/app/reservation/reservation.service';
 
 interface FestivalItem
 {
-    publisher: any;
+    entity: any;
+    type: 'PUBLISHER'|'OTHER';
     reservation: any;
     key: {status: string; name: string; firstInteraction: string | null; lastInteraction: string | null};
 }
@@ -104,6 +109,7 @@ export class Festival
     private readonly dialog = inject(MatDialog);
     readonly reservationService = inject(ReservationService);
     readonly publisherService = inject(PublisherService);
+    readonly otherService = inject(OtherService);
 
     id = input.required<number>();
     festival = this.svc._currentFestival;
@@ -121,8 +127,9 @@ export class Festival
     readonly baseItems = computed(() => {
         const reservations = this.reservationService._reservations();
         const publishers = this.publisherService._publishers();
+        const others = this.otherService._others();
 
-        return publishers.map((p) => {
+        const pubItems = publishers.map((p) => {
             const res = reservations.find((r) => r.entity_id === p.id);
             const status = res?.status || 'TO_BE_CONTACTED';
             const name = p.name || '';
@@ -132,8 +139,38 @@ export class Festival
             const firstInteraction = dates.length > 0 ? dates[0] : null;
             const lastInteraction = dates.length > 0 ? dates[dates.length - 1] : null;
 
-            return {publisher: p, reservation: res, key: {status, name, firstInteraction, lastInteraction}};
+            return {
+                entity: p,
+                type: 'PUBLISHER' as const,
+                reservation: res,
+                key: {status, name, firstInteraction, lastInteraction}
+            };
         });
+
+        const otherItems = others
+                               .map((o) => {
+                                   const res = reservations.find((r) => r.entity_id === o.id);
+
+                                   if (!res) return null;
+
+                                   const status = res.status || 'TO_BE_CONTACTED';
+                                   const name = o.name || '';
+                                   const dates = res.interactions?.map((i) => i.interaction_date) || [];
+                                   dates.sort();
+
+                                   const firstInteraction = dates.length > 0 ? dates[0] : null;
+                                   const lastInteraction = dates.length > 0 ? dates[dates.length - 1] : null;
+
+                                   return {
+                                       entity: o,
+                                       type: 'OTHER' as const,
+                                       reservation: res,
+                                       key: {status, name, firstInteraction, lastInteraction}
+                                   };
+                               })
+                               .filter((item): item is NonNullable<typeof item> => item !== null);
+
+        return [...pubItems, ...otherItems] as FestivalItem[];
     });
 
     readonly usedStock = computed(() => {
@@ -177,7 +214,6 @@ export class Festival
         dialogRef.afterClosed().subscribe(result => {
             if (result)
             {
-                // Recharger le festival après modification
                 this.svc.loadFestivalById(this.id());
             }
         });
@@ -188,5 +224,42 @@ export class Festival
         const start = new Date(festival.start_date);
         const end = new Date(festival.end_date);
         return `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
+    }
+
+    addOtherEntity()
+    {
+        const dialogRef = this.dialog.open(OtherNewDialog, {width: '400px'});
+        dialogRef.afterClosed().subscribe(name => {
+            if (name)
+            {
+                this.otherService.create({name}).subscribe({
+                    next: (newOther: EntityDTO|null) => {
+                        if (newOther && newOther.id)
+                        {
+                            this.reservationService
+                                .create(this.id(), {entity_id: newOther.id, status: 'TO_BE_CONTACTED'})
+                                .subscribe();
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    importOtherEntity()
+    {
+        const currentReservations = this.reservationService._reservations();
+        const excludedIds = currentReservations.filter(r => r.entity_id !== undefined).map(r => r.entity_id!);
+
+        const dialogRef = this.dialog.open(OtherImportDialog, {width: '400px', data: {excludedIds: excludedIds}});
+
+        dialogRef.afterClosed().subscribe((other: EntityDTO|null) => {
+            if (other && other.id)
+            {
+                this.reservationService.create(this.id(), {entity_id: other.id, status: 'TO_BE_CONTACTED'}).subscribe({
+                    error: (err) => console.error('Error creating reservation', err)
+                });
+            }
+        });
     }
 }

@@ -23,13 +23,14 @@
       {{ isExpanded() ? 'expand_less' : 'expand_more' }}
     </mat-icon>
 
-    <button class="logo-name-button" (click)="navigateToPublisher()" [disabled]="!publisher()">
-      @if (this.publisher()?.logoUrl) {
-      <img [src]="this.publisher()?.logoUrl" alt="{{ this.publisher()?.name }} logo" class="logo-img" />
+    <button class="logo-name-button" (click)="navigateToEntity()"
+      [disabled]="!entity() || entityType() !== 'PUBLISHER'">
+      @if (this.entity()?.logoUrl) {
+      <img [src]="this.entity()?.logoUrl" alt="{{ this.entity()?.name }} logo" class="logo-img" />
       } @else {
       <mat-icon class="logo-fallback-icon">business</mat-icon>
       }
-      <span class="publisher-name">{{ this.publisher()?.name }}</span>
+      <span class="publisher-name">{{ this.entity()?.name }}</span>
     </button>
 
     <div class="items-row">
@@ -87,7 +88,7 @@
       <mat-icon class="tables-icon">sports_esports</mat-icon>
       Jeux réservés
     </h3>
-    <reservation-games [publisherId]="publisherId()" [festivalId]="festivalId()"
+    <reservation-games [publisherId]="entityId()" [entityName]="entity()?.name" [festivalId]="festivalId()"
       [reservation]="reservation()"></reservation-games>
   </div>
   } }

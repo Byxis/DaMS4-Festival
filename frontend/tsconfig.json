@@ -24,6 +24,7 @@
       "@users/*": ["src/app/users/*"],
       "@publisher/*": ["src/app/publisher/*"],
       "@festivals/*": ["src/app/festivals/*"],
+      "@other/*": ["src/app/other/*"],
       "@shared/*": ["src/app/shared/*"]
     }
   },

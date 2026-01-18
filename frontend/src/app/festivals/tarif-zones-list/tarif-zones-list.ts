@@ -108,8 +108,8 @@ export class TarifZonesList
                     compareB = b.price;
                     break;
                 case 'outlets':
-                    compareA = a.electricalOutlet;
-                    compareB = b.electricalOutlet;
+                    compareA = a.electricalOutletPrice;
+                    compareB = b.electricalOutletPrice;
                     break;
                 case 'gameZones':
                     compareA = this.getGameZoneCount(a);

@@ -48,6 +48,8 @@ export class FactureComponent
             return null;
         };
 
+        const processedGames = new Set<string>();
+
         gameList.forEach(game => {
             if (game.zone_id)
             {
@@ -55,28 +57,39 @@ export class FactureComponent
                 if (info)
                 {
                     const {tarifZone} = info;
+                    const gameKey = `${tarifZone.id}-${game.game_id}`;
+
+                    if (processedGames.has(gameKey)) return;
+                    processedGames.add(gameKey);
+
                     const surface =
                         ((game.table_count ?? 0) + (game.big_table_count ?? 0) + (game.town_table_count ?? 0)) * 4 +
                         (game.floor_space ?? 0);
                     const outlets = game.electrical_outlets ?? 0;
                     const surfaceCost = surface * tarifZone.price;
-                    const outletCost = outlets * tarifZone.electricalOutlet;
 
                     const current = summaryMap.get(tarifZone.id!) || {
                         name: tarifZone.name,
                         surface: 0,
                         priceM2: tarifZone.price,
                         outlets: 0,
-                        priceOutlet: tarifZone.electricalOutlet,
+                        priceOutlet: tarifZone.electricalOutletPrice || 0,
                         total: 0
                     };
 
                     current.surface += surface;
                     current.outlets += outlets;
-                    current.total += surfaceCost + outletCost;
+                    current.total += surfaceCost;
 
                     summaryMap.set(tarifZone.id!, current);
                 }
+            }
+        });
+
+        summaryMap.forEach((current) => {
+            if (current.outlets > 0)
+            {
+                current.total += current.priceOutlet;
             }
         });
 

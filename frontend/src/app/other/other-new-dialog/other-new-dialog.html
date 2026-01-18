@@ -1,0 +1,11 @@
+<h2 mat-dialog-title>Nouvelle Entité</h2>
+<mat-dialog-content>
+    <mat-form-field appearance="outline" style="width: 100%">
+        <mat-label>Nom</mat-label>
+        <input matInput [(ngModel)]="name" (keyup.enter)="save()">
+    </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button (click)="cancel()">Annuler</button>
+    <button mat-flat-button color="primary" (click)="save()" [disabled]="!name.trim()">Créer</button>
+</mat-dialog-actions>

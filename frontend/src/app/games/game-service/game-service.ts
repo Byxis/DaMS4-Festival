@@ -71,7 +71,7 @@ import {GameDto} from '../game/game-dto';
             .pipe(map(games => this.transformLogoUrls(games)));
     }
 
-    add(data: Partial<GameDto>&{logoFile?: File}): void
+    add(data: Partial<GameDto>&{logoFile?: File}): Observable<GameDto>
     {
         const gameData: Partial<GameDto> = {
             name: data.name,
@@ -81,28 +81,20 @@ import {GameDto} from '../game/game-dto';
             maximum_number_of_player: data.maximum_number_of_player,
         };
         const logo = data.logoFile || data.logo;
-        this.http
+        return this.http
             .post<GameDto>(
                 `${environment.apiUrl}/publishers/addGameToPublisher`, {...gameData, logo}, {withCredentials: true})
-            .subscribe({
-                next: (newGame) => {
+            .pipe(
+                switchMap(newGame => {
                     if (data.logoFile && newGame.id)
                     {
-                        this.uploadLogo(newGame.id, data.logoFile).subscribe({
-                            next: () => this._games.update(games => [...games, newGame]),
-                            error: (err) => {
-                                console.error('Erreur upload nouveau jeu', err);
-                                this._games.update(games => [...games, newGame]);
-                            }
-                        });
+                        return this.uploadLogo(newGame.id, data.logoFile).pipe(map(() => newGame));
                     }
-                    else
-                    {
-                        this._games.update(games => [...games, newGame]);
-                    }
-                },
-                error: (err) => console.error('Erreur', err)
-            });
+                    return of(newGame);
+                }),
+                tap(newGame => {
+                    this._games.update(games => [...games, newGame]);
+                }));
     }
 
     private uploadLogo(gameId: number, logoFile: File): Observable<any>
