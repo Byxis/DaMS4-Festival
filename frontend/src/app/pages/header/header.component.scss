@@ -31,7 +31,7 @@
 }
 
 .profile-menu {
-  padding: 0 !important; /* remove default Material padding */
+  padding: 0 !important; 
 }
 
 /* menu panel itself */
@@ -75,7 +75,6 @@
   align-self: stretch;
 }
 
-/* user values */
 .value {
   font-size: 0.95rem;
   font-weight: 650;
@@ -88,7 +87,6 @@
   font-size: 0.9rem;
 }
 
-/* clickable copy behavior */
 .selectable {
   cursor: pointer;
   user-select: none;
@@ -101,7 +99,6 @@
   background: rgba(0, 0, 0, 0.05);
 }
 
-/* role */
 .role {
   margin-top: 4px;
   text-align: center;
@@ -117,7 +114,6 @@
   opacity: 0.9;
 }
 
-/* buttons section */
 .profile-card button {
   width: 100%;
   border: 0;
@@ -136,13 +132,11 @@
   transform: scale(0.99);
 }
 
-/* edit button: use your app theme system */
 .profile-card .edit-btn {
   background-color: var(--mat-sys-primary);
   color: var(--mat-sys-on-primary);
 }
 
-/* logout button: error container */
 .profile-card .logout-btn {
   background-color: var(--mat-sys-error-container);
   color: var(--mat-sys-on-error-container);

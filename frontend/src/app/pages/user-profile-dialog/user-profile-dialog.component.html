@@ -55,7 +55,7 @@
 
 <mat-dialog-actions align="end">
   <button mat-button (click)="cancel()">Fermer</button>
-  <button mat-flat-button color="primary" (click)="submit()">
+  <button mat-flat-button color="primary" (click)="submit() " [disabled]="form.invalid">
     Enregistrer les modifications
   </button>
 </mat-dialog-actions>
