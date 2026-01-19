@@ -2,23 +2,24 @@
 <mat-dialog-content>
     <mat-form-field appearance="outline" class="full-width">
         <mat-label>Rechercher</mat-label>
-        <input matInput [(ngModel)]="searchTerm" (input)="filter()" placeholder="Filtrer par nom..." />
+        <input #searchInput matInput [value]="this.searchTerm()"
+            (input)="this.searchTerm.set(searchInput.value); this.filter()" placeholder="Filtrer par nom..." />
         <mat-icon matPrefix>search</mat-icon>
     </mat-form-field>
 
-    @if (isLoading) {
+    @if (this.isLoading) {
     <div class="loading">
         <mat-spinner diameter="40"></mat-spinner>
         <p>Chargement...</p>
     </div>
-    } @else if (filteredOthers.length > 0) {
+    } @else if (this.filteredOthers.length > 0) {
     <div class="editors-list">
-        @for (other of filteredOthers; track other.id) {
+        @for (other of this.filteredOthers; track other.id) {
         <div class="editor-item">
             <div class="editor-info">
                 <div class="editor-name">{{ other.name }}</div>
             </div>
-            <button mat-raised-button color="accent" (click)="import(other)" class="import-btn">
+            <button mat-raised-button color="accent" (click)="this.import(other)" class="import-btn">
                 <mat-icon>add</mat-icon>
                 Importer
             </button>
@@ -34,5 +35,5 @@
 </mat-dialog-content>
 
 <mat-dialog-actions>
-    <button mat-button (click)="cancel()">Annuler</button>
+    <button mat-button (click)="this.cancel()">Annuler</button>
 </mat-dialog-actions>

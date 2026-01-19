@@ -82,7 +82,6 @@ const SORT_STRATEGIES: SortConfig<FestivalItem> = {
 @Component({
     selector: 'app-festival',
     imports: [
-        DatePipe,
         CommonModule,
         MatCardModule,
         MatToolbarModule,

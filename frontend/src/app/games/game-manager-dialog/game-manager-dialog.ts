@@ -1,6 +1,6 @@
 
 import {CommonModule} from '@angular/common';
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, OnInit, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
@@ -40,7 +40,7 @@ export class GameManagerDialog implements OnInit
 
     games: GameDto[] = [];
     filteredGames: GameDto[] = [];
-    searchTerm = '';
+    searchTerm = signal('');
     isLoading = true;
 
     ngOnInit()
@@ -66,7 +66,7 @@ export class GameManagerDialog implements OnInit
 
     filter()
     {
-        const term = this.searchTerm.toLowerCase();
+        const term = this.searchTerm().toLowerCase();
         this.filteredGames = this.games.filter(g => g.name.toLowerCase().includes(term));
     }
 

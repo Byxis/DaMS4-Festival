@@ -3,25 +3,26 @@
     <mat-form-field appearance="outline" class="search-field">
         <mat-label>Rechercher...</mat-label>
         <mat-icon matPrefix>search</mat-icon>
-        <input matInput [(ngModel)]="searchTerm" (input)="filter()">
+        <input #searchInput matInput [value]="this.searchTerm()"
+            (input)="this.searchTerm.set(searchInput.value); this.filter()">
     </mat-form-field>
 
-    @if (isLoading) {
+    @if (this.isLoading) {
     <div class="loading-container">
         <mat-spinner diameter="40"></mat-spinner>
     </div>
     } @else {
     <mat-list>
-        @for (game of filteredGames; track game.id) {
+        @for (game of this.filteredGames; track game.id) {
         <mat-list-item>
             <mat-icon matListItemIcon>sports_esports</mat-icon>
             <div matListItemTitle>{{game.name}}</div>
             <div matListItemLine>{{game.type}}</div>
             <div class="actions" matListItemMeta>
-                <button mat-icon-button color="primary" (click)="editGame(game)">
+                <button mat-icon-button color="primary" (click)="this.editGame(game)">
                     <mat-icon>edit</mat-icon>
                 </button>
-                <button mat-icon-button color="warn" (click)="deleteGame(game)">
+                <button mat-icon-button color="warn" (click)="this.deleteGame(game)">
                     <mat-icon>delete</mat-icon>
                 </button>
             </div>
@@ -33,5 +34,5 @@
     }
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-    <button mat-button (click)="close()">Fermer</button>
+    <button mat-button (click)="this.close()">Fermer</button>
 </mat-dialog-actions>

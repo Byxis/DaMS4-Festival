@@ -1,6 +1,6 @@
 
 import {CommonModule} from '@angular/common';
-import {Component, effect, inject, OnInit} from '@angular/core';
+import {Component, effect, inject, OnInit, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
@@ -39,7 +39,7 @@ export class OtherImportDialog implements OnInit
 
     others: EntityDTO[] = [];
     filteredOthers: EntityDTO[] = [];
-    searchTerm = '';
+    searchTerm = signal('');
     isLoading = true;
 
     constructor()
@@ -61,7 +61,7 @@ export class OtherImportDialog implements OnInit
 
     filter()
     {
-        const term = this.searchTerm.toLowerCase();
+        const term = this.searchTerm().toLowerCase();
         this.filteredOthers = this.others.filter(o => o.name.toLowerCase().includes(term));
     }
 

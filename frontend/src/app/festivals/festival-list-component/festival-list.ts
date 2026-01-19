@@ -1,14 +1,12 @@
-import {Component, computed, effect, inject, WritableSignal} from '@angular/core';
+import {Component, effect, inject} from '@angular/core';
 import {MatButtonModule} from "@angular/material/button";
-import {MatIcon} from '@angular/material/icon';
 
 import {FestivalCard} from '../festival-card-component/festival-card';
-import {FestivalNewFormComponent} from "../festival-new-form-component/festival-new-form-component";
 import {FestivalService} from '../festival-service/festival-service';
 
 @Component({
     selector: 'app-festival-list',
-    imports: [FestivalCard, FestivalNewFormComponent, MatButtonModule, MatIcon],
+    imports: [FestivalCard, MatButtonModule],
     templateUrl: './festival-list.html',
     styleUrl: './festival-list.scss'
 })

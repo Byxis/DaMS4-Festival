@@ -4,8 +4,8 @@
 
     <mat-form-field class="search-field" appearance="outline">
       <mat-label>Chercher un jeu</mat-label>
-      <input matInput [(ngModel)]="searchTerm" placeholder="name of the game"
-        (input)="searchGameByName($event.target.value)" />
+      <input #searchInput matInput [value]="this.searchTerm()" placeholder="name of the game"
+        (input)="this.searchTerm.set(searchInput.value); this.searchGameByName(searchInput.value)" />
     </mat-form-field>
   </div>
   <div class="game-table">
@@ -18,22 +18,23 @@
       <div class="header-cell">Min</div>
       <div class="header-cell">Max</div>
       <div class="header-cell actions-cell">
-        <button mat-icon-button (click)="openGameFormDialog()" class="highlighted" aria-label="Ajouter un jeu">
+        <button mat-icon-button (click)="this.openGameFormDialog()" class="highlighted" aria-label="Ajouter un jeu">
           <mat-icon>add_circle_outline</mat-icon>
         </button>
       </div>
     </div>
 
     <div class="table-viewport">
-      @for (game of gameService.games(); track game.id) {
+      @for (game of this.gameService.games(); track game.id) {
       <div class="table-row">
         <div class="cell id-cell center">
           <div class="id-badge">{{ game.id }}</div>
         </div>
 
         <div class="cell logo-cell center">
-          @if (game.logoUrl && !logoErrors.has(game.id!)) {
-          <img [src]="game.logoUrl" [alt]="game.name + ' logo'" (error)="logoErrors.add(game.id!)" class="game-logo">
+          @if (game.logoUrl && !this.logoErrors.has(game.id!)) {
+          <img [src]="game.logoUrl" [alt]="game.name + ' logo'" (error)="this.onLogoError(game.id!, $event)"
+            class="game-logo">
           } @else {
           <div class="logo-placeholder">
             <mat-icon>business</mat-icon>
@@ -66,11 +67,11 @@
         </div>
 
         <div class="cell actions-cell">
-          <button mat-icon-button class="edit-btn" (click)="openEditGameDialog(game); $event.stopPropagation()"
+          <button mat-icon-button class="edit-btn" (click)="this.openEditGameDialog(game); $event.stopPropagation()"
             aria-label="Modifier le jeu" matTooltip="Modifier">
             <mat-icon>edit</mat-icon>
           </button>
-          <button mat-icon-button class="delete-btn" (click)="confirmDeleteGame(game); $event.stopPropagation()"
+          <button mat-icon-button class="delete-btn" (click)="this.confirmDeleteGame(game); $event.stopPropagation()"
             aria-label="Supprimer le jeu" matTooltip="Supprimer">
             <mat-icon>delete</mat-icon>
           </button>

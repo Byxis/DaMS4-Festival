@@ -2,10 +2,11 @@
 <mat-dialog-content>
     <mat-form-field appearance="outline" style="width: 100%">
         <mat-label>Nom</mat-label>
-        <input matInput [(ngModel)]="name" (keyup.enter)="save()">
+        <input #nameInput matInput [value]="this.name()" (input)="this.name.set(nameInput.value)"
+            (keyup.enter)="this.save()">
     </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-    <button mat-button (click)="cancel()">Annuler</button>
-    <button mat-flat-button color="primary" (click)="save()" [disabled]="!name.trim()">Créer</button>
+    <button mat-button (click)="this.cancel()">Annuler</button>
+    <button mat-flat-button color="primary" (click)="this.save()" [disabled]="!this.name().trim()">Créer</button>
 </mat-dialog-actions>
