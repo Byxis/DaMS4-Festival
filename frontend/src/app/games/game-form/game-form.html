@@ -31,21 +31,25 @@
     </mat-form-field>
 
     <div class="row">
-      <mat-form-field appearance="outline">
-        <mat-label>Nombre minimum de joueurs</mat-label>
-        <input matInput type="number" formControlName="number_minimal_of_player" min="1" max="99" />
-        @if (getErrorMessage(form.get('number_minimal_of_player'))) {
-        <mat-error>{{ getErrorMessage(form.get('number_minimal_of_player')) }}</mat-error>
-        }
-      </mat-form-field>
+      <div class="half-width">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nombre minimum de joueurs</mat-label>
+          <input matInput type="number" formControlName="number_minimal_of_player" min="1" max="99" />
+          @if (getErrorMessage(form.get('number_minimal_of_player'))) {
+          <mat-error>{{ getErrorMessage(form.get('number_minimal_of_player')) }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Nombre maximum de joueurs</mat-label>
-        <input matInput type="number" formControlName="number_maximal_of_player" min="1" max="99" />
-        @if (getErrorMessage(form.get('number_maximal_of_player'))) {
-        <mat-error>{{ getErrorMessage(form.get('number_maximal_of_player')) }}</mat-error>
-        }
-      </mat-form-field>
+      <div class="half-width">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nombre maximum de joueurs</mat-label>
+          <input matInput type="number" formControlName="number_maximal_of_player" min="1" max="99" />
+          @if (getErrorMessage(form.get('number_maximal_of_player'))) {
+          <mat-error>{{ getErrorMessage(form.get('number_maximal_of_player')) }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
     </div>
 
     <div class="logo-section">

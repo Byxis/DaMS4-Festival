@@ -10,7 +10,6 @@
   border-radius: 8px;
   background-color: var(--mat-sys-surface);
   margin-bottom: 1rem;
-  // overflow: hidden; // Removed to allow sticky header to work relative to viewport
 }
 
 .reservation-header {
@@ -18,8 +17,8 @@
   top: 0;
   z-index: 10;
   border-bottom: 1px solid var(--mat-sys-outline);
-  border-top-left-radius: 8px; // Maintain rounded corners
-  border-top-right-radius: 8px; // Maintain rounded corners
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
   display: grid;
   grid-template-columns: 48px 1fr 2fr 1fr;
   gap: 1.5rem;
@@ -27,7 +26,7 @@
   padding: 1rem 1.5rem;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  background-color: var(--mat-sys-surface); // Ensure background is solid for sticky effect
+  background-color: var(--mat-sys-surface);
 
   &:hover {
     background-color: var(--mat-sys-surface-dim);

@@ -1,8 +1,15 @@
+mat-dialog-content {
+    max-height: 65vh;
+    overflow-y: auto !important;
+    padding-top: 10px;
+}
 
-.dialog-content {
-    min-height: 300px;
-    display: flex;
-    flex-direction: column;
+mat-dialog-actions {
+    border-top: 1px solid var(--mat-sys-outline-variant);
+    padding-top: 1rem;
+    padding-bottom: 0.5rem;
+    background-color: var(--mat-sys-surface);
+    z-index: 2;
 }
 .search-field {
     width: 100%;

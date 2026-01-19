@@ -4,234 +4,244 @@
 .reservation-games-container {
   display: flex;
   flex-direction: column;
-
-  .filter-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    padding: 0 0.25rem;
-    
-    .search-field {
-      width: 300px;
-      font-size: 0.875rem;
-  
-      mat-icon {
-        color: var(--mat-sys-on-surface-variant);
-        margin-right: 0.5rem;
-      }
-    }
-  
-    mat-checkbox {
-      color: var(--mat-sys-on-surface);
-    }
-  }
-  
-  .games-table {
-    width: 100%;
-    border-collapse: separate; 
-    border-spacing: 0 0.5rem; 
-    
-    font-size: 0.875rem;
-    color: var(--mat-sys-on-surface);
-  
-    th {
-       text-align: left;
-       padding: 0.75rem 1rem;
-       color: var(--mat-sys-on-surface-variant);
-       font-weight: 500;
-       font-size: 0.8rem;
-       text-transform: uppercase;
-       letter-spacing: 0.05em;
-       border-bottom: 1px solid var(--mat-sys-outline);
-    }
-  
-    td {
-      padding: 0.75rem 1rem;
-      vertical-align: middle;
-      border-bottom: 1px solid var(--mat-sys-outline-variant);
-      
-      &:first-child {
-          border-top-left-radius: 4px;
-          border-bottom-left-radius: 4px;
-      }
-      &:last-child {
-          border-top-right-radius: 4px;
-          border-bottom-right-radius: 4px;
-      }
-    }
-  
-    tr {
-        transition: background-color 0.2s ease;
-        
-        &:hover {
-            background-color: var(--mat-sys-surface-container-lowest);
-        }
-        
-        &.reserved {
-           background-color: var(--mat-sys-surface-container-lowest);
-           td {
-               font-weight: 500;
-           }
-        }
-    }
-  }
-  
-  .logo-cell {
-    width: 48px;
-    
-    .game-logo {
-       width: 40px;
-       height: 40px;
-       object-fit: contain;
-       border-radius: 4px;
-       background-color: white; 
-       border: 1px solid var(--mat-sys-outline-variant);
-    }
-    
-    mat-icon {
-       color: var(--mat-sys-outline);
-       width: 40px; 
-       height: 40px; 
-       font-size: 40px;
-    }
-  }
-  
-  .name-cell {
-    
-    .game-info {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    
-    .game-name {
-       font-weight: 500;
-       color: var(--mat-sys-on-surface);
-       font-size: 0.95rem;
-    }
-    
-    .game-type {
-       font-size: 0.75rem;
-       color: var(--mat-sys-inverse-primary);
-    }
-  }
-  
-  .qty-input {
-    width: 50px;
-    padding: 0.4rem;
-    text-align: center;
-    font-size: 0.875rem;
-    font-weight: 500;
-    border: 1px solid var(--mat-sys-outline);
-    border-radius: 6px;
-    background-color: var(--mat-sys-surface);
-    color: var(--mat-sys-on-surface);
-    transition: all 0.2s ease;
-    
-    &:hover {
-      border-color: var(--mat-sys-primary);
-    }
-  
-    &:focus {
-      outline: none;
-      border-color: var(--mat-sys-primary);
-      background-color: var(--mat-sys-primary-container);
-    }
-    
-    &::-webkit-outer-spin-button,
-    &::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    &[type='number'] {
-      -moz-appearance: textfield;
-    }
-  }
-  
-  
-  .status-button {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.4rem 0.75rem;
-      border: 1px solid var(--mat-sys-outline);
-      border-radius: 20px;
-      background-color: var(--mat-sys-surface-container-lowest);
-      min-width: auto;
-      height: auto;
-      cursor: pointer;
-      transition: all 0.2s ease;
-  
-      .status-text {
-          font-size: 0.75rem;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.02em;
-      }
-  
-      .status-icon {
-          font-size: 1.1rem;
-          width: 1.1rem;
-          height: 1.1rem;
-      }
-  
-      &:hover {
-          filter: brightness(0.95);
-      }
-  }
-  
-  .loading, .empty-cell {
-    padding: 3rem;
-    text-align: center;
-    color: var(--mat-sys-on-surface-variant);
-    font-style: italic;
-    width: 100%;
-    display: block;
-  }
-  
-  .zone-selector {
-      width: 140px;
-  }
-  
-  .compact-form-field {
-      width: 100%;
-      
-      .mat-mdc-form-field-wrapper {
-          padding-bottom: 0;
-      }
-      
-      .mat-mdc-form-field-flex {
-          height: 32px !important;
-          min-height: 32px !important;
-          align-items: center;
-          padding: 0 8px;
-      }
-      
-      .mat-mdc-form-field-infix {
-          padding: 4px 0 !important;
-          min-height: 32px !important;
-          border-top: 0;
-      }
-      
-      .mat-mdc-text-field-wrapper {
-          height: 32px !important;
-          padding: 0 8px !important;
-      }
-  
-       .mat-mdc-select-trigger {
-          height: 32px !important;
-          align-items: center;
-          display: flex;
-      }
-  
-       .mat-mdc-select-value {
-          font-size: 0.8rem !important;
-       }
-  }
 }
 
+.filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 0 0.25rem;
+}
+
+.filter-bar .search-field {
+  width: 300px;
+  font-size: 0.875rem;
+}
+
+.filter-bar .search-field mat-icon {
+  color: var(--mat-sys-on-surface-variant);
+  margin-right: 0.5rem;
+}
+
+.filter-bar mat-checkbox {
+  color: var(--mat-sys-on-surface);
+}
+
+.games-table {
+  width: 100%;
+  border-collapse: separate; 
+  border-spacing: 0 0.5rem; 
+  font-size: 0.875rem;
+  color: var(--mat-sys-on-surface);
+}
+
+.games-table th {
+   text-align: left;
+   padding: 0.75rem 1rem;
+   color: var(--mat-sys-on-surface-variant);
+   font-weight: 500;
+   font-size: 0.8rem;
+   text-transform: uppercase;
+   letter-spacing: 0.05em;
+   border-bottom: 1px solid var(--mat-sys-outline);
+}
+
+.games-table td {
+  padding: 0.75rem 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+
+.games-table td:first-child {
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+.games-table td:last-child {
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+.games-table tr {
+    transition: background-color 0.2s ease;
+}
+
+.games-table tr:hover {
+    background-color: var(--mat-sys-surface-container-lowest);
+}
+
+.games-table tr.reserved {
+   background-color: var(--mat-sys-surface-container-lowest);
+}
+
+.logo-cell {
+  width: 48px;
+}
+
+.logo-cell .game-logo {
+   width: 40px;
+   height: 40px;
+   object-fit: contain;
+   border-radius: 4px;
+   background-color: white; 
+   border: 1px solid var(--mat-sys-outline-variant);
+}
+
+.logo-cell mat-icon {
+   color: var(--mat-sys-outline);
+   width: 40px; 
+   height: 40px; 
+   font-size: 40px;
+}
+
+.name-cell .game-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.name-cell .game-name {
+   font-weight: 500;
+   color: var(--mat-sys-on-surface);
+   font-size: 0.95rem;
+}
+
+.name-cell .game-type {
+   font-size: 0.75rem;
+   color: var(--mat-sys-inverse-primary);
+}
+
+.qty-input {
+  width: 50px;
+  padding: 0.4rem;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid var(--mat-sys-outline);
+  border-radius: 6px;
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  transition: all 0.2s ease;
+}
+
+.qty-input:hover {
+  border-color: var(--mat-sys-primary);
+}
+
+.qty-input:focus {
+  outline: none;
+  border-color: var(--mat-sys-primary);
+  background-color: var(--mat-sys-primary-container);
+}
+
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.qty-input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.status-button {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid var(--mat-sys-outline);
+    border-radius: 20px;
+    background-color: var(--mat-sys-surface-container-lowest);
+    min-width: auto;
+    height: auto;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.status-button .status-text {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-button .status-icon {
+    font-size: 1.1rem;
+    width: 1.1rem;
+    height: 1.1rem;
+}
+
+.status-button:hover {
+    filter: brightness(0.95);
+}
+
+.loading, .empty-cell {
+  padding: 3rem;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+  width: 100%;
+  display: block;
+}
+
+.zone-selector {
+    width: 140px;
+}
+
+.compact-form-field {
+    width: 100%;
+}
+
+.compact-form-field .mat-mdc-form-field-wrapper {
+    padding-bottom: 0;
+}
+
+.compact-form-field .mat-mdc-form-field-flex {
+    height: 32px !important;
+    min-height: 32px !important;
+    align-items: center;
+    padding: 0 8px;
+}
+
+.compact-form-field .mat-mdc-form-field-infix {
+    padding: 4px 0 !important;
+    min-height: 32px !important;
+    border-top: 0;
+}
+
+.compact-form-field .mat-mdc-text-field-wrapper {
+    height: 32px !important;
+    padding: 0 8px !important;
+}
+
+.compact-form-field .mat-mdc-select-trigger {
+    height: 32px !important;
+    align-items: center;
+    display: flex;
+}
+
+.compact-form-field .mat-mdc-select-value {
+    font-size: 0.8rem !important;
+}
+
+.status-menu-panel {
+  margin-top: 4px !important;
+
+  .mat-mdc-menu-content {
+    padding: 4px 0 !important;
+  }
+
+  .mat-mdc-menu-item {
+    border-radius: 4px;
+    margin: 2px 4px;
+    padding: 0 12px !important;
+    min-height: 36px !important;
+    font-size: 0.85rem !important;
+    transition: all 0.2s ease;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+}
 .status-menu-panel {
   margin-top: 4px !important;
 

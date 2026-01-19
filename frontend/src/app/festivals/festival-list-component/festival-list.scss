@@ -4,18 +4,6 @@
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 25px;
   margin: 30px 0;
-
-
-  app-festival-card {
-    animation: fadeInUp 0.5s ease-out;
-    animation-fill-mode: both;
-
-    @for $i from 1 through 10 {
-       &:nth-child(#{$i}) {
-         animation-delay: #{$i * 0.1 + 0.1}s;
-       }
-    }
-  }
 }
 
 

@@ -6,6 +6,7 @@
   max-width: 400px;
   border-radius: 12px;
   margin: 0 auto;
+  transition: transform 0.2s ease-in-out;
 
   &:hover {
     transform: translateY(-4px);
@@ -38,14 +39,14 @@
   align-items: center;
   font-size: 0.85rem;
   font-weight: 500;
+}
 
-  mat-icon {
-    font-size: 16px;
-    height: 16px;
-    width: 16px;
-    margin-right: 4px;
-    color: var(--mat-sys-primary);
-  }
+mat-icon {
+  font-size: 16px;
+  height: 16px;
+  width: 16px;
+  margin-right: 4px;
+  color: var(--mat-sys-primary);
 }
 
 .festival-dates {
@@ -87,25 +88,12 @@ mat-card-content {
     align-items: center;
     gap: 8px;
     margin: 4px 0;
-
+  }
+  
     mat-icon {
       font-size: 20px;
       width: 20px;
       height: 20px;
       color: var(--mat-sys-primary);
-    }
   }
-}
-
-.festival-logo-placeholder {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: bold;
-  font-size: 16px;
 }

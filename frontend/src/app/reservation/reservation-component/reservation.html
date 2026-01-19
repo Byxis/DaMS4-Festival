@@ -55,8 +55,7 @@
       <mat-menu #statusMenu="matMenu" panelClass="status-menu-panel">
         @for (status of statuses; track status) {
         <button mat-menu-item (click)="setStatus(status)" [style.color]="getStatusColor(status)"
-          [style.backgroundColor]="getStatusBackgroundColor(status)"
-          [style.fontWeight]="selectedStatus() === status ? '700' : '500'">
+          [style.backgroundColor]="getStatusBackgroundColor(status)">
           {{ getStatusLabel(status) }}
         </button>
         }

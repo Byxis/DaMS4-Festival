@@ -107,8 +107,7 @@
                         @for (status of gameStatuses; track status) {
                         <button mat-menu-item (click)="setGameStatus(game.id!, status)"
                             [style.color]="getGameStatusColor(status)"
-                            [style.backgroundColor]="getGameStatusBackgroundColor(status)"
-                            [style.fontWeight]="getGameValue(game.id!, 'status') === status ? '700' : '500'">
+                            [style.backgroundColor]="getGameStatusBackgroundColor(status)">
                             {{ getGameStatusLabel(status) }}
                         </button>
                         }
