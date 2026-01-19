@@ -70,7 +70,6 @@ $delete-color: #d44d3d;
         animation: fadeInUp 0.5s ease-out;
         animation-fill-mode: both;
         
-        // Offset animations
         @for $i from 1 through 10 {
            &:nth-child(#{$i}) {
              animation-delay: #{$i * 0.1}s;
@@ -79,7 +78,6 @@ $delete-color: #d44d3d;
     }
   }
 
-  // Responsive style
   @media (max-width: 768px) {
     .festivals-list {
       grid-template-columns: 1fr;
