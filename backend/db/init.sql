@@ -78,7 +78,10 @@ CREATE TABLE IF NOT EXISTS festivals (
     end_date DATE NOT NULL,
     table_count INT DEFAULT 0,
     big_table_count INT DEFAULT 0,
-    town_table_count INT DEFAULT 0
+    town_table_count INT DEFAULT 0,
+    table_surface INT DEFAULT 4,
+    big_table_surface INT DEFAULT 4,
+    town_table_surface INT DEFAULT 4
 ); 
 
 CREATE TABLE IF NOT EXISTS tarif_zone(
