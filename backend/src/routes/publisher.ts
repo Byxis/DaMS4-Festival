@@ -81,7 +81,6 @@ router.get("/", async (_req: Request, res: Response) => {
     publisherRows.forEach((publisher) => {
         publisher.contacts = contactRows.filter((contact) => contact.entity_id === publisher.id);
 
-        // Generate logoUrl using helper (same as games)
         const logoUrl = getLogoUrl(publisher);
         if (logoUrl)
         {
@@ -196,7 +195,6 @@ router.post("/import/:editorId", requireAdmin, async (req: Request, res: Respons
 
         const newPublisher = inserPublisher[0]!;
 
-        // Store the logo URL directly (same as games)
         if (editor.logo)
         {
             await client.query("UPDATE entities SET logo = $1 WHERE id = $2", [editor.logo, newPublisher.id]);
@@ -286,7 +284,6 @@ router.post("/import-by-name", requireAdmin, async (req: Request, res: Response)
 
         const newPublisher = inserPublisher[0]!;
 
-        // Store the logo URL directly (same as games)
         if (editor.logo)
         {
             await client.query("UPDATE entities SET logo = $1 WHERE id = $2", [editor.logo, newPublisher.id]);

@@ -7,7 +7,7 @@ import fs from "fs";
 import https from "https";
 import morgan from "morgan";
 
-import {ensureAdmin} from "./db/initAdmin.js";
+import {ensureAdmin, ensureEditor, ensureGuest, ensurePublisher} from "./db/initDefaultUsers.js";
 import {requireAdmin} from "./middleware/auth-admin.js";
 import {verifyToken} from "./middleware/token-management.js";
 import authRouter from "./routes/auth.js";
@@ -23,6 +23,9 @@ import usersRouter from "./routes/users.js";
 const app = express();
 
 await ensureAdmin();
+await ensureEditor();
+await ensurePublisher();
+await ensureGuest();
 
 // Ajout manuel des principaux en-têtes HTTP de sécurité
 app.use((req, res, next) => {
