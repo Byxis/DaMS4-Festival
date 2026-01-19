@@ -52,30 +52,45 @@ export class TarifZonesList
 
         // Calculate usage from reservations
         const reservations = this.reservationService._reservations();
-        const usageMap = new Map<number, {t: number, b: number, tw: number}>();
+        const usageMap = new Map<number, {t: number, b: number, tw: number, eo: number, fs: number}>();
 
         reservations.forEach(r => {
             r.games?.forEach(g => {
                 if (g.zone_id)
                 {
-                    const current = usageMap.get(g.zone_id) || {t: 0, b: 0, tw: 0};
+                    const current = usageMap.get(g.zone_id) || {t: 0, b: 0, tw: 0, eo: 0, fs: 0};
                     current.t += g.table_count || 0;
                     current.b += g.big_table_count || 0;
                     current.tw += g.town_table_count || 0;
+                    current.eo += g.electrical_outlets || 0;
+                    current.fs += g.floor_space || 0;
                     usageMap.set(g.zone_id, current);
                 }
             });
         });
 
         // Map zones with updated game zones
-        let zones = festival.tarif_zones.map(
-            tz => ({
-                ...tz,
-                game_zones: tz.game_zones?.map(gz => {
-                    const usage = usageMap.get(gz.id!) || {t: 0, b: 0, tw: 0};
-                    return {...gz, reserved_table: usage.t, reserved_big_table: usage.b, reserved_town_table: usage.tw};
-                })
-            }));
+        let zones = festival.tarif_zones.map(tz => ({
+                                                 ...tz,
+                                                 game_zones: tz.game_zones?.map(gz => {
+                                                     const usage =
+                                                         usageMap.get(gz.id!) || {t: 0, b: 0, tw: 0, eo: 0, fs: 0};
+                                                     const surfaceStandard = festival?.table_surface ?? 4;
+                                                     const surfaceBig = festival?.big_table_surface ?? 4;
+                                                     const surfaceTown = festival?.town_table_surface ?? 4;
+                                                     const surfaceArea = (usage.t * surfaceStandard) +
+                                                         (usage.b * surfaceBig) + (usage.tw * surfaceTown) + usage.fs;
+
+                                                     return {
+                                                         ...gz,
+                                                         reserved_table: usage.t,
+                                                         reserved_big_table: usage.b,
+                                                         reserved_town_table: usage.tw,
+                                                         reserved_electrical_outlets: usage.eo,
+                                                         surface_area: surfaceArea
+                                                     };
+                                                 })
+                                             }));
 
         // Filter by search term
         const term = this.searchTerm().toLowerCase().trim();
@@ -150,16 +165,8 @@ export class TarifZonesList
 
     calculateSurface(zone: ZoneTarifDTO): number
     {
-        const totalStandard = this.getTotalTables(zone);
-        const totalBig = this.getTotalBigTables(zone);
-        const totalTown = this.getTotalTownTables(zone);
-
-        const festival = this.festivalService._currentFestival();
-        const surfaceStandard = festival?.table_surface ?? 4;
-        const surfaceBig = festival?.big_table_surface ?? 4;
-        const surfaceTown = festival?.town_table_surface ?? 4;
-
-        return (totalStandard * surfaceStandard) + (totalBig * surfaceBig) + (totalTown * surfaceTown);
+        if (!zone.game_zones) return 0;
+        return zone.game_zones.reduce((sum, gz) => sum + (gz.surface_area || 0), 0);
     }
 
     toggleZone(zoneId: number): void

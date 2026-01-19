@@ -6,4 +6,6 @@ export interface ZoneGameDTO {
     reserved_table: number;
     reserved_big_table: number;
     reserved_town_table: number;
+    reserved_electrical_outlets: number;
+    surface_area: number;
 }
