@@ -39,14 +39,14 @@ export class CreateUserDialog {
     firstName: new FormControl(this.data?.firstName ?? '', {
       nonNullable: true,
       validators: [
-        Validators.pattern(/^[A-Za-z\- ]*$/), // empty allowed
+        Validators.pattern(/^[A-Za-zÀ-ÖØ-öø-ÿ\- ]*$/), // empty allowed
       ],
     }),
 
     lastName: new FormControl(this.data?.lastName ?? '', {
       nonNullable: true,
       validators: [
-        Validators.pattern(/^[A-Za-z\- ]*$/), // empty allowed
+        Validators.pattern(/^[A-Za-zÀ-ÖØ-öø-ÿ\- ]*$/), // empty allowed
       ],
     }),
 

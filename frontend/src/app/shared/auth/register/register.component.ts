@@ -43,11 +43,11 @@ export class RegisterComponent {
   readonly form = new FormGroup({
     firstName: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.minLength(1), Validators.required, Validators.pattern(/^[A-Za-z\- ]+$/)],
+      validators: [Validators.minLength(1), Validators.required, Validators.pattern(/^[A-Za-zÀ-ÖØ-öø-ÿ\- ]*$/)],
     }),
     lastName: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.minLength(1), Validators.required, Validators.pattern(/^[A-Za-z\- ]+$/)],
+      validators: [Validators.minLength(1), Validators.required, Validators.pattern(/^[A-Za-zÀ-ÖØ-öø-ÿ\- ]*$/)],
     }),
     email: new FormControl('', {
       nonNullable: true,
