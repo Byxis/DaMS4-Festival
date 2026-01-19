@@ -96,6 +96,11 @@ This method automates the setup of the database, backend, and frontend.
 1. **Configure Environment**  
    If needed, edit the `docker-compose.prod.yml` file to modify values like `JWT_SECRET`, `JWT_EXPIRATION`, `REFRESH_EXPIRATION`, and `FRONTEND_URL`.
 
+   in order to load the game and editor data :
+
+   docker compose -f docker-compose.prod.yml down -v
+   docker compose -f docker-compose.prod.yml up --build
+
 2. **Run the Application**
 
    ```bash
@@ -152,7 +157,7 @@ Use this method for development or if you prefer running services manually.
 
 | [<img src="https://github.com/byxis.png" width="100px" style="border-radius: 50%;" alt="Alexis Serrano"/>](https://github.com/byxis) | [<img src="https://github.com/AndreaAntoniali.png" width="100px" style="border-radius: 50%;" alt="Andréa Antoniali"/>](https://github.com/AndreaAntoniali) | [<img src="https://github.com/esternielsen.png" width="100px" style="border-radius: 50%;" alt="Esther Nielsen"/>](https://github.com/esternielsen) | [<img src="https://github.com/YoanBst.png" width="100px" style="border-radius: 50%;" alt="Yoan Bastide"/>](https://github.com/YoanBst) |
 | :---: | :---: | :---: | :---: |
-| **Alexis Serrano** | **Andréa Antoniali** | **Esther Nielsen** | **Yoan Bastide** |
+| **Alexis Serrano** | **Andréa Antoniali** | **Esther Nielsen** | **Yoan Bastides** |
 | [![GitHub](https://img.shields.io/badge/GitHub-Byxis-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/byxis) | [![GitHub](https://img.shields.io/badge/GitHub-AndreaAntoniali-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/AndreaAntoniali) | [![GitHub](https://img.shields.io/badge/GitHub-esternielsen-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/esternielsen) | [![GitHub](https://img.shields.io/badge/GitHub-YoanBst-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/YoanBst) |
 
 </div>

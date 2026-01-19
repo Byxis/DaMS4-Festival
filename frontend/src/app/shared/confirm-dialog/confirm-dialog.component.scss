@@ -1,0 +1,39 @@
+.confirm-dialog {
+  h2[mat-dialog-title] {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 1rem 1.5rem;
+    color: var(--mat-sys-on-surface);
+    font-size: 1.25rem;
+    font-weight: 500;
+    
+    .warning-icon {
+      color: var(--mat-sys-error);
+      font-size: 1.5rem;
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+  
+  mat-dialog-content {
+    padding: 0 1.5rem 1rem;
+    
+    p {
+      margin: 0;
+      color: var(--mat-sys-on-surface-variant);
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+  }
+  
+  mat-dialog-actions {
+    padding: 1rem 1.5rem;
+    gap: 0.5rem;
+    
+    button {
+      min-width: 100px;
+    }
+  }
+}

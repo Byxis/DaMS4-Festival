@@ -1,7 +1,7 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { PublisherService } from '@publisher/publisher.service';
-import { PublisherDTO } from '@publisher/publisherDto';
+import { PublisherService } from 'src/app/publisher/publisher.service';
+import { PublisherDTO } from 'src/app/publisher/publisherDto';
 import { MatIcon } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -10,7 +10,9 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule, MatIconButton } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { PublisherEditDialog } from '@publisher/publisher-edit-dialog/publisher-edit-dialog.component';
+import { PublisherEditDialog } from 'src/app/publisher/publisher-edit-dialog/publisher-edit-dialog.component';
+import { GameService } from 'src/app/games/game-service/game-service';
+import { PublishersImportDialog } from 'src/app/publisher/publisher-import-dialog/publisher-import-dialog';
 
 type SortColumn = 'id' | 'name' | 'games' | 'contacts' | 'firstContact' | 'festivals';
 type SortDirection = 'asc' | 'desc';
@@ -35,6 +37,8 @@ export class PublishersList {
   private readonly router = inject(Router);
   private readonly publisherService = inject(PublisherService);
   private readonly dialog = inject(MatDialog);
+   private readonly gameService = inject(GameService); 
+   errorMessage = computed(() => this.publisherService.errorMessage()); 
 
   readonly sortColumn = signal<SortColumn>('id');
   readonly sortDirection = signal<SortDirection>('asc');
@@ -114,8 +118,8 @@ export class PublishersList {
   }
 
   getGameCount(publisher: PublisherDTO): number {
-    // TODO: Implement when game data is available
-    return 0;
+    
+    return publisher.numberOfGames ;
   }
 
   getFestivalCount(publisher: PublisherDTO): number {
@@ -188,4 +192,40 @@ export class PublishersList {
     }
     return `Trier par ${label}`;
   }
+
+  openImportEditorDialog(): void {
+  const dialogRef = this.dialog.open(PublishersImportDialog, {
+    width: '800px',
+    maxHeight: '90vh',
+  });
+
+  dialogRef.afterClosed().subscribe((result) => {
+    if (result) {
+      console.log('Éditeur importé:', result);
+      
+      this.publisherService.getExistingEditors();
+      
+    }
+  });
+}
+
+  constructor() {
+   
+    effect(() => {
+      const publishers = this.publisherService._publishers();
+      publishers.forEach(pub => {
+        if (pub.id && !pub.numberOfGames) {
+          this.gameService.getGameCountByPublisher(pub.id).subscribe({
+            next: (gameCount) => {
+              pub.numberOfGames = gameCount;  
+              console.log(`📊 Publisher ${pub.id}: ${gameCount} games`);
+            },
+            error: (err) => console.error('Error:', err)
+          });
+        }
+      });
+    });
+  }
+
+  
 }

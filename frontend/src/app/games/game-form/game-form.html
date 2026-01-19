@@ -1,0 +1,90 @@
+<h2 mat-dialog-title>{{ isEditMode ? 'Modifier le jeu' : 'Créer un nouveau jeu' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form">
+    
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nom</mat-label>
+      <input matInput formControlName="name" />
+      @if (getErrorMessage(form.get('name'))) {
+        <mat-error>{{ getErrorMessage(form.get('name')) }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Editeur</mat-label>
+      <input matInput formControlName="editor" />
+      @if (getErrorMessage(form.get('editor'))) {
+        <mat-error>{{ getErrorMessage(form.get('editor')) }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Type de jeu</mat-label>
+      <mat-select formControlName="type">
+        <mat-option *ngFor="let type of gameTypes" [value]="type">
+          {{ type }}
+        </mat-option>
+      </mat-select>
+      @if (getErrorMessage(form.get('type'))) {
+        <mat-error>{{ getErrorMessage(form.get('type')) }}</mat-error>
+      }
+    </mat-form-field>
+
+   <div class="row">
+  <mat-form-field appearance="outline">
+    <mat-label>Nombre minimum de joueurs</mat-label>
+    <input 
+      matInput 
+      type="number" 
+      formControlName="number_minimal_of_player"
+      min="1"
+      max="99" 
+      />
+    @if (getErrorMessage(form.get('number_minimal_of_player'))) {
+      <mat-error>{{ getErrorMessage(form.get('number_minimal_of_player')) }}</mat-error>
+    }
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Nombre maximum de joueurs</mat-label>
+    <input 
+      matInput 
+      type="number" 
+      formControlName="number_maximal_of_player"
+      min="1"
+      max="99"
+       />
+    @if (getErrorMessage(form.get('number_maximal_of_player'))) {
+      <mat-error>{{ getErrorMessage(form.get('number_maximal_of_player')) }}</mat-error>
+    }
+  </mat-form-field>
+</div>
+
+   
+    <div class="logo-section">
+      <h3>Logo</h3>
+      @if (currentLogoUrl) {
+        <img [src]="currentLogoUrl" alt="Game logo" class="logo-preview">
+        <button mat-button type="button" (click)="removeLogo()" color="warn">
+          <mat-icon>delete</mat-icon>
+          Supprimer
+        </button>
+      } @else {
+        <div class="no-logo">Aucun logo sélectionné</div>
+      }
+      <input type="file" #logoInput hidden accept="image/*" (change)="onLogoSelected($event)">
+      <button mat-button type="button" (click)="logoInput.click()">
+        <mat-icon>upload</mat-icon>
+        Changer le logo
+      </button>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button (click)="cancel()">Annuler</button>
+  <button mat-raised-button color="primary" (click)="submit()" [disabled]="!form.valid">
+    {{ isEditMode ? 'Enregistrer' : 'Créer' }}
+  </button>
+</mat-dialog-actions>

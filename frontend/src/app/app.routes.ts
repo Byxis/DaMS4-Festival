@@ -11,10 +11,13 @@ import { Publisher } from './pages/publisher/publisher';
 import { publisherResolver } from './pages/publisher/publisher.resolver';
 import { PublishersList } from './pages/publishers-list/publishers-list';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
+import { Game } from './games/game/game';
+import { GameList } from './games/game-list/game-list';
 import { FestivalList } from './festivals/festival-list-component/festival-list';
 import { FestivalsPage } from './pages/festivals-page/festivals-page';
 import { viewPublishersGuard } from '@auth/view-publishers.guard';
 import { viewFestivalsGuard } from '@auth/view-festivals.guard';
+
 
 export const routes: Routes = [
   { path: 'login', component: LoginPage },

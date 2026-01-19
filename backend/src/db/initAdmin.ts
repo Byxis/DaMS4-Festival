@@ -9,5 +9,8 @@ export async function ensureAdmin() {
         ON CONFLICT (email) DO NOTHING`,
         [hash]
     );
+    
     console.log("👍 Compte admin vérifié ou créé");
 }
+
+
