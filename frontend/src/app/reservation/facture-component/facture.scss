@@ -1,0 +1,139 @@
+:host {
+  display: block;
+}
+
+.facture-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  border: 1px solid var(--mat-sys-outline);
+  border-radius: 12px;
+  background-color: var(--mat-sys-surface-container-lowest);
+}
+
+.facture-section .facture-title {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--mat-sys-on-surface);
+}
+
+.facture-section .facture-title .facture-icon {
+  font-size: 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.facture-section .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.facture-section .empty-state .empty-icon {
+  font-size: 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  color: var(--mat-sys-on-surface-variant);
+  opacity: 0.5;
+}
+
+.facture-section .empty-state .empty-text {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.facture-section .facture-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.facture-content .facture-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.facture-table thead {
+  background-color: var(--mat-sys-surface);
+  border-bottom: 1px solid var(--mat-sys-outline);
+}
+
+.facture-table thead th {
+  padding: 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--mat-sys-on-surface);
+  border-right: 1px solid var(--mat-sys-outline);
+}
+
+.facture-table thead th:last-child {
+  border-right: none;
+}
+
+.facture-table tbody .facture-row {
+  border-bottom: 1px solid var(--mat-sys-outline);
+  transition: background-color 0.2s ease;
+}
+
+.facture-table tbody .facture-row:hover {
+  background-color: color-mix(in srgb, var(--mat-sys-primary) 5%, var(--mat-sys-surface));
+}
+
+.facture-table tbody .facture-row td {
+  padding: 0.75rem;
+  color: var(--mat-sys-on-surface);
+  border-right: 1px solid var(--mat-sys-outline);
+}
+
+.facture-table tbody .facture-row td:last-child {
+  border-right: none;
+}
+
+.facture-table tbody .facture-row td.zone-label {
+  font-weight: 500;
+}
+
+.facture-table tbody .facture-row td.zone-count,
+.facture-table tbody .facture-row td.zone-price,
+.facture-table tbody .facture-row td.zone-total {
+  text-align: right;
+}
+
+.facture-table tbody .facture-row td.zone-total {
+  font-weight: 600;
+  color: var(--mat-sys-primary);
+}
+
+.facture-section .facture-footer {
+  padding-top: 1rem;
+  border-top: 2px solid var(--mat-sys-primary);
+}
+
+.facture-footer .grand-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.grand-total .grand-total-label {
+  font-weight: 600;
+  color: var(--mat-sys-on-surface);
+}
+
+.grand-total .grand-total-amount {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--mat-sys-primary);
+}

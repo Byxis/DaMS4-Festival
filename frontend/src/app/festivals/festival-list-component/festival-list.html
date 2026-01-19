@@ -1,6 +1,11 @@
 <div class="festivals-container">
-    @for(festival of this.svc._festivals(); track festival.id; let i =$index){
+    @for(festival of festivals(); track festival.id){
     <app-festival-card [festival]="festival">
     </app-festival-card>
+    } @empty {
+    <div class="no-results">
+        <mat-icon>event_busy</mat-icon>
+        <p>Aucun festival ne correspond à votre recherche.</p>
+    </div>
     }
 </div>

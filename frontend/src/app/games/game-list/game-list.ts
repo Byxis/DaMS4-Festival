@@ -1,15 +1,14 @@
-import {JsonPipe} from '@angular/common';
 import {HttpClient} from '@angular/common/http';
-import {Component, effect, inject, input, signal, WritableSignal} from '@angular/core';
+import {Component, effect, inject, input, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardTitle} from '@angular/material/card';
-import {MatOption, MatOptionModule} from '@angular/material/core';
+import {MatOptionModule} from '@angular/material/core';
 import {MatDialog} from '@angular/material/dialog';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
-import {MatSelect, MatSelectModule} from '@angular/material/select';
+import {MatSelectModule} from '@angular/material/select';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {ActivatedRoute} from '@angular/router';
 
@@ -23,13 +22,9 @@ import {GameDto} from '../game/game-dto';
 @Component({
     selector: 'app-game-list',
     imports: [
-        JsonPipe,
-        GameForm,
         MatFormFieldModule,
         MatIconModule,
         MatOptionModule,
-        MatOption,
-        MatSelect,
         MatSelectModule,
         MatInputModule,
         FormsModule,
@@ -50,7 +45,7 @@ export class GameList
     showForm = false;
     showCreateForm = false;
 
-    searchTerm = '';
+    searchTerm = signal('');
     hasGames = false;
 
     private allGames: GameDto[] = [];

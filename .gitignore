@@ -9,6 +9,10 @@
 */tmp
 */out-tsc
 */bazel-out
+*/dist
+*/tmp
+*/out-tsc
+*/bazel-out
 
 # Angular File
 **/.angular/ 
@@ -18,6 +22,9 @@
 
 # Node
 **/node_modules
+*/npm-debug.log
+*/yarn-error.log
+*/node_modules
 */npm-debug.log
 */yarn-error.log
 

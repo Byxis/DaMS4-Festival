@@ -1,70 +1,79 @@
 <mat-card>
-    <mat-card-header>
-        <mat-card-title>Nouveau Festival</mat-card-title>
-    </mat-card-header>
+  <mat-card-header>
+    <mat-card-title>{{ this.getTitle() }}</mat-card-title>
+  </mat-card-header>
 
-    <mat-card-content>
-        <form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-card-content>
+    <form [formGroup]="this.form" (submit)="this.submit()">
 
-            <!-- Informations générales -->
-            <div class="form-section">
-                <mat-form-field appearance="outline">
-                    <mat-label>Nom du festival</mat-label>
-                    <input matInput type="text" formControlName="name" placeholder="Nom du festival">
-                    <mat-error>Le nom est requis.</mat-error>
-                </mat-form-field>
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Nom du festival</mat-label>
+        <input matInput formControlName="name" placeholder="ex: Festival des Arts 2025">
+      </mat-form-field>
 
-                <mat-form-field appearance="outline">
-                    <mat-label>Lieu du festival</mat-label>
-                    <input matInput type="text" formControlName="location" placeholder="Lieu du festival">
-                    <mat-error>Le lieu est requis.</mat-error>
-                </mat-form-field>
-            </div>
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Lieu</mat-label>
+        <input matInput formControlName="location" placeholder="ex: Paris, France">
+      </mat-form-field>
 
-            <!-- Dates -->
-            <div class="form-section">
-                <mat-form-field appearance="outline">
-                    <mat-label>Date de début</mat-label>
-                    <input matInput type="date" formControlName="start_date" placeholder="Date de début">
-                    <mat-error>Rentrez une date de début</mat-error>
-                </mat-form-field>
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Date de début</mat-label>
+        <input matInput formControlName="start_date" type="date">
+      </mat-form-field>
 
-                <mat-form-field appearance="outline">
-                    <mat-label>Date de fin</mat-label>
-                    <input matInput type="date" formControlName="end_date" placeholder="Date de fin">
-                    <mat-error>Rentrez une date de fin</mat-error>
-                </mat-form-field>
-            </div>
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Date de fin</mat-label>
+        <input matInput formControlName="end_date" type="date">
+      </mat-form-field>
 
-            <!-- Tables -->
-            <div class="tables-section">
-                <mat-form-field appearance="outline">
-                    <mat-label>Tables</mat-label>
-                    <input matInput type="number" formControlName="table_count" placeholder="Nombre de tables">
-                    <mat-hint>Tables disponibles</mat-hint>
-                    <mat-error>Rentrez un nombre valide</mat-error>
-                </mat-form-field>
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Tables</mat-label>
+        <input matInput formControlName="table_count" type="number" placeholder="150">
+      </mat-form-field>
 
-                <mat-form-field appearance="outline">
-                    <mat-label>Grandes Tables</mat-label>
-                    <input matInput type="number" formControlName="big_table_count" placeholder="Nombre de grandes tables">
-                    <mat-hint>Grandes tables</mat-hint>
-                    <mat-error>Rentrez un nombre valide</mat-error>
-                </mat-form-field>
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Grandes tables</mat-label>
+        <input matInput formControlName="big_table_count" type="number" placeholder="40">
+      </mat-form-field>
 
-                <mat-form-field appearance="outline">
-                    <mat-label>Tables de mairie</mat-label>
-                    <input matInput type="number" formControlName="town_table_count" placeholder="Nombre de tables de mairie">
-                    <mat-hint>Tables de mairie</mat-hint>
-                    <mat-error>Rentrez un nombre valide</mat-error>
-                </mat-form-field>
-            </div>
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Tables municipales</mat-label>
+        <input matInput formControlName="town_table_count" type="number" placeholder="20">
+      </mat-form-field>
 
-            <!-- Actions -->
-            <div class="form-actions">
-                <button mat-button type="button" (click)="cancel()">Annuler</button>
-                <button mat-raised-button color="primary" type="submit">Créer le festival</button>
-            </div>
-        </form>
-    </mat-card-content>
+      <!-- Logo Upload Section -->
+      <div class="logo-section">
+        @if(this.hasLogoToDisplay()) {
+        <div class="logo-preview">
+          <img [src]="this.logoPreview" alt="Logo preview">
+          <button mat-icon-button (click)="this.removeLogo()" type="button" color="warn">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        @if(this.hasExistingLogo) {
+        <p class="logo-hint">Logo actuel du festival</p>
+        }
+        } @else {
+        <div class="logo-upload">
+          <input type="file" accept="image/*" (change)="this.onLogoSelected($event)" #fileInput style="display: none">
+          <button mat-stroked-button type="button" (click)="fileInput.click()">
+            <mat-icon>upload</mat-icon>
+            {{ this.isEditing ? 'Changer le logo' : 'Uploader un logo' }}
+          </button>
+        </div>
+        @if(this.deleteLogo) {
+        <p class="logo-hint warning">Le logo sera supprimé lors de la mise à jour</p>
+        }
+        }
+      </div>
+
+    </form>
+  </mat-card-content>
+
+  <mat-card-actions>
+    <button mat-stroked-button (click)="this.cancel()">Annuler</button>
+    <button mat-raised-button color="primary" [disabled]="this.form.invalid" (click)="this.submit()">
+      {{ this.getSubmitButtonText() }}
+    </button>
+  </mat-card-actions>
 </mat-card>

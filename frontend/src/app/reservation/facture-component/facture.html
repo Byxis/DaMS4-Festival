@@ -1,0 +1,49 @@
+<div class="facture-section">
+  <h3 class="facture-title">
+    <mat-icon class="facture-icon">receipt_long</mat-icon>
+    Facture
+  </h3>
+  @if ((games() ?? []).length === 0) {
+  <div class="empty-state">
+    <mat-icon class="empty-icon">receipt</mat-icon>
+    <p class="empty-text">Aucun jeu réservé</p>
+  </div>
+  } @else {
+  <div class="facture-content">
+    <table class="facture-table">
+      <thead>
+        <tr>
+          <th>Zone</th>
+          <th>Surface (m²)</th>
+          <th>Prix / m²</th>
+          <th>Prises</th>
+          <th>Forfait Prise</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of zoneSummary().rows; track row.name) {
+        <tr class="facture-row">
+          <td class="zone-label">{{ row.name }}</td>
+          <td class="zone-count">{{ row.surface }}</td>
+          <td class="zone-price">{{ formatPrice(row.priceM2) }}</td>
+          <td class="zone-count">{{ row.outlets }}</td>
+          <td class="zone-price">{{ formatPrice(row.priceOutlet) }}</td>
+          <td class="zone-total">{{ formatPrice(row.total) }}</td>
+        </tr>
+        } @empty {
+        <tr class="facture-row">
+          <td colspan="6" style="text-align: center; font-style: italic;">Aucune zone définie</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+    <div class="facture-footer">
+      <div class="grand-total">
+        <span class="grand-total-label">Total</span>
+        <span class="grand-total-amount">{{ formatPrice(zoneSummary().grandTotal) }}</span>
+      </div>
+    </div>
+  </div>
+  }
+</div>

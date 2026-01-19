@@ -1,10 +1,8 @@
 
 import {HttpClient} from '@angular/common/http';
-import {computed, inject, Injectable, signal} from '@angular/core';
-import {toSignal} from '@angular/core/rxjs-interop';
-import {Form} from '@angular/forms';
+import {inject, Injectable, signal} from '@angular/core';
 import {environment} from '@env/environment';
-import {map, Observable} from 'rxjs';
+import {map, Observable, of, switchMap, tap} from 'rxjs';
 
 import {GameDto} from '../game/game-dto';
 
@@ -15,15 +13,51 @@ import {GameDto} from '../game/game-dto';
     private readonly _games = signal<GameDto[]>([])
     readonly games = this._games.asReadonly()
 
-
     setGames(games: GameDto[]): void
     {
         this._games.set(games);
     }
 
-    update(partial: Partial<GameDto>&{id: number}): Observable<GameDto>
+    private transformLogoUrls(games: GameDto[]): GameDto[]
     {
-        return this.http.put<GameDto>(`${environment.apiUrl}/games/${partial.id}`, partial, {withCredentials: true});
+        return games.map(game => {
+            if (!game.logoUrl) return game;
+            if (game.logoUrl.startsWith('http://') || game.logoUrl.startsWith('https://'))
+            {
+                return game;
+            }
+            return {...game, logoUrl: `${environment.apiUrl}${game.logoUrl}`};
+        });
+    }
+
+    update(partial: Partial<GameDto>&{
+        id: number;
+        logoFile?: File
+    }): Observable<GameDto>
+    {
+        return this.http.put<GameDto>(`${environment.apiUrl}/games/${partial.id}`, partial, {withCredentials: true})
+            .pipe(
+                switchMap(updatedGame => {
+                    if (partial.logoFile)
+                    {
+                        return this.uploadLogo(updatedGame.id!, partial.logoFile).pipe(map(() => updatedGame));
+                    }
+                    return of(updatedGame);
+                }),
+                tap(finalGame => {
+                    this._games.update(games => games.map(g => {
+                        if (g.id === finalGame.id)
+                        {
+                            if (partial.logoFile)
+                            {
+                                const baseUrl = `${environment.apiUrl}/games/${finalGame.id}/logo`;
+                                return {...finalGame, logoUrl: `${baseUrl}?t=${Date.now()}`};
+                            }
+                            return finalGame;
+                        }
+                        return g;
+                    }));
+                }));
     }
 
     delete(gameId: number): Observable<void>
@@ -33,31 +67,11 @@ import {GameDto} from '../game/game-dto';
 
     searchGameByPublisherIDInDBObservable(publisherID: number): Observable<GameDto[]>
     {
-        return this.http.get<GameDto[]>(`${environment.apiUrl}/games/filterByPublisherID/${publisherID}`);
+        return this.http.get<GameDto[]>(`${environment.apiUrl}/games/filterByPublisherID/${publisherID}`)
+            .pipe(map(games => this.transformLogoUrls(games)));
     }
 
-    makeFilterSearchObservable(filters: {
-        editor_name?: string,
-        type?: string,
-        number_minimal_of_player?: number|null,
-        number_maximal_of_player?: number|null
-    }): Observable<GameDto[]>
-    {
-        const params: any = {};
-        if (filters.editor_name) params.editor_name = filters.editor_name;
-        if (filters.type) params.type = filters.type;
-        if (filters.number_minimal_of_player != null) params.min = String(filters.number_minimal_of_player);
-        if (filters.number_maximal_of_player != null) params.max = String(filters.number_maximal_of_player);
-        return this.http.get<GameDto[]>(`${environment.apiUrl}/games/filter`, {params});
-    }
-
-    searchGameByName(gameName: string, publisherId: number): Observable<GameDto[]>
-    {
-        return this.http.get<GameDto[]>(
-            `${environment.apiUrl}/games/search`, {params: {gameName, publisherId: publisherId.toString()}});
-    }
-
-    add(data: Partial<GameDto>&{logoFile?: File}): void
+    add(data: Partial<GameDto>&{logoFile?: File}): Observable<GameDto>
     {
         const gameData: Partial<GameDto> = {
             name: data.name,
@@ -67,41 +81,27 @@ import {GameDto} from '../game/game-dto';
             maximum_number_of_player: data.maximum_number_of_player,
         };
         const logo = data.logoFile || data.logo;
-        this.http
+        return this.http
             .post<GameDto>(
                 `${environment.apiUrl}/publishers/addGameToPublisher`, {...gameData, logo}, {withCredentials: true})
-            .subscribe({
-                next: (newGame) => {
-                    console.log('Jeu ajouté');
-
+            .pipe(
+                switchMap(newGame => {
                     if (data.logoFile && newGame.id)
                     {
-                        this.uploadLogo(newGame.id, data.logoFile, newGame);
+                        return this.uploadLogo(newGame.id, data.logoFile).pipe(map(() => newGame));
                     }
-                    else
-                    {
-                        this._games.update(games => [...games, newGame]);
-                    }
-                },
-                error: (err) => console.error('Erreur', err)
-            });
+                    return of(newGame);
+                }),
+                tap(newGame => {
+                    this._games.update(games => [...games, newGame]);
+                }));
     }
 
-    private uploadLogo(gameId: number, logoFile: File, newGame: GameDto): void
+    private uploadLogo(gameId: number, logoFile: File): Observable<any>
     {
         const formData = new FormData();
         formData.append('logo', logoFile);
-
-        this.http.post(`${environment.apiUrl}/games/${gameId}/logo`, formData, {withCredentials: true}).subscribe({
-            next: () => {
-                console.log('Logo uploadé');
-                this._games.update(games => [...games, newGame]);
-            },
-            error: (err) => {
-                console.error('Message:', err.error?.error);
-                this._games.update(games => [...games, newGame]);
-            }
-        });
+        return this.http.post(`${environment.apiUrl}/games/${gameId}/logo`, formData, {withCredentials: true});
     }
 
     checkPublisherGames(publisherId: number)
@@ -118,19 +118,16 @@ import {GameDto} from '../game/game-dto';
             .pipe(map(response => response.exists));
     }
 
-    filterByEditorID(publisherId: number)
+    filterByEditorID(publisherId: number): Observable<GameDto[]>
     {
-        return this.http.get<GameDto[]>(`${environment.apiUrl}/games/gamesByEditorID/${publisherId}`);
+        return this.http.get<GameDto[]>(`${environment.apiUrl}/games/gamesByEditorID/${publisherId}`)
+            .pipe(map(games => this.transformLogoUrls(games)));
     }
 
     getGameCountByPublisher(publisherId: number): Observable<number>
     {
         return this.http.get<{gameCount: number}>(`${environment.apiUrl}/games/numberOfPresentedGame/${publisherId}`)
-            .pipe(map(response => {
-                console.log(' Response from backend:', response);
-                console.log(' GameCount value:', response.gameCount);
-                return response.gameCount;
-            }));
+            .pipe(map(response => response.gameCount));
     }
 
     sortGames(order: string): void

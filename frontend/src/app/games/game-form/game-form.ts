@@ -42,6 +42,8 @@ export class GameForm
 
     currentLogoUrl: string|null = null;
     newLogoFile: File|null = null;
+    newLogoPreview: string|null = null;
+    logoToDelete = false;
 
     readonly form = new FormGroup({
         name: new FormControl('', {
@@ -106,9 +108,11 @@ export class GameForm
         if (input.files && input.files[0])
         {
             this.newLogoFile = input.files[0];
+            this.logoToDelete = false;
+
             const reader = new FileReader();
             reader.onload = (e) => {
-                this.currentLogoUrl = e.target?.result as string;
+                this.newLogoPreview = e.target?.result as string;
             };
             reader.readAsDataURL(this.newLogoFile);
         }
@@ -148,10 +152,17 @@ export class GameForm
         };
     }
 
-    removeLogo(): void
+    deleteLogo(): void
+    {
+        this.logoToDelete = true;
+        this.newLogoFile = null;
+        this.newLogoPreview = null;
+    }
+
+    deleteNewLogo(): void
     {
         this.newLogoFile = null;
-        this.currentLogoUrl = null;
+        this.newLogoPreview = null;
     }
 
     submit(): void
@@ -160,7 +171,7 @@ export class GameForm
         {
             const data = this.form.getRawValue();
 
-            const gameData = {...data, logoFile: this.newLogoFile};
+            const gameData = {...data, logoFile: this.newLogoFile, deleteLogo: this.logoToDelete};
 
             this.dialogRef.close(gameData);
         }

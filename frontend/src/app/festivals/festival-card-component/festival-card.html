@@ -1,43 +1,31 @@
+<mat-card class="festival-card" appearance="outlined" (mouseenter)="isHovered = true" (mouseleave)="isHovered = false"
+  (click)="navigateToFestivalPage()">
 
-<mat-card 
-  class="festival-card" 
-  appearance="outlined"
-  (mouseenter)="isHovered = true"
-  (mouseleave)="isHovered = false"
-  >
-
-
-  <mat-card-header>
-    <!-- <div mat-card-avatar class="example-header-image"></div> -->
-    <mat-card-title>{{this.festival().name}}</mat-card-title>
-    <mat-card-subtitle></mat-card-subtitle>
-  </mat-card-header>
-  
-  @if(isHovered){
- <mat-card-content>
-    <p>
-      Lieu : {{this.festival().location}} <br>
-      Début : {{this.festival().start_date | date : "shortDate"}} <br>
-      Fin : {{this.festival().end_date | date : "shortDate"}} <br>
-
-
-    <p>Tables disponibles :
-      {{this.festival().table_count}}</p> <br>
-    <p>Grandes tables disponibles : 
-      {{this.festival().big_table_count}}</p> <br>
-    <p>Tables de mairie disponibles : 
-      {{this.festival().town_table_count}}</p> <br>
-  </mat-card-content>
+  @if(festival().logoUrl) {
+  <div class="card-background" [style.background-image]="'url(' + festival().logoUrl + ')'"></div>
   }
-  @else{
- <mat-card-content>
-    <p>
-      Lieu : {{this.festival().location}} <br>
-      Début : {{this.festival().start_date | date : "shortDate"}} <br>
 
-  </mat-card-content>
-  }
- 
+  <div class="festival-banner">
+    <div class="festival-name">{{festival().name}}</div>
+    <div class="festival-dates">
+      {{festival().start_date | date : "shortDate"}} - {{festival().end_date | date : "shortDate"}}
+    </div>
+    <div class="festival-location">
+      <mat-icon>location_on</mat-icon>
+      <span>{{festival().location}}</span>
+    </div>
+  </div>
 
+  <div class="card-content-overlay">
+    @if(isHovered){
+    <mat-card-content>
+      <p>Tables disponibles :</p>
+      <br>
+      <p><mat-icon>table_bar</mat-icon> {{festival().table_count}}</p>
+      <p><mat-icon>table_restaurant</mat-icon> {{festival().big_table_count}}</p>
+      <p><mat-icon>desk</mat-icon> {{festival().town_table_count}}</p>
+    </mat-card-content>
+    }
+  </div>
 
 </mat-card>

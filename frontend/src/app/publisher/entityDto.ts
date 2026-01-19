@@ -1,7 +1,7 @@
 import { ContactDTO } from './contactDto';
 import { GameDto } from '../games/game/game-dto';
 
-export interface PublisherDTO {
+export interface EntityDTO {
   id?: number;
   name: string;
   contacts?: ContactDTO[];

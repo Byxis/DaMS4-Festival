@@ -1,0 +1,38 @@
+<h2 mat-dialog-title>Gérer les jeux</h2>
+<mat-dialog-content class="dialog-content">
+    <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Rechercher...</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <input #searchInput matInput [value]="this.searchTerm()"
+            (input)="this.searchTerm.set(searchInput.value); this.filter()">
+    </mat-form-field>
+
+    @if (this.isLoading) {
+    <div class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+    } @else {
+    <mat-list>
+        @for (game of this.filteredGames; track game.id) {
+        <mat-list-item>
+            <mat-icon matListItemIcon>sports_esports</mat-icon>
+            <div matListItemTitle>{{game.name}}</div>
+            <div matListItemLine>{{game.type}}</div>
+            <div class="actions" matListItemMeta>
+                <button mat-icon-button color="primary" (click)="this.editGame(game)">
+                    <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="this.deleteGame(game)">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </div>
+        </mat-list-item>
+        } @empty {
+        <div class="empty-state">Aucun jeu trouvé</div>
+        }
+    </mat-list>
+    }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Fermer</button>
+</mat-dialog-actions>

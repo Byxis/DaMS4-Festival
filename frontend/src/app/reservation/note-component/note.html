@@ -1,0 +1,13 @@
+<div class="note-section">
+  <h3 class="note-title">
+    <mat-icon class="note-icon">note</mat-icon>
+    Notes
+  </h3>
+  <textarea
+    class="note-input"
+    placeholder="Ajouter une note..."
+    [value]="note() ?? ''"
+    (change)="updateNote($event)"
+    (blur)="onNoteBlur()"
+  ></textarea>
+</div>
