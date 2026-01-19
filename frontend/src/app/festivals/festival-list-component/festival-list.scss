@@ -1,6 +1,4 @@
 
-
-// Container for festival cards
 .festivals-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -8,34 +6,42 @@
   margin: 30px 0;
 
 
-
-
-
   app-festival-card {
     animation: fadeInUp 0.5s ease-out;
     animation-fill-mode: both;
 
-    // Offset the animation for each card
-    &:nth-child(1) {
-      animation-delay: 0.1s;
-    }
-    &:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-    &:nth-child(3) {
-      animation-delay: 0.3s;
-    }
-    &:nth-child(4) {
-      animation-delay: 0.4s;
-    }
-    &:nth-child(5) {
-      animation-delay: 0.5s;
+    @for $i from 1 through 10 {
+       &:nth-child(#{$i}) {
+         animation-delay: #{$i * 0.1 + 0.1}s;
+       }
     }
   }
 }
 
 
-// Responsive style
+.no-results {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  color: var(--mat-sys-on-surface-variant);
+  opacity: 0.7;
+  
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+  }
+  
+  p {
+    font-size: 1.1rem;
+    margin: 0;
+  }
+}
+
 @media (max-width: 768px) {
   .festivals-container {
     grid-template-columns: 1fr;
@@ -55,5 +61,3 @@
   }
 
 }
-
-

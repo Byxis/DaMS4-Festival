@@ -584,4 +584,43 @@ router.delete("/:id/logo", requireAdmin, async (req: Request, res: Response) => 
     res.json({message: "Logo deleted"});
 });
 
+// GET /api/publishers/:id/festivals - Retrieve festivals where the publisher has a reservation with status FACTURED or
+// CONFIRMED
+router.get("/:id/festivals", async (req: Request, res: Response) => {
+    const {id} = req.params;
+    try
+    {
+        const {rows} = await pool.query(
+            `SELECT DISTINCT f.*
+             FROM festivals f
+             JOIN reservations r ON f.id = r.festival_id
+             WHERE r.entity_id = $1
+               AND r.status IN ('FACTURED', 'CONFIRMED')
+             ORDER BY f.start_date DESC`,
+            [id]);
+
+        const FESTIVAL_LOGO_DIR = "./uploads/festival-logos";
+        if (fs.existsSync(FESTIVAL_LOGO_DIR))
+        {
+            rows.forEach((festival: any) => {
+                const logoFiles =
+                    fs.readdirSync(FESTIVAL_LOGO_DIR).filter((f: string) => f.startsWith(`${festival.id}.`));
+                if (logoFiles.length > 0)
+                {
+                    festival.logoUrl = `/festivals/${festival.id}/logo`;
+                }
+            });
+        }
+
+        res.json(rows);
+    }
+    catch (err: any)
+    {
+        console.error(err);
+        res.status(500).json({
+            error: "Could not retrieve festivals: " + err.message,
+        });
+    }
+});
+
 export default router;

@@ -34,23 +34,27 @@
     </div>
   </header>
 
-  <contact-list
-    [contacts]="this.contacts()"
-    (addContact)="this.openContactAddDialog()"
-    (editContact)="this.openContactEditDialog($event)"
-    (deleteContact)="this.deleteContact($event)"
-  >
+  <contact-list [contacts]="this.contacts()" (addContact)="this.openContactAddDialog()"
+    (editContact)="this.openContactEditDialog($event)" (deleteContact)="this.deleteContact($event)">
   </contact-list>
- 
-  
-  <app-game-list
-  [isGameListForPublisher]="true"
-  [publisherId]="this.publisher().id"
-  [publisherName]="this.publisher().name"
-    ></app-game-list>
-  
+
+
+  <app-game-list [isGameListForPublisher]="true" [publisherId]="this.publisher().id"
+    [publisherName]="this.publisher().name"></app-game-list>
+
+  <div class="festivals-section">
+    <h3>Festivals (Réservations confirmées/facturées)</h3>
+    @if (festivals().length > 0) {
+    <div class="festivals-list">
+      @for (festival of festivals(); track festival.id) {
+      <app-festival-card [festival]="festival"></app-festival-card>
+      }
+    </div>
+    } @else {
+    <p class="no-data">Aucun festival trouvé.</p>
+    }
+  </div>
+
 
   }
 </div>
-
-

@@ -336,4 +336,19 @@ export class PublisherService
     {
         return this.http.post(`${environment.apiUrl}/publishers/import-by-name`, {editorName}, {withCredentials: true});
     }
+
+    getPublisherFestivals(publisherId: number): Observable<any[]>
+    {
+        return this.http
+            .get<any[]>(`${environment.apiUrl}/publishers/${publisherId}/festivals`, {withCredentials: true})
+            .pipe(map((festivals) => {
+                festivals.forEach((f) => {
+                    if (f.logoUrl)
+                    {
+                        f.logoUrl = `${environment.apiUrl}${f.logoUrl}`;
+                    }
+                });
+                return festivals;
+            }));
+    }
 }

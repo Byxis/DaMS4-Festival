@@ -1,8 +1,11 @@
+import {CommonModule} from '@angular/common';
 import {Component, computed, effect, inject, input, signal} from '@angular/core';
 import {MatButton} from '@angular/material/button';
 import {MatDialog} from '@angular/material/dialog';
 import {MatIcon} from '@angular/material/icon';
 import {Router} from '@angular/router';
+import {FestivalDto} from 'src/app/festivals/dtos/festival-dto';
+import {FestivalCard} from 'src/app/festivals/festival-card-component/festival-card';
 import {GameList} from 'src/app/games/game-list/game-list';
 import {GameService} from 'src/app/games/game-service/game-service';
 import {ContactDialog} from 'src/app/publisher/contact-dialog/contact-dialog.component';
@@ -14,7 +17,7 @@ import {PublisherService} from 'src/app/publisher/publisher.service';
 
 @Component({
     selector: 'publisher',
-    imports: [ContactList, MatIcon, MatButton, GameList],
+    imports: [ContactList, MatIcon, MatButton, GameList, CommonModule, FestivalCard],
     templateUrl: './publisher.html',
     styleUrl: './publisher.scss',
 })
@@ -37,6 +40,18 @@ export class Publisher
     readonly contacts = computed(() => this.publisher().contacts ?? []);
 
     readonly numberOfGames = signal<number>(0);
+    readonly festivals = signal<FestivalDto[]>([]);
+
+    constructor()
+    {
+        effect(() => {
+            const id = this.publisherId();
+            if (id)
+            {
+                this.publisherService.getPublisherFestivals(id).subscribe((f) => this.festivals.set(f));
+            }
+        });
+    }
 
 
 
