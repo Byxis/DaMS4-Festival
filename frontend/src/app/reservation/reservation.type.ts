@@ -8,6 +8,7 @@ export interface Reservation {
     electrical_outlets: number;
     note: string|null;
     status: string;
+    presented_by_them?: boolean;
     interactions?: ReservationInteraction[];
     games?: ReservationGame[];
 }

@@ -213,15 +213,27 @@
     gap: 1.5rem;
 
     .warnings-container {
-      margin-top: 16px;
+      flex: 1;
       display: flex;
       flex-direction: column;
       gap: 4px;
 
-      .warning-text {
-          color: var(--mat-sys-error);
+      .warning-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--mat-sys-error);
+
+        .warning-icon {
+          font-size: 1.25rem;
+          width: 1.25rem;
+          height: 1.25rem;
+        }
+
+        .warning-text {
           font-size: 0.9em;
           font-weight: 500;
+        }
       }
     }
   }
@@ -321,4 +333,16 @@
 table {
   flex: 1;
   min-width: 280px;
+}
+
+.tables-footer {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.presented-by-them-section {
+  margin-left: auto;
 }

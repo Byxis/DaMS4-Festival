@@ -40,6 +40,7 @@ router.get("/:id/reservations", async (req: Request, res: Response) => {
                 r.electrical_outlets,
                 r.note,
                 r.status,
+                r.presented_by_them,
                 COALESCE(json_agg(DISTINCT jsonb_build_object('id', ri.id, 'reservation_id', ri.reservation_id, 'description', ri.description, 'interaction_date', ri.interaction_date)) FILTER (WHERE ri.id IS NOT NULL), '[]'::json) as interactions,
                 COALESCE(json_agg(DISTINCT jsonb_build_object('id', rg.id, 'reservation_id', rg.reservation_id, 'game_id', rg.game_id, 'amount', rg.amount, 'table_count', rg.table_count, 'big_table_count', rg.big_table_count, 'town_table_count', rg.town_table_count, 'electrical_outlets', rg.electrical_outlets, 'status', rg.status, 'zone_id', rg.zone_id, 'floor_space', rg.floor_space)) FILTER (WHERE rg.id IS NOT NULL), '[]'::json) as games
             FROM reservations r
@@ -71,6 +72,7 @@ router.post("/:id/reservations", requireAdmin, async (req: Request, res: Respons
         town_table_count = 0,
         note,
         status = "TO_BE_CONTACTED",
+        presented_by_them = false,
     } = req.body;
 
     if (!entity_id)
@@ -81,8 +83,8 @@ router.post("/:id/reservations", requireAdmin, async (req: Request, res: Respons
     try
     {
         const {rows} = await pool.query<Reservation>(
-            `INSERT INTO reservations (festival_id, entity_id, table_count, big_table_count, town_table_count, note, status)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            `INSERT INTO reservations (festival_id, entity_id, table_count, big_table_count, town_table_count, note, status, presented_by_them)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             RETURNING *`,
             [
                 id,
@@ -92,6 +94,7 @@ router.post("/:id/reservations", requireAdmin, async (req: Request, res: Respons
                 town_table_count,
                 note,
                 status,
+                presented_by_them,
             ]);
 
         res.status(201).json(rows[0]);
@@ -123,6 +126,7 @@ router.get("/:id/reservations/:reservationId", async (req: Request, res: Respons
                 r.town_table_count,
                 r.note,
                 r.status,
+                r.presented_by_them,
                 COALESCE(json_agg(DISTINCT jsonb_build_object('id', ri.id, 'reservation_id', ri.reservation_id, 'description', ri.description, 'interaction_date', ri.interaction_date)) FILTER (WHERE ri.id IS NOT NULL), '[]'::json) as interactions,
                 COALESCE(json_agg(DISTINCT jsonb_build_object('id', rg.id, 'reservation_id', rg.reservation_id, 'game_id', rg.game_id, 'amount', rg.amount, 'table_count', rg.table_count, 'big_table_count', rg.big_table_count, 'town_table_count', rg.town_table_count, 'electrical_outlets', rg.electrical_outlets, 'status', rg.status, 'zone_id', rg.zone_id, 'floor_space', rg.floor_space)) FILTER (WHERE rg.id IS NOT NULL), '[]'::json) as games
             FROM reservations r
@@ -158,6 +162,7 @@ router.put("/:id/reservations/:reservationId", requireAdmin, async (req: Request
         electrical_outlets,
         note,
         status,
+        presented_by_them,
     } = req.body;
 
     console.log("Update request body:", req.body);
@@ -175,6 +180,7 @@ router.put("/:id/reservations/:reservationId", requireAdmin, async (req: Request
     if (note !== undefined) updates.note = note;
     if (status !== undefined) updates.status = status;
     if (electrical_outlets !== undefined) updates.electrical_outlets = electrical_outlets;
+    if (presented_by_them !== undefined) updates.presented_by_them = presented_by_them;
 
     if (Object.keys(updates).length === 0)
     {

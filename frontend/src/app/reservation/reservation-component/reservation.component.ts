@@ -440,4 +440,25 @@ export class ReservationComponent
             this.router.navigate(['/publishers', id]);
         }
     }
+
+    togglePresentedByThem(checked: boolean)
+    {
+        const reservationId = this.getActualReservationId();
+        const festivalId = this.festivalId();
+        const entityId = this.entityId();
+
+        if (!reservationId)
+        {
+            this.reservationService
+                .create(festivalId, {
+                    entity_id: entityId,
+                    presented_by_them: checked,
+                })
+                .subscribe();
+        }
+        else
+        {
+            this.reservationService.update(festivalId, reservationId, {presented_by_them: checked}).subscribe();
+        }
+    }
 }

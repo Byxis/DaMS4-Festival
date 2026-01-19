@@ -66,6 +66,7 @@
   @if (isExpanded()) {
   <div class="reservation-details">
     <div class="details-main">
+
       <div class="tables-section">
         <h3 class="tables-title">
           <mat-icon class="tables-icon">table_chart</mat-icon>
@@ -77,13 +78,24 @@
             [festivalId]="festivalId()"></table>
           }
         </div>
-        @if (tableWarnings().length > 0) {
-        <div class="warnings-container">
-          @for (warning of tableWarnings(); track $index) {
-          <div class="warning-text">{{ warning }}</div>
+        <div class="tables-footer">
+          @if (tableWarnings().length > 0) {
+          <div class="warnings-container">
+            @for (warning of tableWarnings(); track $index) {
+            <div class="warning-item">
+              <mat-icon class="warning-icon">warning</mat-icon>
+              <span class="warning-text">{{ warning }}</span>
+            </div>
+            }
+          </div>
           }
+          <div class="presented-by-them-section">
+            <mat-checkbox [checked]="this.reservation()?.presented_by_them"
+              (change)="this.togglePresentedByThem($event.checked)">
+              Jeux présentés par l'éditeur / entité
+            </mat-checkbox>
+          </div>
         </div>
-        }
       </div>
       <note [note]="reservation()?.note ?? null" [reservation]="reservation()" [festivalId]="festivalId()"></note>
     </div>
