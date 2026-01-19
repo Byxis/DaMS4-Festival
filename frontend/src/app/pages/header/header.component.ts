@@ -5,6 +5,8 @@ import { MatMenuModule } from "@angular/material/menu";
 import { MatToolbarModule } from "@angular/material/toolbar";
 import { RouterModule, Router } from "@angular/router";
 import { AuthService } from "@auth/auth.service";
+import { roleEnToFr } from 'src/app/shared/utils/roles';
+
 
 @Component({
   selector: 'app-header',
@@ -21,6 +23,7 @@ import { AuthService } from "@auth/auth.service";
 export class HeaderComponent {
   authSvc = inject(AuthService);
   router = inject(Router);
+  roleEnToFr = roleEnToFr;
 
   logout() {
     this.authSvc.logout();
