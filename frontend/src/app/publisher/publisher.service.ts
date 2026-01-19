@@ -42,7 +42,7 @@ export class PublisherService
             next: (data) => {
                 for (const publisher of data)
                 {
-                    if (publisher.logoUrl)
+                    if (publisher.logoUrl && !publisher.logoUrl.startsWith('http'))
                     {
                         publisher.logoUrl = `${environment.apiUrl}${publisher.logoUrl}`;
                     }
@@ -103,6 +103,10 @@ export class PublisherService
 
     addPublisherToList(publisher: EntityDTO)
     {
+        if (publisher.logoUrl && !publisher.logoUrl.startsWith('http'))
+        {
+            publisher.logoUrl = `${environment.apiUrl}${publisher.logoUrl}`;
+        }
         this.publishers.update((publishers) => [...publishers, publisher]);
     }
 

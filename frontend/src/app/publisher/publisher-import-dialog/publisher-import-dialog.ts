@@ -75,8 +75,12 @@ export class PublishersImportDialog implements OnInit
     {
         this.publisherService.importEditor(editor.id).subscribe({
             next: (result: any) => {
-                this.publisherService.addPublisherToList(
-                    {...result.publisher, numberOfGames: result.gamesCount, contacts: [], logoUrl: undefined});
+                this.publisherService.addPublisherToList({
+                    ...result.publisher,
+                    numberOfGames: result.gamesCount,
+                    contacts: [],
+                    logoUrl: result.publisher.logoUrl
+                });
 
                 this.editors = this.editors.filter(e => e.id !== editor.id);
                 this.filterEditors();

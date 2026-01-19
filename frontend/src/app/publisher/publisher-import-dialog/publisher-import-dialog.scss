@@ -17,6 +17,31 @@
 
 .editor-item .editor-info {
   flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.editor-logo-container {
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: var(--mat-sys-surface-variant);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  .editor-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  mat-icon {
+    color: var(--mat-sys-on-surface-variant);
+  }
 }
 
 .editor-item .editor-info .editor-name {

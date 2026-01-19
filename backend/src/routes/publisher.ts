@@ -1,7 +1,6 @@
 import {Router} from "express";
 import type {Request, Response} from "express";
 import fs from "fs";
-import fsPromises from "fs/promises";
 import multer from "multer";
 import path from "path";
 
@@ -62,6 +61,17 @@ const upload = multer({
     limits: {fileSize: 10 * 1024 * 1024},  // 10MB max
 });
 
+function getLogoUrl(publisher: any): string|null
+{
+    if (!publisher.logo) return null;
+    if (publisher.logo.startsWith('http://') || publisher.logo.startsWith('https://'))
+    {
+        return publisher.logo;  // Return URL directly
+    }
+    return `/publishers/${publisher.id}/logo`;  // Local file
+}
+
+
 /* ---------- /api/publishers ----------*/
 
 // GET /api/publishers - Retrieve all publishers with their contacts
@@ -70,11 +80,12 @@ router.get("/", async (_req: Request, res: Response) => {
     const {rows: contactRows} = await pool.query<Contact>("SELECT * FROM contact");
     publisherRows.forEach((publisher) => {
         publisher.contacts = contactRows.filter((contact) => contact.entity_id === publisher.id);
-        const logoFiles = fs.readdirSync("./uploads/logos").filter((f: string) => f.startsWith(`${publisher.id}.`));
 
-        if (logoFiles.length > 0)
+        // Generate logoUrl using helper (same as games)
+        const logoUrl = getLogoUrl(publisher);
+        if (logoUrl)
         {
-            publisher.logoUrl = `/publishers/${publisher.id}/logo`;
+            (publisher as any).logoUrl = logoUrl;
         }
     });
     res.json(publisherRows);
@@ -183,7 +194,14 @@ router.post("/import/:editorId", requireAdmin, async (req: Request, res: Respons
             return res.status(404).json({error: "can't add new publisher"});
         }
 
-        const newPublisher = inserPublisher[0];
+        const newPublisher = inserPublisher[0]!;
+
+        // Store the logo URL directly (same as games)
+        if (editor.logo)
+        {
+            await client.query("UPDATE entities SET logo = $1 WHERE id = $2", [editor.logo, newPublisher.id]);
+            newPublisher.logo = editor.logo;
+        }
 
         const {rows: gamesRows} = await client.query(
             "SELECT name, minimum_number_of_player, maximum_number_of_player, logo, type_of_games_id FROM games WHERE editor_id = $1",
@@ -212,7 +230,9 @@ router.post("/import/:editorId", requireAdmin, async (req: Request, res: Respons
         }
 
         await client.query("COMMIT");
-        res.status(201).json({publisher: newPublisher, gamesCount: gamesRows.length});
+
+        res.status(201).json(
+            {publisher: {...newPublisher, logoUrl: getLogoUrl(newPublisher)}, gamesCount: gamesRows.length});
     }
     catch (err: any)
     {
@@ -264,7 +284,14 @@ router.post("/import-by-name", requireAdmin, async (req: Request, res: Response)
         const {rows: inserPublisher} =
             await client.query<Publisher>("INSERT INTO publisher (name) VALUES ($1) RETURNING *", [editor.name]);
 
-        const newPublisher = inserPublisher[0];
+        const newPublisher = inserPublisher[0]!;
+
+        // Store the logo URL directly (same as games)
+        if (editor.logo)
+        {
+            await client.query("UPDATE entities SET logo = $1 WHERE id = $2", [editor.logo, newPublisher.id]);
+            newPublisher.logo = editor.logo;
+        }
 
 
         const {rows: gamesRows} = await client.query(
@@ -293,7 +320,9 @@ router.post("/import-by-name", requireAdmin, async (req: Request, res: Response)
         }
 
         await client.query("COMMIT");
-        res.status(201).json({publisher: newPublisher, gamesCount: gamesRows.length});
+
+        res.status(201).json(
+            {publisher: {...newPublisher, logoUrl: getLogoUrl(newPublisher)}, gamesCount: gamesRows.length});
     }
     catch (err: any)
     {

@@ -180,7 +180,8 @@
         </div>
         <div class="cell logo-cell center">
           @if (publisher.logoUrl) {
-          <img [src]="publisher.logoUrl" [alt]="publisher.name + ' logo'" class="publisher-logo" />
+          <img [src]="publisher.logoUrl" [alt]="publisher.name + ' logo'" class="publisher-logo"
+            (error)="publisher.logoUrl = undefined" />
           } @else {
           <div class="logo-placeholder">
             <mat-icon>business</mat-icon>
