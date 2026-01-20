@@ -23,8 +23,9 @@ export class HeaderComponent
 
     logout()
     {
-        this.authSvc.logout();
-        this.router.navigate(['/login']);
+        this.authSvc.logout().subscribe(() => {
+            this.router.navigate(['/login']);
+        });
     }
 
     goToLoginPage()
