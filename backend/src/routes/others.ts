@@ -3,7 +3,7 @@ import {Router} from "express";
 import type {Request, Response} from "express";
 
 import pool from "../db/database.js";
-import {requireAdmin} from "../middleware/auth-admin.js";
+import {requireAdmin, requireEditor} from "../middleware/auth-admin.js";
 import type {Contact} from "../types/contact.js";
 import type {Other} from "../types/other.js";
 
@@ -50,7 +50,7 @@ router.get("/", async (_req: Request, res: Response) => {
 });
 
 //! POST /api/others - Create a new other entity
-router.post("/", requireAdmin, async (req: Request, res: Response) => {
+router.post("/", requireEditor, async (req: Request, res: Response) => {
     const {name} = req.body;
     if (!name)
     {
@@ -100,7 +100,7 @@ router.get("/:id", async (req: Request, res: Response) => {
 });
 
 //! DELETE /api/others/:id - Delete a specific entity
-router.delete("/:id", requireAdmin, async (req: Request, res: Response) => {
+router.delete("/:id", requireEditor, async (req: Request, res: Response) => {
     const {id} = req.params;
     try
     {
@@ -121,7 +121,7 @@ router.delete("/:id", requireAdmin, async (req: Request, res: Response) => {
 });
 
 //! PUT /api/others/:id - Update name
-router.put("/:id", requireAdmin, async (req: Request, res: Response) => {
+router.put("/:id", requireEditor, async (req: Request, res: Response) => {
     const {id} = req.params;
     const {name} = req.body;
 
@@ -150,7 +150,7 @@ router.put("/:id", requireAdmin, async (req: Request, res: Response) => {
 /* ---------- /api/others/:id/contacts ----------*/
 
 //! POST /api/others/:id/contacts - Add a contact
-router.post("/:id/contacts", requireAdmin, async (req: Request, res: Response) => {
+router.post("/:id/contacts", requireEditor, async (req: Request, res: Response) => {
     const {id} = req.params;
     const {name, family_name, role, telephone, email} = req.body;
 
@@ -180,7 +180,7 @@ router.post("/:id/contacts", requireAdmin, async (req: Request, res: Response) =
 });
 
 //! DELETE /api/others/:id/contacts/:contactId - Delete a contact
-router.delete("/:id/contacts/:contactId", requireAdmin, async (req: Request, res: Response) => {
+router.delete("/:id/contacts/:contactId", requireEditor, async (req: Request, res: Response) => {
     const {contactId} = req.params;
     try
     {
@@ -201,7 +201,7 @@ router.delete("/:id/contacts/:contactId", requireAdmin, async (req: Request, res
 });
 
 //! PUT /api/others/:id/contacts/:contactId - Update a contact
-router.put("/:id/contacts/:contactId", requireAdmin, async (req: Request, res: Response) => {
+router.put("/:id/contacts/:contactId", requireEditor, async (req: Request, res: Response) => {
     const {contactId} = req.params;
     const {name, family_name, role, telephone, email} = req.body;
 

@@ -24,7 +24,6 @@ export class FestivalCard
 
     navigateToFestivalPage(): void
     {
-        console.log("You clicked on ", this.festival().id)
         if (this.festival().id)
         {
             this.router.navigate(["/festivals", this.festival().id]);

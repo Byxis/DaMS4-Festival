@@ -1,9 +1,11 @@
 <div class="main-container">
     <div class="header">
         <h1>Festivals </h1>
+        @if(authService.isEditor() || authService.isAdmin()) {
         <button matFab aria-label="Add a festival button" (click)="openFormDialog()">
             <mat-icon>add</mat-icon>
         </button>
+        }
 
         <div class="filters-container">
             <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">

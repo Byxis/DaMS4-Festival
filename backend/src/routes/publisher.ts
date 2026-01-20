@@ -5,7 +5,8 @@ import multer from "multer";
 import path from "path";
 
 import pool from "../db/database.js";
-import {requireAdmin} from "../middleware/auth-admin.js";
+import {requireAdmin, requireEditor} from "../middleware/auth-admin.js";
+import {verifyTokenOptional} from "../middleware/token-management.js";
 import type {Contact} from "../types/contact.js";
 import type {Publisher} from "../types/publisher.js";
 
@@ -22,7 +23,7 @@ import type {Publisher} from "../types/publisher.js";
  * !- DELETE /api/publishers/:id - Delete a specific publisher by ID
  * !- PUT /api/publishers/:id - Update a specific publisher name by ID
  *
- * - GET /api/publishers/:id/contacts - Add a contact to a specific publisher
+ * !- GET /api/publishers/:id/contacts - Get all contacts of a specific publisher
  * !- DELETE /api/publishers/:id/contacts/:contactId - Delete a specific contact from a specific publisher
  * !- PUT /api/publishers/:id/contacts/:contactId - Update a specific contact of a specific publisher
  *
@@ -73,13 +74,16 @@ function getLogoUrl(publisher: any): string|null
 
 
 /* ---------- /api/publishers ----------*/
+// GET /api/publishers - Retrieve all publishers with their contacts (contacts only for admin/editor)
+router.get("/", verifyTokenOptional, async (req: Request, res: Response) => {
+    const isAuthorized = req.user?.role === 'admin' || req.user?.role === 'editor';
 
-// GET /api/publishers - Retrieve all publishers with their contacts
-router.get("/", async (_req: Request, res: Response) => {
     const {rows: publisherRows} = await pool.query<Publisher>("SELECT * FROM publisher");
-    const {rows: contactRows} = await pool.query<Contact>("SELECT * FROM contact");
+
+    const {rows: contactRows} = isAuthorized ? await pool.query<Contact>("SELECT * FROM contact") : {rows: []};
+
     publisherRows.forEach((publisher) => {
-        publisher.contacts = contactRows.filter((contact) => contact.entity_id === publisher.id);
+        publisher.contacts = isAuthorized ? contactRows.filter((contact) => contact.entity_id === publisher.id) : [];
 
         const logoUrl = getLogoUrl(publisher);
         if (logoUrl)
@@ -91,7 +95,7 @@ router.get("/", async (_req: Request, res: Response) => {
 });
 
 //! POST /api/publishers - Create a new publisher
-router.post("/", requireAdmin, async (req: Request, res: Response) => {
+router.post("/", requireEditor, async (req: Request, res: Response) => {
     const {name} = req.body;
     if (!name)
     {
@@ -116,7 +120,7 @@ router.post("/", requireAdmin, async (req: Request, res: Response) => {
 });
 
 //! GET /api/publishers/getAllExistingPublishers - Get all editors not yet imported with game count
-router.get("/getAllExistingPublishers", requireAdmin, async (req: Request, res: Response) => {
+router.get("/getAllExistingPublishers", requireEditor, async (req: Request, res: Response) => {
     try
     {
         const {rows} = await pool.query(`SELECT 
@@ -139,7 +143,7 @@ router.get("/getAllExistingPublishers", requireAdmin, async (req: Request, res: 
 });
 
 //! GET /api/publishers/check-exists/:name - Check is a publisher name is available, or already taken
-router.get("/check-exists/:name", async (req: Request, res: Response) => {
+router.get("/check-exists/:name", requireEditor, async (req: Request, res: Response) => {
     const {name} = req.params;
 
     try
@@ -165,7 +169,7 @@ router.get("/check-exists/:name", async (req: Request, res: Response) => {
 
 
 //! POST /api/publishers/import/:editorId - Import an existing publisher
-router.post("/import/:editorId", requireAdmin, async (req: Request, res: Response) => {
+router.post("/import/:editorId", requireEditor, async (req: Request, res: Response) => {
     const {editorId} = req.params;
     const client = await pool.connect();
 
@@ -245,7 +249,7 @@ router.post("/import/:editorId", requireAdmin, async (req: Request, res: Respons
 });
 
 //! POST /api/publishers/import-by-name - Import an existing publisher by name
-router.post("/import-by-name", requireAdmin, async (req: Request, res: Response) => {
+router.post("/import-by-name", requireEditor, async (req: Request, res: Response) => {
     const {editorName} = req.body;
     const client = await pool.connect();
 
@@ -335,7 +339,7 @@ router.post("/import-by-name", requireAdmin, async (req: Request, res: Response)
 
 
 //! POST /api/publishers/addGameToPublisher - Create a new game, and add it to the publisher's list of games
-router.post("/addGameToPublisher", requireAdmin, async (req, res) => {
+router.post("/addGameToPublisher", requireEditor, async (req, res) => {
     const {name, publisher_id, type, minimum_number_of_player, maximum_number_of_player, logo} = req.body;
 
     if (!publisher_id || Number.isNaN(Number(publisher_id)))
@@ -406,7 +410,7 @@ router.get("/:id", async (req: Request, res: Response) => {
 
 
 //! DELETE /api/publishers/:id - Delete a specific publisher by ID
-router.delete("/:id", requireAdmin, async (req: Request, res: Response) => {
+router.delete("/:id", requireEditor, async (req: Request, res: Response) => {
     const {id} = req.params;
     try
     {
@@ -427,7 +431,7 @@ router.delete("/:id", requireAdmin, async (req: Request, res: Response) => {
 });
 
 //! PUT /api/publishers/:id - Update a specific publisher name by ID
-router.put("/:id", requireAdmin, async (req: Request, res: Response) => {
+router.put("/:id", requireEditor, async (req: Request, res: Response) => {
     const {id} = req.params;
     const {name} = req.body;
 
@@ -457,7 +461,7 @@ router.put("/:id", requireAdmin, async (req: Request, res: Response) => {
 /* ---------- /api/publishers/:id/contacts ----------*/
 
 //! POST /api/publishers/:id/contacts - Add a contact to a specific publisher
-router.post("/:id/contacts", requireAdmin, async (req: Request, res: Response) => {
+router.post("/:id/contacts", requireEditor, async (req: Request, res: Response) => {
     const {id} = req.params;
     const {name, family_name, role, telephone, email} = req.body;
     if (!name)
@@ -490,7 +494,7 @@ router.post("/:id/contacts", requireAdmin, async (req: Request, res: Response) =
 });
 
 //! DELETE /api/publishers/:id/contacts/:contactId - Delete a specific contact from a specific publisher
-router.delete("/:id/contacts/:contactId", requireAdmin, async (req: Request, res: Response) => {
+router.delete("/:id/contacts/:contactId", requireEditor, async (req: Request, res: Response) => {
     const {contactId} = req.params;
     try
     {
@@ -511,7 +515,7 @@ router.delete("/:id/contacts/:contactId", requireAdmin, async (req: Request, res
 });
 
 //! PUT /api/publishers/:id/contacts/:contactId - Update a specific contact of a specific publisher
-router.put("/:id/contacts/:contactId", requireAdmin, async (req: Request, res: Response) => {
+router.put("/:id/contacts/:contactId", requireEditor, async (req: Request, res: Response) => {
     const {contactId} = req.params;
     const {name, family_name, role, telephone, email} = req.body;
     if (!contactId)
@@ -565,7 +569,7 @@ router.get("/:id/logo", async (req: Request, res: Response) => {
 });
 
 //! POST /api/publishers/:id/logo - Upload a logo for a specific publisher
-router.post("/:id/logo", requireAdmin, upload.single("logo"), async (req: Request, res: Response) => {
+router.post("/:id/logo", requireEditor, upload.single("logo"), async (req: Request, res: Response) => {
     const {id} = req.params;
 
     if (!req.file)
@@ -596,7 +600,7 @@ router.post("/:id/logo", requireAdmin, upload.single("logo"), async (req: Reques
 });
 
 //! DELETE /api/publishers/:id/logo - Delete the logo of a specific publisher
-router.delete("/:id/logo", requireAdmin, async (req: Request, res: Response) => {
+router.delete("/:id/logo", requireEditor, async (req: Request, res: Response) => {
     const {id} = req.params;
 
     const files = fs.readdirSync("./uploads/logos").filter((f: string) => f.startsWith(`${id}.`));

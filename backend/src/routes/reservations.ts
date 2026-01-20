@@ -2,7 +2,7 @@ import {Router} from "express";
 import type {Request, Response} from "express";
 
 import pool from "../db/database.js";
-import {requireAdmin} from "../middleware/auth-admin.js";
+import {requireAdmin, requireEditor} from "../middleware/auth-admin.js";
 import type {Reservation, ReservationGame, ReservationInteraction,} from "../types/reservation.js";
 
 /**
@@ -10,10 +10,9 @@ import type {Reservation, ReservationGame, ReservationInteraction,} from "../typ
  * All routes that modify data require admin privileges (and are marked with !).
  *
  * Endpoints:
- * - GET /api/festivals/:id/reservations - Get all reservations for a festival
+ * ! - GET /api/festivals/:id/reservations - Get all reservations for a festival
  * ! - POST /api/festivals/:id/reservations - Create a new reservation
-
- * - GET /api/festivals/:id/reservations/:reservationId - Get a specific reservation with interactions and games
+ * ! - GET /api/festivals/:id/reservations/:reservationId - Get a specific reservation with interactions and games
  * ! - PUT /api/festivals/:id/reservations/:reservationId - Update a reservation
  * ! - DELETE /api/festivals/:id/reservations/:reservationId - Delete a reservation
  * ! - POST /api/festivals/:id/reservations/:reservationId/interactions - Add an interaction to a reservation
@@ -24,7 +23,7 @@ const router = Router();
 /* ---------- /api/festivals/:id/reservations ----------*/
 
 // GET /api/festivals/:id/reservations - Get all reservations for a festival
-router.get("/:id/reservations", async (req: Request, res: Response) => {
+router.get("/:id/reservations", requireEditor, async (req: Request, res: Response) => {
     try
     {
         const {id} = req.params;
@@ -63,7 +62,7 @@ router.get("/:id/reservations", async (req: Request, res: Response) => {
 });
 
 // ! POST /api/festivals/:id/reservations - Create a new reservation
-router.post("/:id/reservations", requireAdmin, async (req: Request, res: Response) => {
+router.post("/:id/reservations", requireEditor, async (req: Request, res: Response) => {
     const {id} = req.params;
     const {
         entity_id,
@@ -110,8 +109,8 @@ router.post("/:id/reservations", requireAdmin, async (req: Request, res: Respons
 
 /* ---------- /api/festivals/:id/reservations/:reservationId ----------*/
 
-// GET /api/festivals/:id/reservations/:reservationId - Get a specific reservation with interactions and games
-router.get("/:id/reservations/:reservationId", async (req: Request, res: Response) => {
+//! GET /api/festivals/:id/reservations/:reservationId - Get a specific reservation with interactions and games
+router.get("/:id/reservations/:reservationId", requireEditor, async (req: Request, res: Response) => {
     try
     {
         const {id, reservationId} = req.params;
@@ -153,7 +152,7 @@ router.get("/:id/reservations/:reservationId", async (req: Request, res: Respons
 });
 
 // ! PUT /api/festivals/:id/reservations/:reservationId - Update a reservation
-router.put("/:id/reservations/:reservationId", requireAdmin, async (req: Request, res: Response) => {
+router.put("/:id/reservations/:reservationId", requireEditor, async (req: Request, res: Response) => {
     const {id, reservationId} = req.params;
     const {
         table_count,
@@ -219,7 +218,7 @@ router.put("/:id/reservations/:reservationId", requireAdmin, async (req: Request
 });
 
 // ! DELETE /api/festivals/:id/reservations/:reservationId - Delete a reservation
-router.delete("/:id/reservations/:reservationId", requireAdmin, async (req: Request, res: Response) => {
+router.delete("/:id/reservations/:reservationId", requireEditor, async (req: Request, res: Response) => {
     const {id, reservationId} = req.params;
 
     try
@@ -248,7 +247,7 @@ router.delete("/:id/reservations/:reservationId", requireAdmin, async (req: Requ
 /* ---------- /api/festivals/:id/reservations/:reservationId/interactions ----------*/
 
 // ! POST /api/festivals/:id/reservations/:reservationId/interactions - Add an interaction to a reservation
-router.post("/:id/reservations/:reservationId/interactions", requireAdmin, async (req: Request, res: Response) => {
+router.post("/:id/reservations/:reservationId/interactions", requireEditor, async (req: Request, res: Response) => {
     const {id, reservationId} = req.params;
     const {description} = req.body;
 
@@ -287,7 +286,7 @@ router.post("/:id/reservations/:reservationId/interactions", requireAdmin, async
 /* ---------- /api/festivals/:id/reservations/:reservationId/games ----------*/
 
 // ! POST /api/festivals/:id/reservations/:reservationId/games - Upsert a game in a reservation
-router.post("/:id/reservations/:reservationId/games", requireAdmin, async (req: Request, res: Response) => {
+router.post("/:id/reservations/:reservationId/games", requireEditor, async (req: Request, res: Response) => {
     const {id, reservationId} = req.params;
     const {
         game_id,
@@ -386,7 +385,7 @@ router.post("/:id/reservations/:reservationId/games", requireAdmin, async (req: 
 });
 
 // ! DELETE /api/festivals/:id/reservations/:reservationId/games/:gameId - Delete a game from a reservation
-router.delete("/:id/reservations/:reservationId/games/:gameId", requireAdmin, async (req: Request, res: Response) => {
+router.delete("/:id/reservations/:reservationId/games/:gameId", requireEditor, async (req: Request, res: Response) => {
     const {id, reservationId, gameId} = req.params;
 
     try

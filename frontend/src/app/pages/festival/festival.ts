@@ -14,6 +14,7 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatTableModule} from '@angular/material/table';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {Router} from '@angular/router';
+import {AuthService} from '@auth/auth.service';
 import {OtherImportDialog} from '@other/other-import-dialog/other-import-dialog';
 import {OtherNewDialog} from '@other/other-new-dialog/other-new-dialog';
 import {OtherService} from '@other/other.service';
@@ -109,6 +110,7 @@ export class Festival
     readonly reservationService = inject(ReservationService);
     readonly publisherService = inject(PublisherService);
     readonly otherService = inject(OtherService);
+    readonly authService = inject(AuthService);
 
     id = input.required<number>();
     festival = this.svc._currentFestival;

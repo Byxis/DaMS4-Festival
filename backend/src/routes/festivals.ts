@@ -5,7 +5,7 @@ import multer from "multer";
 import path from "path";
 
 import pool from "../db/database.js";
-import {requireAdmin} from "../middleware/auth-admin.js";
+import {requireAdmin, requireEditor} from "../middleware/auth-admin.js";
 import type {Festival} from "../types/festival.js";
 import type {Game_Zone} from "../types/game_zone.js";
 import type {Tarif_Zone} from "../types/tarif_zone.js";
@@ -100,7 +100,7 @@ router.get("/", async (_req: Request, res: Response) => {
 });
 
 //! POST /api/festivals - Create a new festival
-router.post("/", requireAdmin, async (req: Request, res: Response) => {
+router.post("/", requireEditor, async (req: Request, res: Response) => {
     const {
         name,
         location,
@@ -200,7 +200,7 @@ router.get("/:id", async (req: Request, res: Response) => {
 });
 
 //! DELETE /api/festivals/:id - Delete a specific festival by ID
-router.delete("/:id", requireAdmin, async (req: Request, res: Response) => {
+router.delete("/:id", requireEditor, async (req: Request, res: Response) => {
     const {id} = req.params;
     try
     {
@@ -226,7 +226,7 @@ router.delete("/:id", requireAdmin, async (req: Request, res: Response) => {
 });
 
 //! PUT /api/festivals/:id - Update a specific festival by ID
-router.put("/:id", requireAdmin, async (req: Request, res: Response) => {
+router.put("/:id", requireEditor, async (req: Request, res: Response) => {
     const {id} = req.params;
     const {
         name,
@@ -281,7 +281,7 @@ router.put("/:id", requireAdmin, async (req: Request, res: Response) => {
 /* ---------- /api/festivals/:id/tarif-zones ----------*/
 
 //! POST /api/festivals/:id/tarif-zones - Add a tarif zone to a festival
-router.post("/:id/tarif-zones", requireAdmin, async (req: Request, res: Response) => {
+router.post("/:id/tarif-zones", requireEditor, async (req: Request, res: Response) => {
     const {id} = req.params;
     const {name, price, numberOutlets, electricalOutletPrice, maxTable} = req.body;
 
@@ -314,7 +314,7 @@ router.post("/:id/tarif-zones", requireAdmin, async (req: Request, res: Response
 });
 
 //! DELETE /api/festivals/:id/tarif-zones/:tarifZoneId - Delete a tarif zone
-router.delete("/:id/tarif-zones/:tarifZoneId", requireAdmin, async (req: Request, res: Response) => {
+router.delete("/:id/tarif-zones/:tarifZoneId", requireEditor, async (req: Request, res: Response) => {
     const {tarifZoneId} = req.params;
     try
     {
@@ -335,7 +335,7 @@ router.delete("/:id/tarif-zones/:tarifZoneId", requireAdmin, async (req: Request
 });
 
 //! PUT /api/festivals/:id/tarif-zones/:tarifZoneId - Update a tarif zone
-router.put("/:id/tarif-zones/:tarifZoneId", requireAdmin, async (req: Request, res: Response) => {
+router.put("/:id/tarif-zones/:tarifZoneId", requireEditor, async (req: Request, res: Response) => {
     const {tarifZoneId} = req.params;
     const {name, price, numberOutlets, electricalOutletPrice, maxTable} = req.body;
 
@@ -367,7 +367,7 @@ router.put("/:id/tarif-zones/:tarifZoneId", requireAdmin, async (req: Request, r
 /* ---------- /api/festivals/:id/tarif-zones/:tarifZoneId/game-zones ----------*/
 
 //! POST /api/festivals/:id/tarif-zones/:tarifZoneId/game-zones - Add a game zone to a tarif zone
-router.post("/:id/tarif-zones/:tarifZoneId/game-zones", requireAdmin, async (req: Request, res: Response) => {
+router.post("/:id/tarif-zones/:tarifZoneId/game-zones", requireEditor, async (req: Request, res: Response) => {
     const {tarifZoneId} = req.params;
     const {name, reserved_table, reserved_big_table, reserved_town_table} = req.body;
 
@@ -407,7 +407,7 @@ router.post("/:id/tarif-zones/:tarifZoneId/game-zones", requireAdmin, async (req
 
 //! DELETE /api/festivals/:id/tarif-zones/:tarifZoneId/game-zones/:gameZoneId - Delete a game zone
 router.delete(
-    "/:id/tarif-zones/:tarifZoneId/game-zones/:gameZoneId", requireAdmin, async (req: Request, res: Response) => {
+    "/:id/tarif-zones/:tarifZoneId/game-zones/:gameZoneId", requireEditor, async (req: Request, res: Response) => {
         const {gameZoneId} = req.params;
         try
         {
@@ -428,7 +428,7 @@ router.delete(
     });
 
 //! PUT /api/festivals/:id/tarif-zones/:tarifZoneId/game-zones/:gameZoneId - Update a game zone
-router.put("/:id/tarif-zones/:tarifZoneId/game-zones/:gameZoneId", requireAdmin, async (req: Request, res: Response) => {
+router.put("/:id/tarif-zones/:tarifZoneId/game-zones/:gameZoneId", requireEditor, async (req: Request, res: Response) => {
     const {gameZoneId} = req.params;
     const {name, reserved_table, reserved_big_table, reserved_town_table} = req.body;
 
@@ -480,7 +480,7 @@ router.get("/:id/logo", async (req: Request, res: Response) => {
 });
 
 //! POST /api/festivals/:id/logo - Upload a logo for a specific festival
-router.post("/:id/logo", requireAdmin, upload.single("logo"), async (req: Request, res: Response) => {
+router.post("/:id/logo", requireEditor, upload.single("logo"), async (req: Request, res: Response) => {
     const {id} = req.params;
 
     if (!req.file)
@@ -511,7 +511,7 @@ router.post("/:id/logo", requireAdmin, upload.single("logo"), async (req: Reques
 });
 
 //! DELETE /api/festivals/:id/logo - Delete the logo of a specific festival
-router.delete("/:id/logo", requireAdmin, async (req: Request, res: Response) => {
+router.delete("/:id/logo", requireEditor, async (req: Request, res: Response) => {
     const {id} = req.params;
 
     const files = fs.readdirSync(FESTIVAL_LOGO_DIR).filter((f: string) => f.startsWith(`${id}.`));

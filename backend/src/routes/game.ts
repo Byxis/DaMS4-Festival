@@ -5,7 +5,7 @@ import multer from "multer";
 import path from "path";
 
 import pool from "../db/database.js";
-import {requireAdmin} from "../middleware/auth-admin.js";
+import {requireAdmin, requireEditor} from "../middleware/auth-admin.js";
 import {verifyToken} from "../middleware/token-management.js";
 
 /**
@@ -20,6 +20,10 @@ import {verifyToken} from "../middleware/token-management.js";
  *
  * - GET /api/games/:id/logo - Retrieve the logo of a specific game
  * !- POST /api/games/:id/logo - Upload a logo for a specific game
+ * !- DELETE /api/games/:id/logo - Delete the logo of a specific game
+ * !- PUT /api/games/:id/logo - Update the logo of a specific game
+ * !- PUT /api/games/:id - Update a specific game
+ * !- DELETE /api/games/:id - Delete a specific game
  */
 
 const router = Router();
@@ -231,7 +235,7 @@ router.get("/filterByPublisherID/:publisherID", async (req, res) => {
 /* ---------- PUT/DELETE /api/games/:id ----------*/
 
 //! PUT /api/games/:id - Update a specific game
-router.put("/:id", verifyToken, requireAdmin, async (req: Request, res: Response) => {
+router.put("/:id", requireEditor, async (req: Request, res: Response) => {
     const {id} = req.params;
     if (!id || !/^\d+$/.test(id))
     {
@@ -278,7 +282,7 @@ router.put("/:id", verifyToken, requireAdmin, async (req: Request, res: Response
 });
 
 //! DELETE /api/games/:id - Delete a specific game
-router.delete("/:id", verifyToken, requireAdmin, async (req: Request, res: Response) => {
+router.delete("/:id", requireEditor, async (req: Request, res: Response) => {
     const {id} = req.params;
     if (!id || !/^\d+$/.test(id))
     {
@@ -320,7 +324,7 @@ router.delete("/:id", verifyToken, requireAdmin, async (req: Request, res: Respo
 /* ---------- /api/games/:id/logo ----------*/
 
 //! POST /api/games/:id/logo - Upload a logo for a specific game
-router.post("/:id/logo", verifyToken, requireAdmin, upload.single("logo"), async (req: Request, res: Response) => {
+router.post("/:id/logo", requireEditor, upload.single("logo"), async (req: Request, res: Response) => {
     const {id} = req.params;
     if (!id || !/^\d+$/.test(id))
     {
@@ -351,6 +355,7 @@ router.post("/:id/logo", verifyToken, requireAdmin, upload.single("logo"), async
         res.status(500).json({error: errorMessage});
     }
 });
+
 // GET /api/games/:id/logo - Retrieve the logo of a specific game
 router.get("/:id/logo", async (req: Request, res: Response) => {
     const {id} = req.params;

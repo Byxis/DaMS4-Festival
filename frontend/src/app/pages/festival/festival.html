@@ -7,9 +7,11 @@
         <div class="festival-info">
             <div class="title-row">
                 <h1>{{ f.name }}</h1>
+                @if(authService.isEditor() || authService.isAdmin()) {
                 <button mat-icon-button color="primary" title="Edit Festival" (click)="editFestival()">
                     <mat-icon>edit</mat-icon>
                 </button>
+                }
             </div>
 
             <div class="info-row">
@@ -56,7 +58,7 @@
                     </div>
                 </div>
             </div>
-
+            @if(authService.isEditor() || authService.isAdmin()) {
             <div class="stock-inline">
                 <br>
                 <h3>Superficie des tables (m²)</h3>
@@ -87,6 +89,7 @@
                     </div>
                 </div>
             </div>
+            }
         </div>
 
         <!-- Logo -->
@@ -103,8 +106,9 @@
             }
         </div>
     </div>
-
+    @if(authService.isEditor() || authService.isAdmin()) {
     <mat-divider class="section-divider"></mat-divider>
+
 
     <!-- SECTION 2: Zones uniquement -->
     <div class="content-section">
@@ -145,6 +149,7 @@
         </button>
     </div>
 
+    }
     } @else {
     <!-- Loading State -->
     <div class="loading-container">

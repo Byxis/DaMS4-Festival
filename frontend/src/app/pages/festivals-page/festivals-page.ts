@@ -9,6 +9,7 @@ import {MatIcon} from "@angular/material/icon";
 import {MatInputModule} from '@angular/material/input';
 import {MatSelectModule} from '@angular/material/select';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import {AuthService} from '@auth/auth.service';
 import {FestivalList} from "src/app/festivals/festival-list-component/festival-list";
 import {FestivalNewFormComponent} from 'src/app/festivals/festival-new-form-component/festival-new-form-component';
 import {FestivalService} from 'src/app/festivals/festival-service/festival-service';
@@ -39,6 +40,7 @@ export class FestivalsPage
     readonly svc = inject(FestivalService);
 
     private readonly dialog = inject(MatDialog);
+    readonly authService = inject(AuthService);
 
     searchTerm = signal('');
     sortBy = signal<SortOption>('startDate');

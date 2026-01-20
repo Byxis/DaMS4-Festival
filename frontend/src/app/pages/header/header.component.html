@@ -9,78 +9,56 @@
   <span class="spacer"></span>
 
   @if (authSvc.isLoggedIn()) {
-    @if (!authSvc.isGuest()) {
-      <nav class="nav">
-        <a
-          mat-button
-          routerLink="/festivals"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          Festivals
-        </a>
-
-        <a
-          mat-button
-          routerLink="/publishers"
-          routerLinkActive="active"
-        >
-          Editeurs
-        </a>
-
-        @if (authSvc.isAdmin()) {
-          <a
-            mat-button
-            routerLink="/admin"
-            routerLinkActive="active"
-          >
-            Administration
-          </a>
-        }
-
-        <button
-          mat-icon-button
-          [matMenuTriggerFor]="profilePanel"
-          class="profile-btn"
-          [matMenuTriggerRestoreFocus]="false"
-        >
-          <mat-icon>account_circle</mat-icon>
-        </button>
-      </nav>
-    } @else {
-      <button
-        mat-icon-button
-        [matMenuTriggerFor]="profilePanel"
-        class="profile-btn"
-        [matMenuTriggerRestoreFocus]="false"
-      >
-        <mat-icon>account_circle</mat-icon>
-      </button>
+  @if (!authSvc.isGuest()) {
+  <nav class="nav">
+    <a mat-button routerLink="/festivals" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      Festivals
+    </a>
+    @if (authSvc.isEditor() || authSvc.isAdmin()) {
+    <a mat-button routerLink="/publishers" routerLinkActive="active">
+      Editeurs
+    </a>
     }
+
+    @if (authSvc.isAdmin()) {
+    <a mat-button routerLink="/admin" routerLinkActive="active">
+      Administration
+    </a>
+    }
+
+    <button mat-icon-button [matMenuTriggerFor]="profilePanel" class="profile-btn" [matMenuTriggerRestoreFocus]="false">
+      <mat-icon>account_circle</mat-icon>
+    </button>
+  </nav>
+  } @else {
+  <button mat-icon-button [matMenuTriggerFor]="profilePanel" class="profile-btn" [matMenuTriggerRestoreFocus]="false">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+  }
   }
 </mat-toolbar>
 
 <!-- Profile panel -->
 <mat-menu #profilePanel="matMenu" class="profile-menu">
   @if (authSvc.currentUser(); as user) {
-    <div class="profile-card">
-      <mat-icon class="avatar">account_circle</mat-icon>
+  <div class="profile-card">
+    <mat-icon class="avatar">account_circle</mat-icon>
 
-      <div class="name">
-        {{user.firstName}} {{user.lastName}}
-      </div>
-
-      <div class="email">
-        {{user.email}}
-      </div>
-
-      <div class="role">
-        Vous êtes {{ roleEnToFr(user.role) }}
-      </div>
-
-      <button class="logout-btn" (click)="logout()">
-        Déconnexion
-      </button>
+    <div class="name">
+      {{user.firstName}} {{user.lastName}}
     </div>
+
+    <div class="email">
+      {{user.email}}
+    </div>
+
+    <div class="role">
+      Vous êtes {{ roleEnToFr(user.role) }}
+    </div>
+
+    <button class="logout-btn" (click)="logout()">
+      Déconnexion
+    </button>
+  </div>
   }
 </mat-menu>
