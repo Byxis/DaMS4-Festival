@@ -85,7 +85,7 @@ export class GameForm
                     }
                     else if (game.id)
                     {
-                        this.currentLogoUrl = `https://localhost:4000/api/games/${game.id}/logo`;
+                        this.currentLogoUrl = `${environment.BACKEND_URL}/api/games/${game.id}/logo`;
                     }
                 }
             }
