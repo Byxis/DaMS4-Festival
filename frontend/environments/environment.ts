@@ -1,3 +1,3 @@
 export const environment = {
-    apiUrl: process.env.BACKEND_URL,
+    apiUrl: 'https://localhost:4000/api',
 }
