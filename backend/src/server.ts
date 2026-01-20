@@ -1,22 +1,31 @@
-import fs from "fs";
-import https from "https";
-import express from "express";
-import cors from "cors";
-import morgan from "morgan";
-import cookieParser from "cookie-parser";
-import { ensureAdmin } from "./db/initAdmin.js";
 import "dotenv/config";
 
-import publicRouter from "./routes/public.js";
-import usersRouter from "./routes/users.js";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import express from "express";
+import fs from "fs";
+import https from "https";
+import morgan from "morgan";
+
+import {ensureAdmin, ensureEditor, ensureGuest, ensurePublisher} from "./db/initDefaultUsers.js";
+import {requireAdmin} from "./middleware/auth-admin.js";
+import {verifyToken} from "./middleware/token-management.js";
 import authRouter from "./routes/auth.js";
-import { verifyToken } from "./middleware/token-management.js";
-import { requireAdmin } from "./middleware/auth-admin.js";
+import festivalsRouter from "./routes/festivals.js";
+import game from "./routes/game.js";
+import othersRouter from "./routes/others.js";
+import publicRouter from "./routes/public.js";
+import publisherRouter from "./routes/publisher.js";
+import reservationsRouter from "./routes/reservations.js";
+import usersRouter from "./routes/users.js";
 
 // Création de l’application Express
 const app = express();
 
 await ensureAdmin();
+await ensureEditor();
+await ensurePublisher();
+await ensureGuest();
 
 // Ajout manuel des principaux en-têtes HTTP de sécurité
 app.use((req, res, next) => {
@@ -24,47 +33,59 @@ app.use((req, res, next) => {
     res.setHeader("X-Content-Type-Options", "nosniff");
     // Interdit l'intégration du site dans des iframes externes -> attaque : Clickjacking
     res.setHeader("X-Frame-Options", "SAMEORIGIN");
-    // Évite que les URL avec paramètres sensibles apparaissent dans les en-têtes "Referer" -> attaque : Token ou paramètres dans l’URL
+    // Évite que les URL avec paramètres sensibles apparaissent dans les en-têtes "Referer" -> attaque : Token ou
+    // paramètres dans l’URL
     res.setHeader("Referrer-Policy", "no-referrer");
-    // Politique de ressources : seules les ressources du même site peuvent être chargées -> attaque : Fuite de données statiques
+
     res.setHeader("Cross-Origin-Resource-Policy", "same-origin");
-    // Politique d'ouverture inter-origine (Empêche le partage de contexte entre onglets) -> attaque : de type Spectre - isolation des fenêtres
     res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
-    // Politique d'intégration inter-origine (empêche les inclusions non sûres : force l’isolation complète des ressources intégrées) -> Attaques par chargement de scripts
     res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
+
     next();
 });
 
-app.use(morgan("dev")); // Log des requêtes : Visualiser le flux de requêtes entre Angular et Express
+
+
+app.use(morgan("dev"));  // Log des requêtes : Visualiser le flux de requêtes entre Angular et Express
 
 app.use(express.json());
 
 app.use(cookieParser());
 
+
+
 // Configuration CORS : autoriser le front Angular en HTTPS local
 app.use(
     cors({
-        origin: "https://localhost:8080",
+        origin: process.env.FRONTEND_URL || "https://localhost:8080",
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE"],
         allowedHeaders: ["Content-Type", "Authorization"],
-    })
+    }),
 );
+app.use(express.static("./uploads"));
 
 // Routes publiques
 app.use("/api/public", publicRouter);
 app.use("/api/auth", authRouter);
-app.use("/api/users", verifyToken, usersRouter); // protégé
-app.use("/api/admin", verifyToken, requireAdmin, (req, res) => {
-    res.json({ message: "Bienvenue admin" });
-});
 app.use("/api/users", verifyToken, usersRouter);
+
+app.use("/api/festivals", verifyToken, festivalsRouter);
+app.use("/api/festivals", verifyToken, reservationsRouter);
+
+app.use("/api/admin", verifyToken, requireAdmin, (req, res) => {
+    res.json({message: "Bienvenue admin"});
+});
+app.use("/api/publishers", verifyToken, publisherRouter);
+app.use("/api/others", verifyToken, othersRouter);
+
+app.use('/api/games', game);
 
 // Chargement du certificat et clé générés par mkcert (étape 0)
 const key = fs.readFileSync("./certs/localhost-key.pem");
 const cert = fs.readFileSync("./certs/localhost.pem");
 
 // Lancement du serveur HTTPS
-https.createServer({ key, cert }, app).listen(4000, () => {
+https.createServer({key, cert}, app).listen(4000, () => {
     console.log("👍 Serveur API démarré sur https://localhost:4000");
 });

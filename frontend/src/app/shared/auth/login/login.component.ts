@@ -7,32 +7,31 @@ import {
   MatCardHeader,
   MatCardSubtitle,
   MatCardTitle,
-  MatCardFooter,
 } from '@angular/material/card';
 import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
-import { Router } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '@auth/auth.service';
 
 @Component({
   selector: 'login',
   imports: [
     MatCard,
-    MatCardHeader,
-    MatCardTitle,
-    MatCardSubtitle,
     MatCardContent,
     MatFormField,
     MatLabel,
     MatError,
-    MatIcon,
     MatCardContent,
     MatInput,
     MatButton,
     ReactiveFormsModule,
-    MatCardFooter,
-  ],
+    MatIcon,
+    RouterLink,
+    MatCardHeader,
+    MatCardTitle,
+    MatCardSubtitle,
+],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
   standalone: true,
@@ -40,19 +39,21 @@ import { AuthService } from '@auth/auth.service';
 export class Login {
   private readonly svc = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   readonly isLoading = this.svc.isLoading;
   readonly error = this.svc.error;
 
   constructor() {
     effect(() => {
       if (this.svc.isLoggedIn()) {
-        this.router.navigate(['/']);
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+        this.router.navigateByUrl(returnUrl);
       }
     });
   }
 
   readonly form = new FormGroup({
-    login: new FormControl('', {
+    email: new FormControl('', {
       nonNullable: true,
       validators: [Validators.minLength(5), Validators.required],
     }),
@@ -64,10 +65,10 @@ export class Login {
 
   submit() {
     if (this.form.valid) {
-      var login: string = this.form.value.login ?? '';
+      var email: string = this.form.value.email ?? '';
       var password: string = this.form.value.password ?? '';
-      if (login && password) {
-        this.svc.login(login, password);
+      if (email && password) {
+        this.svc.login(email, password);
       }
     }
   }

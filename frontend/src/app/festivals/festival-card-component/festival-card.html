@@ -1,0 +1,31 @@
+<mat-card class="festival-card" appearance="outlined" (mouseenter)="isHovered = true" (mouseleave)="isHovered = false"
+  (click)="navigateToFestivalPage()">
+
+  @if(festival().logoUrl) {
+  <div class="card-background" [style.background-image]="'url(' + festival().logoUrl + ')'"></div>
+  }
+
+  <div class="festival-banner">
+    <div class="festival-name">{{festival().name}}</div>
+    <div class="festival-dates">
+      {{festival().start_date | date : "shortDate"}} - {{festival().end_date | date : "shortDate"}}
+    </div>
+    <div class="festival-location">
+      <mat-icon>location_on</mat-icon>
+      <span>{{festival().location}}</span>
+    </div>
+  </div>
+
+  <div class="card-content-overlay">
+    @if(isHovered){
+    <mat-card-content>
+      <p>Tables disponibles :</p>
+      <br>
+      <p><mat-icon>table_bar</mat-icon> {{festival().table_count}}</p>
+      <p><mat-icon>table_restaurant</mat-icon> {{festival().big_table_count}}</p>
+      <p><mat-icon>desk</mat-icon> {{festival().town_table_count}}</p>
+    </mat-card-content>
+    }
+  </div>
+
+</mat-card>

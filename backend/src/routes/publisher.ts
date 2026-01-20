@@ -1,0 +1,656 @@
+import {Router} from "express";
+import type {Request, Response} from "express";
+import fs from "fs";
+import multer from "multer";
+import path from "path";
+
+import pool from "../db/database.js";
+import {requireAdmin, requireEditor} from "../middleware/auth-admin.js";
+import {verifyTokenOptional} from "../middleware/token-management.js";
+import type {Contact} from "../types/contact.js";
+import type {Publisher} from "../types/publisher.js";
+
+/**
+ * Routes for managing publishers and their contacts, including logo uploads.
+ * All routes that modify data require admin privileges (and are marked with !).
+ *
+ * Endpoints:
+ * - GET /api/publishers - Retrieve all publishers with their contacts
+ * !- POST /api/publishers - Create a new publisher
+ *
+ * ! POST /api/publishers/addGameToPublisher - Create a new game, and add it to the publisher's list of games
+ * - GET /api/publishers/:id - Retrieve a specific publisher by ID
+ * !- DELETE /api/publishers/:id - Delete a specific publisher by ID
+ * !- PUT /api/publishers/:id - Update a specific publisher name by ID
+ *
+ * !- GET /api/publishers/:id/contacts - Get all contacts of a specific publisher
+ * !- DELETE /api/publishers/:id/contacts/:contactId - Delete a specific contact from a specific publisher
+ * !- PUT /api/publishers/:id/contacts/:contactId - Update a specific contact of a specific publisher
+ *
+ * - GET /api/publishers/:id/logo - Retrieve the logo of a specific publisher
+ * !- POST /api/publishers/:id/logo - Upload a logo for a specific publisher
+ * !- DELETE /api/publishers/:id/logo - Delete the logo of a specific publisher
+ *
+ * - GET /api/publishers/getAllExistingPublishers - Get all editors not yet imported with game count
+ * !- POST /api/publishers/import/:editorId - Import an existing publisher by editor ID
+ * !- POST /api/publishers/import-by-name - Import an existing publisher by editor name
+ * - GET /api/publishers/check-exists/:name - Check if a publisher or editor exists
+ */
+
+const router = Router();
+const upload = multer({
+    storage: multer.diskStorage({
+        destination: "./uploads/logos",
+        filename: (req: Request, file: Express.Multer.File, cb: (error: Error|null, filename: string) => void) => {
+            cb(null, `temp-${Date.now()}${path.extname(file.originalname)}`);
+        },
+    }),
+    fileFilter: (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+        const allowedTypes = /jpeg|jpg|png|gif|webp/;
+        const ext = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+        const mime = allowedTypes.test(file.mimetype);
+
+        if (ext && mime)
+        {
+            return cb(null, true);
+        }
+        else
+        {
+            return cb(new Error("Invalid file type. Only JPEG, JPG, PNG, GIF, or WEBP images are allowed."));
+        }
+    },
+    limits: {fileSize: 10 * 1024 * 1024},  // 10MB max
+});
+
+function getLogoUrl(publisher: any): string|null
+{
+    if (!publisher.logo) return null;
+    if (publisher.logo.startsWith('http://') || publisher.logo.startsWith('https://'))
+    {
+        return publisher.logo;  // Return URL directly
+    }
+    return `/publishers/${publisher.id}/logo`;  // Local file
+}
+
+
+/* ---------- /api/publishers ----------*/
+// GET /api/publishers - Retrieve all publishers with their contacts (contacts only for admin/editor)
+router.get("/", verifyTokenOptional, async (req: Request, res: Response) => {
+    const isAuthorized = req.user?.role === 'admin' || req.user?.role === 'editor';
+
+    const {rows: publisherRows} = await pool.query<Publisher>("SELECT * FROM publisher");
+
+    const {rows: contactRows} = isAuthorized ? await pool.query<Contact>("SELECT * FROM contact") : {rows: []};
+
+    publisherRows.forEach((publisher) => {
+        publisher.contacts = isAuthorized ? contactRows.filter((contact) => contact.entity_id === publisher.id) : [];
+
+        const logoUrl = getLogoUrl(publisher);
+        if (logoUrl)
+        {
+            (publisher as any).logoUrl = logoUrl;
+        }
+    });
+    res.json(publisherRows);
+});
+
+//! POST /api/publishers - Create a new publisher
+router.post("/", requireEditor, async (req: Request, res: Response) => {
+    const {name} = req.body;
+    if (!name)
+    {
+        return res.status(400).json({error: "Name is required"});
+    }
+    const client = await pool.connect();
+
+    try
+    {
+        const publisherResult =
+            await client.query<Publisher>("INSERT INTO publisher (name) VALUES ($1) RETURNING *", [name]);
+        const publisher = publisherResult.rows[0];
+        return res.status(201).json(publisher);
+    }
+    catch (err: any)
+    {
+        console.error(err);
+        res.status(500).json({
+            error: "Could not create publisher: " + err.message,
+        });
+    }
+});
+
+//! GET /api/publishers/getAllExistingPublishers - Get all editors not yet imported with game count
+router.get("/getAllExistingPublishers", requireEditor, async (req: Request, res: Response) => {
+    try
+    {
+        const {rows} = await pool.query(`SELECT 
+        e.id, 
+        e.name, 
+        e.logo,
+        (SELECT COUNT(*) FROM games WHERE editor_id = e.id)::INTEGER as numberOfGames
+       FROM editors e
+       WHERE LOWER(e.name) NOT IN (
+         SELECT LOWER(p.name) FROM publisher p
+       )
+       ORDER BY e.name`);
+        res.json(rows);
+    }
+    catch (err)
+    {
+        console.error(' Erreur:', err);
+        res.status(500).json({error: "Could not find existing publishers"});
+    }
+});
+
+//! GET /api/publishers/check-exists/:name - Check is a publisher name is available, or already taken
+router.get("/check-exists/:name", requireEditor, async (req: Request, res: Response) => {
+    const {name} = req.params;
+
+    try
+    {
+        const editorResult =
+            await pool.query("SELECT id, name, logo FROM editors WHERE LOWER(name) = LOWER($1) LIMIT 1", [name]);
+
+        const publisherResult =
+            await pool.query("SELECT id FROM publisher WHERE LOWER(name) = LOWER($1) LIMIT 1", [name]);
+
+        res.json({
+            existsInEditors: editorResult.rowCount && editorResult.rowCount > 0,
+            editor: editorResult.rows[0] || null,
+            existsInPublisher: publisherResult.rowCount && publisherResult.rowCount > 0,
+        });
+    }
+    catch (err)
+    {
+        res.status(500).json({error: "Could not check publisher"});
+    }
+});
+
+
+
+//! POST /api/publishers/import/:editorId - Import an existing publisher
+router.post("/import/:editorId", requireEditor, async (req: Request, res: Response) => {
+    const {editorId} = req.params;
+    const client = await pool.connect();
+
+    try
+    {
+        await client.query("BEGIN");
+
+        const {rows: existingEditor} =
+            await client.query("SELECT id, name, logo FROM editors WHERE id = $1", [editorId]);
+
+        if (existingEditor.length === 0)
+        {
+            await client.query("ROLLBACK");
+            return res.status(404).json({error: "Editor not found"});
+        }
+
+        const editor = existingEditor[0];
+
+        const {rows: inserPublisher} =
+            await client.query<Publisher>("INSERT INTO publisher (name) VALUES ($1) RETURNING *", [editor.name]);
+
+        if (inserPublisher.length === 0)
+        {
+            await client.query("ROLLBACK");
+            return res.status(404).json({error: "can't add new publisher"});
+        }
+
+        const newPublisher = inserPublisher[0]!;
+
+        if (editor.logo)
+        {
+            await client.query("UPDATE entities SET logo = $1 WHERE id = $2", [editor.logo, newPublisher.id]);
+            newPublisher.logo = editor.logo;
+        }
+
+        const {rows: gamesRows} = await client.query(
+            "SELECT name, minimum_number_of_player, maximum_number_of_player, logo, type_of_games_id FROM games WHERE editor_id = $1",
+            [editorId]);
+
+
+
+        if (!newPublisher || Number.isNaN(Number(newPublisher.id)))
+        {
+            return res.status(400).json({error: "publisher_id is required and must be a number"});
+        }
+
+        for (const game of gamesRows)
+        {
+            await client.query(
+                `INSERT INTO games_publisher (name, publisher_id, minimum_number_of_player, maximum_number_of_player, logo, type_of_games_id)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+                [
+                    game.name,
+                    newPublisher.id,
+                    game.minimum_number_of_player ?? null,
+                    game.maximum_number_of_player ?? null,
+                    game.logo ?? null,
+                    game.type_of_games_id ?? null
+                ]);
+        }
+
+        await client.query("COMMIT");
+
+        res.status(201).json(
+            {publisher: {...newPublisher, logoUrl: getLogoUrl(newPublisher)}, gamesCount: gamesRows.length});
+    }
+    catch (err: any)
+    {
+        await client.query("ROLLBACK");
+        console.error("Import error:", err);
+        res.status(500).json({error: "Could not import publisher: " + err.message});
+    }
+    finally
+    {
+        client.release();
+    }
+});
+
+//! POST /api/publishers/import-by-name - Import an existing publisher by name
+router.post("/import-by-name", requireEditor, async (req: Request, res: Response) => {
+    const {editorName} = req.body;
+    const client = await pool.connect();
+
+    if (!editorName || editorName.trim() === "")
+    {
+        return res.status(400).json({error: "editorName is required"});
+    }
+
+    try
+    {
+        await client.query("BEGIN");
+
+
+        const {rows: existingEditor} =
+            await client.query("SELECT id, name, logo FROM editors WHERE LOWER(name) = LOWER($1)", [editorName.trim()]);
+
+        if (existingEditor.length === 0)
+        {
+            await client.query("ROLLBACK");
+            return res.status(404).json({error: "Editor not found"});
+        }
+
+        const editor = existingEditor[0];
+
+        const {rows: existingPublisher} =
+            await client.query("SELECT id FROM publisher WHERE LOWER(name) = LOWER($1)", [editor.name]);
+
+        if (existingPublisher.length > 0)
+        {
+            await client.query("ROLLBACK");
+            return res.status(409).json({error: "Publisher already exists"});
+        }
+
+        const {rows: inserPublisher} =
+            await client.query<Publisher>("INSERT INTO publisher (name) VALUES ($1) RETURNING *", [editor.name]);
+
+        const newPublisher = inserPublisher[0]!;
+
+        if (editor.logo)
+        {
+            await client.query("UPDATE entities SET logo = $1 WHERE id = $2", [editor.logo, newPublisher.id]);
+            newPublisher.logo = editor.logo;
+        }
+
+
+        const {rows: gamesRows} = await client.query(
+            "SELECT name, minimum_number_of_player, maximum_number_of_player, logo, type_of_games_id FROM games WHERE editor_id = $1",
+            [editor.id]);
+
+        if (!newPublisher || Number.isNaN(Number(newPublisher.id)))
+        {
+            return res.status(400).json({error: "publisher_id is required and must be a number"});
+        }
+
+
+        for (const game of gamesRows)
+        {
+            await client.query(
+                `INSERT INTO games_publisher (name, publisher_id, minimum_number_of_player, maximum_number_of_player, logo, type_of_games_id)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+                [
+                    game.name,
+                    newPublisher.id,
+                    game.minimum_number_of_player ?? null,
+                    game.maximum_number_of_player ?? null,
+                    game.logo ?? null,
+                    game.type_of_games_id ?? null
+                ]);
+        }
+
+        await client.query("COMMIT");
+
+        res.status(201).json(
+            {publisher: {...newPublisher, logoUrl: getLogoUrl(newPublisher)}, gamesCount: gamesRows.length});
+    }
+    catch (err: any)
+    {
+        await client.query("ROLLBACK");
+        console.error("Import error:", err);
+        res.status(500).json({error: "Could not import publisher: " + err.message});
+    }
+    finally
+    {
+        client.release();
+    }
+});
+
+
+//! POST /api/publishers/addGameToPublisher - Create a new game, and add it to the publisher's list of games
+router.post("/addGameToPublisher", requireEditor, async (req, res) => {
+    const {name, publisher_id, type, minimum_number_of_player, maximum_number_of_player, logo} = req.body;
+
+    if (!publisher_id || Number.isNaN(Number(publisher_id)))
+    {
+        return res.status(400).json({error: "publisher_id is required and must be a number"});
+    }
+
+    if (!name || name.toString().trim() === "")
+    {
+        return res.status(400).json({error: "name is required"});
+    }
+
+    let finalTypeOfGameID: number|null = null;
+    const client = await pool.connect();
+
+    try
+    {
+        await client.query("BEGIN");
+        if (type && type.toString().trim() !== "")
+        {
+            const r =
+                await client.query("SELECT id FROM type_of_games WHERE LOWER(description) = LOWER($1) LIMIT 1", [type]);
+            if (r.rowCount)
+            {
+                finalTypeOfGameID = r.rows[0].id;
+            }
+        }
+        const result = await client.query(
+            `INSERT INTO games_publisher (name, publisher_id, minimum_number_of_player, maximum_number_of_player, logo, type_of_games_id)
+       VALUES ($1, $2, $3, $4, $5, $6) 
+       RETURNING *, (SELECT name FROM publisher WHERE id = $2) AS editor_name`,
+            [
+                name,
+                publisher_id,
+                minimum_number_of_player ?? null,
+                maximum_number_of_player ?? null,
+                logo ?? null,
+                finalTypeOfGameID
+            ]);
+        await client.query("COMMIT");
+        res.status(201).json(result.rows[0]);
+    }
+    catch (e)
+    {
+        await client.query("ROLLBACK");
+        console.error(e);
+        res.status(500).json({error: "Erreur lors de l'ajout du jeu au publisher"});
+    }
+    finally
+    {
+        client.release();
+    }
+});
+
+/* ---------- /api/publishers/:id ----------*/
+
+// GET /api/publishers/:id - Retrieve a specific publisher by ID
+router.get("/:id", async (req: Request, res: Response) => {
+    const {id} = req.params;
+    const {rows} = await pool.query<Publisher>("SELECT * FROM publisher WHERE id = $1", [id]);
+    if (rows.length === 0)
+    {
+        return res.status(404).json({error: "Publisher not found"});
+    }
+    res.json(rows[0]);
+});
+
+
+
+//! DELETE /api/publishers/:id - Delete a specific publisher by ID
+router.delete("/:id", requireEditor, async (req: Request, res: Response) => {
+    const {id} = req.params;
+    try
+    {
+        const {rowCount} = await pool.query("DELETE FROM publisher WHERE id = $1", [id]);
+        if (rowCount === 0)
+        {
+            return res.status(404).json({error: "Publisher not found"});
+        }
+        res.status(204).send();
+    }
+    catch (err: any)
+    {
+        console.error(err);
+        res.status(500).json({
+            error: "Could not delete publisher: " + err.message,
+        });
+    }
+});
+
+//! PUT /api/publishers/:id - Update a specific publisher name by ID
+router.put("/:id", requireEditor, async (req: Request, res: Response) => {
+    const {id} = req.params;
+    const {name} = req.body;
+
+    if (!id && !name)
+    {
+        return res.status(400).json({error: "ID and Name are required"});
+    }
+    try
+    {
+        const {rows} =
+            await pool.query<Publisher>("UPDATE publisher SET name = $1 WHERE id = $2 RETURNING *", [name, id]);
+        if (rows.length === 0)
+        {
+            return res.status(404).json({error: "Publisher not found"});
+        }
+        res.json(rows[0]);
+    }
+    catch (err: any)
+    {
+        console.error(err);
+        res.status(500).json({
+            error: "Could not update publisher: " + err.message,
+        });
+    }
+});
+
+/* ---------- /api/publishers/:id/contacts ----------*/
+
+//! POST /api/publishers/:id/contacts - Add a contact to a specific publisher
+router.post("/:id/contacts", requireEditor, async (req: Request, res: Response) => {
+    const {id} = req.params;
+    const {name, family_name, role, telephone, email} = req.body;
+    if (!name)
+    {
+        return res.status(400).json({error: "Name is required"});
+    }
+    if (!family_name)
+    {
+        return res.status(400).json({error: "Family name is required"});
+    }
+
+    if (!(telephone || email))
+    {
+        return res.status(400).json({error: "Phone or email is required"});
+    }
+    try
+    {
+        const {rows} = await pool.query<Contact>(
+            "INSERT INTO contact (entity_id, name, family_name, role, telephone, email) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+            [id, name, family_name, role, telephone, email]);
+        res.status(201).json(rows[0]);
+    }
+    catch (err: any)
+    {
+        console.error(err);
+        res.status(500).json({
+            error: "Could not create contact: " + err.message,
+        });
+    }
+});
+
+//! DELETE /api/publishers/:id/contacts/:contactId - Delete a specific contact from a specific publisher
+router.delete("/:id/contacts/:contactId", requireEditor, async (req: Request, res: Response) => {
+    const {contactId} = req.params;
+    try
+    {
+        const {rowCount} = await pool.query("DELETE FROM contact WHERE id = $1", [contactId]);
+        if (rowCount === 0)
+        {
+            return res.status(404).json({error: "Contact not found"});
+        }
+        res.status(204).send();
+    }
+    catch (err: any)
+    {
+        console.error(err);
+        res.status(500).json({
+            error: "Could not delete contact: " + err.message,
+        });
+    }
+});
+
+//! PUT /api/publishers/:id/contacts/:contactId - Update a specific contact of a specific publisher
+router.put("/:id/contacts/:contactId", requireEditor, async (req: Request, res: Response) => {
+    const {contactId} = req.params;
+    const {name, family_name, role, telephone, email} = req.body;
+    if (!contactId)
+    {
+        return res.status(400).json({error: "Contact ID is required"});
+    }
+
+    try
+    {
+        const {rows} = await pool.query<Contact>(
+            "UPDATE contact SET name = $1, family_name = $2, role = $3, telephone = $4, email = $5 WHERE id = $6 RETURNING *",
+            [name, family_name, role, telephone, email, contactId]);
+        if (rows.length === 0)
+        {
+            return res.status(404).json({error: "Contact not found"});
+        }
+        res.json(rows[0]);
+    }
+    catch (err: any)
+    {
+        console.error(err);
+        res.status(500).json({
+            error: "Could not update contact: " + err.message,
+        });
+    }
+});
+
+/* ---------- /api/publishers/:id/logo ----------*/
+
+// GET /api/publishers/:id/logo - Retrieve the logo of a specific publisher
+router.get("/:id/logo", async (req: Request, res: Response) => {
+    const {id} = req.params;
+
+    if (!id || !/^\d+$/.test(id))
+    {
+        if (req.file) fs.unlinkSync(req.file.path);
+        return res.status(400).json({error: "Invalid ID"});
+    }
+
+    const logoPath = `./uploads/logos/${id}`;
+
+    const files = fs.readdirSync("./uploads/logos").filter((f: string) => f.startsWith(`${id}.`));
+
+    if (files.length === 0)
+    {
+        return res.status(404).json({error: "Logo not found"});
+    }
+
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    res.sendFile(path.resolve(`./uploads/logos/${files[0]}`));
+});
+
+//! POST /api/publishers/:id/logo - Upload a logo for a specific publisher
+router.post("/:id/logo", requireEditor, upload.single("logo"), async (req: Request, res: Response) => {
+    const {id} = req.params;
+
+    if (!req.file)
+    {
+        return res.status(400).json({error: "No file uploaded"});
+    }
+
+    const {rows} = await pool.query("SELECT id FROM publisher WHERE id = $1", [id]);
+    if (rows.length === 0)
+    {
+        fs.unlinkSync(req.file.path);
+        return res.status(404).json({error: "Publisher not found"});
+    }
+
+    const existingFiles = fs.readdirSync("./uploads/logos").filter((f: string) => f.startsWith(`${id}.`));
+
+    existingFiles.forEach((f: string) => fs.unlinkSync(`./uploads/logos/${f}`));
+
+    const ext = path.extname(req.file.originalname);
+    const newPath = `./uploads/logos/${id}${ext}`;
+
+    fs.renameSync(req.file.path, newPath);
+
+    res.json({
+        message: "Logo updated",
+        url: `/publishers/${id}/logo`,
+    });
+});
+
+//! DELETE /api/publishers/:id/logo - Delete the logo of a specific publisher
+router.delete("/:id/logo", requireEditor, async (req: Request, res: Response) => {
+    const {id} = req.params;
+
+    const files = fs.readdirSync("./uploads/logos").filter((f: string) => f.startsWith(`${id}.`));
+
+    if (files.length === 0)
+    {
+        return res.status(404).json({error: "Logo not found"});
+    }
+
+    files.forEach((f: string) => fs.unlinkSync(`./uploads/logos/${f}`));
+    res.json({message: "Logo deleted"});
+});
+
+// GET /api/publishers/:id/festivals - Retrieve festivals where the publisher has a reservation with status FACTURED or
+// CONFIRMED
+router.get("/:id/festivals", async (req: Request, res: Response) => {
+    const {id} = req.params;
+    try
+    {
+        const {rows} = await pool.query(
+            `SELECT DISTINCT f.*
+             FROM festivals f
+             JOIN reservations r ON f.id = r.festival_id
+             WHERE r.entity_id = $1
+               AND r.status IN ('FACTURED', 'CONFIRMED')
+             ORDER BY f.start_date DESC`,
+            [id]);
+
+        const FESTIVAL_LOGO_DIR = "./uploads/festival-logos";
+        if (fs.existsSync(FESTIVAL_LOGO_DIR))
+        {
+            rows.forEach((festival: any) => {
+                const logoFiles =
+                    fs.readdirSync(FESTIVAL_LOGO_DIR).filter((f: string) => f.startsWith(`${festival.id}.`));
+                if (logoFiles.length > 0)
+                {
+                    festival.logoUrl = `/festivals/${festival.id}/logo`;
+                }
+            });
+        }
+
+        res.json(rows);
+    }
+    catch (err: any)
+    {
+        console.error(err);
+        res.status(500).json({
+            error: "Could not retrieve festivals: " + err.message,
+        });
+    }
+});
+
+export default router;

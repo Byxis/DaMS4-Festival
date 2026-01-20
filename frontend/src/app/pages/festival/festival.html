@@ -1,0 +1,160 @@
+<div class="festival-detail-container">
+    @if (festival(); as f) {
+
+    <!-- SECTION 1: Festival Info + Logo -->
+    <div class="top-section">
+        <!-- Festival Info -->
+        <div class="festival-info">
+            <div class="title-row">
+                <h1>{{ f.name }}</h1>
+                @if(authService.isEditor() || authService.isAdmin()) {
+                <button mat-icon-button color="primary" title="Edit Festival" (click)="editFestival()">
+                    <mat-icon>edit</mat-icon>
+                </button>
+                }
+            </div>
+
+            <div class="info-row">
+                <div class="info-item">
+                    <mat-icon class="info-icon">event</mat-icon>
+                    <div class="info-content">
+                        <span class="info-label">Date :</span>
+                        <span class="info-value">{{ getDateRange(f) }}</span>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <mat-icon class="info-icon">location_on</mat-icon>
+                    <div class="info-content">
+                        <span class="info-label">Lieu :</span>
+                        <a href="#" class="info-value location-link">{{ f.location }}</a>
+                    </div>
+                </div>
+            </div>
+
+            <mat-divider class="info-divider"></mat-divider>
+
+            <!-- Festival Stats -->
+            <div class="stock-inline">
+                <h3>Espace de table disponible</h3>
+                <div class="stock-row">
+                    <div class="stock-item-inline">
+                        <span class="stock-label">Tables</span>
+                        <span class="stock-value">{{ usedStock().tables }} / {{ f.table_count }}
+                            <mat-icon>table_bar</mat-icon>
+                        </span>
+                    </div>
+                    <div class="stock-item-inline">
+                        <span class="stock-label">Grandes Tables</span>
+                        <span class="stock-value">{{ usedStock().bigTables }} / {{ f.big_table_count
+                            }} <mat-icon>table_restaurant</mat-icon>
+                        </span>
+                    </div>
+                    <div class="stock-item-inline">
+                        <span class="stock-label">Tables Municipales</span>
+                        <span class="stock-value">{{ usedStock().townTables }} / {{ f.town_table_count }}
+                            <mat-icon>desk</mat-icon>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            @if(authService.isEditor() || authService.isAdmin()) {
+            <div class="stock-inline">
+                <br>
+                <h3>Superficie des tables (m²)</h3>
+                <div class="stock-row">
+                    <div class="stock-item-inline">
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="surface-field">
+                            <mat-label>Standard</mat-label>
+                            <input matInput type="number" step="0.5" [value]="f.table_surface ?? 4"
+                                (change)="updateSurface('table_surface', $event)">
+                            <span matTextSuffix>m²</span>
+                        </mat-form-field>
+                    </div>
+                    <div class="stock-item-inline">
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="surface-field">
+                            <mat-label>Grandes</mat-label>
+                            <input matInput type="number" step="0.5" [value]="f.big_table_surface ?? 4"
+                                (change)="updateSurface('big_table_surface', $event)">
+                            <span matTextSuffix>m²</span>
+                        </mat-form-field>
+                    </div>
+                    <div class="stock-item-inline">
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="surface-field">
+                            <mat-label>Municipales</mat-label>
+                            <input matInput type="number" step="0.5" [value]="f.town_table_surface ?? 4"
+                                (change)="updateSurface('town_table_surface', $event)">
+                            <span matTextSuffix>m²</span>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+
+        <!-- Logo -->
+        <div class="logo-section">
+            @if (f.logoUrl) {
+            <div class="poster-wrapper">
+                <img [src]="f.logoUrl" [alt]="f.name" class="festival-poster">
+            </div>
+            } @else {
+            <div class="poster-placeholder">
+                <mat-icon>image_not_supported</mat-icon>
+                <span>Aucune image disponible</span>
+            </div>
+            }
+        </div>
+    </div>
+    @if(authService.isEditor() || authService.isAdmin()) {
+    <mat-divider class="section-divider"></mat-divider>
+
+
+    <!-- SECTION 2: Zones uniquement -->
+    <div class="content-section">
+        <div class="zones-container">
+            <tarif-zones-list [festivalId]="id()"></tarif-zones-list>
+        </div>
+    </div>
+
+    <mat-divider class="section-divider"></mat-divider>
+
+    <div>
+        <div class="reservation-header-row">
+            <h2>Reservations</h2>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="sort-selector">
+                <mat-label>Trier par</mat-label>
+                <mat-select [value]="sortBy()" (selectionChange)="sortBy.set($event.value)">
+                    @for (option of sortOptions; track option.value) {
+                    <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        @for (item of items(); track item.entity.id) {
+        <reservation [reservationId]="item.reservation?.id" [festivalId]="this.id()" [entityId]="item.entity.id!"
+            [entityType]="item.type" />
+        }
+    </div>
+
+    <div class="footer-actions">
+        <button mat-fab extended color="accent" (click)="importOtherEntity()">
+            <mat-icon>file_upload</mat-icon>
+            Importer une autre entité
+        </button>
+        <button mat-fab extended color="primary" (click)="addOtherEntity()">
+            <mat-icon>add</mat-icon>
+            Ajouter une autre entité
+        </button>
+    </div>
+
+    }
+    } @else {
+    <!-- Loading State -->
+    <div class="loading-container">
+        <mat-spinner diameter="60"></mat-spinner>
+        <p>Chargement des détails du festival...</p>
+    </div>
+    }
+</div>

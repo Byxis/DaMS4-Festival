@@ -1,0 +1,48 @@
+<div class="main-container">
+    <div class="header">
+        <h1>Festivals </h1>
+        @if(authService.isEditor() || authService.isAdmin()) {
+        <button matFab aria-label="Add a festival button" (click)="openFormDialog()">
+            <mat-icon>add</mat-icon>
+        </button>
+        }
+
+        <div class="filters-container">
+            <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+                <mat-label>Rechercher un festival</mat-label>
+                <input matInput [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)"
+                    placeholder="Nom du festival...">
+                <mat-icon matPrefix>search</mat-icon>
+                @if (searchTerm()) {
+                <button mat-icon-button matSuffix (click)="searchTerm.set('')" aria-label="Effacer">
+                    <mat-icon>close</mat-icon>
+                </button>
+                }
+            </mat-form-field>
+
+            <div class="sort-controls">
+                <mat-form-field appearance="outline" class="sort-select" subscriptSizing="dynamic">
+                    <mat-label>Trier par</mat-label>
+                    <mat-select [ngModel]="sortBy()" (ngModelChange)="sortBy.set($event)">
+                        <mat-option value="startDate">Date de début</mat-option>
+                        <mat-option value="endDate">Date de fin</mat-option>
+                        <mat-option value="name">Nom</mat-option>
+                        <mat-option value="id">Date d'ajout</mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <button mat-icon-button class="sort-direction-btn" (click)="toggleSortDirection()"
+                    [matTooltip]="sortDirection() === 'asc' ? 'Ordre croissant' : 'Ordre décroissant'">
+                    <mat-icon>{{ sortDirection() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+                </button>
+            </div>
+
+            <mat-checkbox [ngModel]="showCurrentOnly()" (ngModelChange)="showCurrentOnly.set($event)"
+                class="current-only-checkbox">
+                En cours uniquement
+            </mat-checkbox>
+        </div>
+    </div>
+
+    <app-festival-list [festivals]="filteredFestivals()"></app-festival-list>
+</div>

@@ -1,0 +1,39 @@
+<div class="game-zones-section">
+
+  @if(tarifZone().game_zones && tarifZone().game_zones!.length > 0) {
+  @for(gameZone of tarifZone().game_zones; track trackByGameZoneId($index, gameZone)) {
+  <div class="game-zone-row">
+    <div class="gz-cell name">
+      <mat-icon class="gz-icon">sports_esports</mat-icon>
+      <span>{{ gameZone.name }}</span>
+    </div>
+
+    <div class="gz-cell center hide-tablet hide-mobile">{{ gameZone.reserved_table }}</div>
+    <div class="gz-cell center hide-tablet hide-mobile">{{ gameZone.reserved_big_table }}</div>
+    <div class="gz-cell center hide-tablet hide-mobile">{{ gameZone.reserved_town_table }}</div>
+    <div class="gz-cell center hide-tablet hide-mobile">
+      {{ gameZone.reserved_electrical_outlets }}
+    </div>
+
+    <div class="gz-cell center hide-mobile">{{ gameZone.surface_area }} m²</div>
+
+    <div class="gz-cell center"></div>
+    <div class="gz-cell center"></div>
+
+    <div class="gz-cell actions">
+      <button mat-icon-button (click)="editGameZone($event, gameZone)" matTooltip="Modifier">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button mat-icon-button color="warn" (click)="deleteGameZone($event, gameZone)" matTooltip="Supprimer">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  </div>
+  }
+  } @else {
+  <div class="no-game-zones">
+    <mat-icon>info_outline</mat-icon>
+    <p>Aucune zone de jeu pour le moment</p>
+  </div>
+  }
+</div>

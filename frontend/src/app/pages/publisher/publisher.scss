@@ -1,0 +1,92 @@
+@use 'skeleton';
+@use 'basic';
+
+$background-delete-color: #fbe6e5;
+$delete-color: #d44d3d;
+
+.editor-page-wrapper {
+  padding: 24px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0 20px 0;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.logo-name-group {
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 200px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.edit-btn {
+  background-color: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+}
+
+.delete-btn {
+  background-color: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.festivals-section {
+  margin-top: 32px;
+}
+
+.festivals-section h3 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  padding-bottom: 8px;
+}
+
+.festivals-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 25px;
+  margin: 30px 0;
+}
+
+@media (max-width: 768px) {
+  .festivals-list {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.no-data {
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+}

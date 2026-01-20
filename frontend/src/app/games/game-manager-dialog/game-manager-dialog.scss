@@ -1,0 +1,36 @@
+mat-dialog-content {
+    max-height: 65vh;
+    overflow-y: auto !important;
+    padding-top: 10px;
+}
+
+mat-dialog-actions {
+    border-top: 1px solid var(--mat-sys-outline-variant);
+    padding-top: 1rem;
+    padding-bottom: 0.5rem;
+    background-color: var(--mat-sys-surface);
+    z-index: 2;
+}
+.search-field {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+}
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: var(--mat-sys-on-surface-variant);
+}
+.actions {
+    display: flex;
+    gap: 8px;
+}
+mat-list-item {
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+}

@@ -1,0 +1,113 @@
+<div class="reservation-container">
+  @if (isLoading()) {
+  <div class="skeleton-container">
+    <div class="skeleton-header">
+      <div class="skeleton skeleton-icon"></div>
+      <div class="skeleton skeleton-title"></div>
+      <div class="skeleton skeleton-items">
+        <div class="skeleton skeleton-item"></div>
+        <div class="skeleton skeleton-item"></div>
+        <div class="skeleton skeleton-item"></div>
+      </div>
+      <div class="skeleton skeleton-status"></div>
+    </div>
+  </div>
+  } @else if (isError()) {
+  <div class="error-container">
+    <mat-icon class="error-icon">error_outline</mat-icon>
+    <div class="error-message">Erreur lors du chargement de la réservation</div>
+  </div>
+  } @else {
+  <div class="reservation-header" (click)="toggleExpand()">
+    <mat-icon class="expand-icon" [class.expanded]="isExpanded()">
+      {{ isExpanded() ? 'expand_less' : 'expand_more' }}
+    </mat-icon>
+
+    <button class="logo-name-button" (click)="navigateToEntity()"
+      [disabled]="!entity() || entityType() !== 'PUBLISHER'">
+      @if (this.entity()?.logoUrl) {
+      <img [src]="this.entity()?.logoUrl" alt="{{ this.entity()?.name }} logo" class="logo-img" />
+      } @else {
+      <mat-icon class="logo-fallback-icon">business</mat-icon>
+      }
+      <span class="publisher-name">{{ this.entity()?.name }}</span>
+    </button>
+
+    <div class="items-row">
+      @for (item of items(); track $index) {
+      <div class="item" (click)="$event.stopPropagation()" [class.locked]="item.locked">
+        <mat-checkbox [checked]="item.checked" [disabled]="item.locked"
+          (change)="toggleItemCheck($index)"></mat-checkbox>
+        <span class="item-label" (click)="!item.locked && toggleItemCheck($index)">{{
+          item.label
+          }}</span>
+      </div>
+      }
+    </div>
+
+    <div class="status-container">
+      <button mat-button [matMenuTriggerFor]="statusMenu" class="status-button" (click)="$event.stopPropagation()"
+        [style.backgroundColor]="getStatusBackgroundColor(selectedStatus())"
+        [style.color]="getStatusColor(selectedStatus())" [style.borderColor]="getStatusColor(selectedStatus())">
+        <span class="status-text">Statut : {{ currentStatusLabel() }}</span>
+        <mat-icon class="status-icon">expand_more</mat-icon>
+      </button>
+      <mat-menu #statusMenu="matMenu" panelClass="status-menu-panel">
+        @for (status of statuses; track status) {
+        <button mat-menu-item (click)="setStatus(status)" [style.color]="getStatusColor(status)"
+          [style.backgroundColor]="getStatusBackgroundColor(status)">
+          {{ getStatusLabel(status) }}
+        </button>
+        }
+      </mat-menu>
+    </div>
+  </div>
+  @if (isExpanded()) {
+  <div class="reservation-details">
+    <div class="details-main">
+
+      <div class="tables-section">
+        <h3 class="tables-title">
+          <mat-icon class="tables-icon">table_chart</mat-icon>
+          Stock de tables totales
+        </h3>
+        <div class="tables-container">
+          @for (tableConfig of tableConfigs; track tableConfig.key) {
+          <table [tableConfig]="tableConfig" [count]="tableInputs()[tableConfig.key]" [reservation]="reservation()"
+            [festivalId]="festivalId()"></table>
+          }
+        </div>
+        <div class="tables-footer">
+          @if (tableWarnings().length > 0) {
+          <div class="warnings-container">
+            @for (warning of tableWarnings(); track $index) {
+            <div class="warning-item">
+              <mat-icon class="warning-icon">warning</mat-icon>
+              <span class="warning-text">{{ warning }}</span>
+            </div>
+            }
+          </div>
+          }
+          <div class="presented-by-them-section">
+            <mat-checkbox [checked]="this.reservation()?.presented_by_them"
+              (change)="this.togglePresentedByThem($event.checked)">
+              Jeux présentés par l'éditeur / entité
+            </mat-checkbox>
+          </div>
+        </div>
+      </div>
+      <note [note]="reservation()?.note ?? null" [reservation]="reservation()" [festivalId]="festivalId()"></note>
+    </div>
+    <div class="details-sidebar">
+      <updates [interactions]="reservation()?.interactions"></updates>
+      <facture [games]="reservation()?.games"></facture>
+    </div>
+    <h3 class="tables-title">
+      <mat-icon class="tables-icon">sports_esports</mat-icon>
+      Jeux réservés
+    </h3>
+    <reservation-games [publisherId]="entityId()" [entityName]="entity()?.name" [festivalId]="festivalId()"
+      [reservation]="reservation()"></reservation-games>
+  </div>
+  } }
+</div>

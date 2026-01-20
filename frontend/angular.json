@@ -35,6 +35,9 @@
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
+            "stylePreprocessorOptions": {
+              "includePaths": ["src/app/shared/styles"]
+            },
             "assets": [
               {
                 "glob": "**/*",
@@ -49,12 +52,12 @@
                 {
                   "type": "initial",
                   "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumError": "2MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "8kB",
+                  "maximumError": "40kB"
                 }
               ],
               "outputHashing": "all"
@@ -71,6 +74,7 @@
           "builder": "@angular/build:dev-server",
           "options": {
             "ssl": true,
+            "port": 8080,
             "sslKey": "../certs/localhost-key.pem",
             "sslCert": "../certs/localhost.pem"
           },
@@ -104,5 +108,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "44b22ed6-e8cb-4f88-ac71-853d21c04d9f"
   }
 }

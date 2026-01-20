@@ -1,43 +1,52 @@
 services:
     db:
         image: postgres:16-alpine
-        container_name: secureapp_db_prod
+        container_name: ayae-festival_db_prod
         restart: unless-stopped
         environment:
-            POSTGRES_USER: secureapp
-            POSTGRES_PASSWORD: secureapp
-            POSTGRES_DB: secureapp
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_DB: ${POSTGRES_DB}
         volumes:
-            - db_data:/var/lib/postgresql/data
-            - ./backend/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+           - ./backend/db/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+           - ./backend/db/editorsData.csv:/tmp/editorsData.csv  
+           - ./backend/db/typesOfGamesData.csv:/tmp/typesOfGamesData.csv  
+           - ./backend/db/GamesDATA.csv:/tmp/GamesDATA.csv 
+           - db_data:/var/lib/postgresql/data
         networks:
             - secure_net
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+            interval: 5s
+            timeout: 5s
+            retries: 30
     backend:
         build:
             context: ./backend
             dockerfile: Dockerfile
-        container_name: secureapp_backend_prod
+        container_name: ayae-festival_backend_prod
         restart: unless-stopped
         depends_on:
-            - db
+            db:
+                 condition: service_healthy
+        env_file:
+            - .env
         environment:
             NODE_ENV: production
-            DATABASE_URL: postgresql://secureapp:secureapp@db:5432/secureapp
-            JWT_SECRET: "mon_secret_jwt_super_long_et_complexe"
-            JWT_EXPIRATION: "15m"
-            REFRESH_EXPIRATION: "7d"
-            FRONTEND_URL: http://localhost:8080
+            DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
         volumes:
             - ./backend/certs:/app/certs:ro
+            - uploads_data:/app/uploads
         ports:
             - "4000:4000"
         networks:
             - secure_net
+
     frontend:
         build:
             context: ./frontend
             dockerfile: Dockerfile
-        container_name: secureapp_frontend_prod
+        container_name: ayae-festival_frontend_prod
         restart: unless-stopped
         depends_on:
             - backend
@@ -47,10 +56,11 @@ services:
             - secure_net
     adminer:
         image: adminer:latest
-        container_name: secureapp_adminer_prod
+        container_name: ayae-festival_adminer_prod
         restart: unless-stopped
         depends_on:
-            - db
+            db:
+                condition: service_healthy
         ports:
             - "8081:8080"
         environment:
@@ -59,5 +69,6 @@ services:
             - secure_net
 volumes:
     db_data:
+    uploads_data:
 networks:
     secure_net:

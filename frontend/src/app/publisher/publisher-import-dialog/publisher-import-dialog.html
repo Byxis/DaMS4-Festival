@@ -1,0 +1,54 @@
+<h2 mat-dialog-title>Importer un éditeur existant</h2>
+<mat-dialog-content>
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Rechercher</mat-label>
+    <input #searchInput matInput [value]="this.searchTerm()"
+      (input)="this.searchTerm.set(searchInput.value); this.filterEditors()" placeholder="Filtrer par nom..." />
+    <mat-icon matPrefix>search</mat-icon>
+  </mat-form-field>
+
+  @if (this.isLoading) {
+  <div class="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Chargement...</p>
+  </div>
+  } @else if (this.filteredEditors.length > 0) {
+  <div class="editors-list">
+    @for (editor of this.filteredEditors; track editor.id) {
+    <div class="editor-item">
+      <div class="editor-info">
+        <div class="editor-logo-container">
+          @if (editor.logo && (editor.logo.startsWith('http') || editor.logo.startsWith('https'))) {
+          <img [src]="editor.logo" class="editor-logo" alt="Logo" loading="lazy">
+          } @else {
+          <mat-icon>business</mat-icon>
+          }
+        </div>
+        <div>
+          <div class="editor-name">{{ editor.name }}</div>
+          <div class="editor-details">
+            <span class="detail">
+              <mat-icon>games</mat-icon>
+              {{ editor.numberofgames || 0 }} jeux
+            </span>
+          </div>
+        </div>
+      </div>
+      <button mat-raised-button color="accent" (click)="this.importEditor(editor)" class="import-btn">
+        <mat-icon>add</mat-icon>
+        Importer
+      </button>
+    </div>
+    }
+  </div>
+  } @else {
+  <div class="empty">
+    <mat-icon>business</mat-icon>
+    <p>Aucun éditeur disponible.</p>
+  </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Fermer</button>
+</mat-dialog-actions>

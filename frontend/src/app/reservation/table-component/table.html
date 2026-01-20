@@ -1,0 +1,17 @@
+<div class="table-item">
+  <div class="table-input-group">
+    <span class="table-count">{{ count() }}</span>
+    <span class="table-label">{{ tableConfig().label }}</span>
+  </div>
+  <div class="table-input-wrapper">
+    <input
+      type="number"
+      min="0"
+      [value]="count()"
+      (change)="updateValue($event)"
+      (blur)="onInputBlur()"
+      class="table-quantity-input"
+    />
+    <mat-icon class="table-icon">{{ tableConfig().icon }}</mat-icon>
+  </div>
+</div>

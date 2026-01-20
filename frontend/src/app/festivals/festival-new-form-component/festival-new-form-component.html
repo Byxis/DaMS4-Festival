@@ -1,0 +1,79 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>{{ this.getTitle() }}</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <form [formGroup]="this.form" (submit)="this.submit()">
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Nom du festival</mat-label>
+        <input matInput formControlName="name" placeholder="ex: Festival des Arts 2025">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Lieu</mat-label>
+        <input matInput formControlName="location" placeholder="ex: Paris, France">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Date de début</mat-label>
+        <input matInput formControlName="start_date" type="date">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Date de fin</mat-label>
+        <input matInput formControlName="end_date" type="date">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Tables</mat-label>
+        <input matInput formControlName="table_count" type="number" placeholder="150">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Grandes tables</mat-label>
+        <input matInput formControlName="big_table_count" type="number" placeholder="40">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Tables municipales</mat-label>
+        <input matInput formControlName="town_table_count" type="number" placeholder="20">
+      </mat-form-field>
+
+      <!-- Logo Upload Section -->
+      <div class="logo-section">
+        @if(this.hasLogoToDisplay()) {
+        <div class="logo-preview">
+          <img [src]="this.logoPreview" alt="Logo preview">
+          <button mat-icon-button (click)="this.removeLogo()" type="button" color="warn">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        @if(this.hasExistingLogo) {
+        <p class="logo-hint">Logo actuel du festival</p>
+        }
+        } @else {
+        <div class="logo-upload">
+          <input type="file" accept="image/*" (change)="this.onLogoSelected($event)" #fileInput style="display: none">
+          <button mat-stroked-button type="button" (click)="fileInput.click()">
+            <mat-icon>upload</mat-icon>
+            {{ this.isEditing ? 'Changer le logo' : 'Uploader un logo' }}
+          </button>
+        </div>
+        @if(this.deleteLogo) {
+        <p class="logo-hint warning">Le logo sera supprimé lors de la mise à jour</p>
+        }
+        }
+      </div>
+
+    </form>
+  </mat-card-content>
+
+  <mat-card-actions>
+    <button mat-stroked-button (click)="this.cancel()">Annuler</button>
+    <button mat-raised-button color="primary" [disabled]="this.form.invalid" (click)="this.submit()">
+      {{ this.getSubmitButtonText() }}
+    </button>
+  </mat-card-actions>
+</mat-card>
