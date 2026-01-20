@@ -8,6 +8,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {MatSelectModule} from '@angular/material/select';
+import {environment} from '@env/environment';
 import {map, Observable} from 'rxjs';
 
 import {GameService} from '../game-service/game-service';
@@ -85,7 +86,7 @@ export class GameForm
                     }
                     else if (game.id)
                     {
-                        this.currentLogoUrl = `https://localhost:4000/api/games/${game.id}/logo`;
+                        this.currentLogoUrl = `${environment.apiUrl}/games/${game.id}/logo`;
                     }
                 }
             }
