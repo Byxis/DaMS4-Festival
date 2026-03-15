@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -38,6 +39,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.ayae.festivals.data.LoginViewModel
+import fr.ayae.festivals.ui.HomePage
 import fr.ayae.festivals.ui.LoginScreen
 import fr.ayae.festivals.ui.Navigation.Destination
 import fr.ayae.festivals.ui.theme.AYAEFestivalsTheme
@@ -48,57 +52,114 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AYAEFestivalsTheme {
-                LoginScreen()
+                AYAEFestivalsApp()
             }
         }
     }
 }
 
-@PreviewScreenSizes
-@Composable
-fun AYAEFestivalsApp() {
-
-    val backStack = remember { mutableStateListOf<Any>(Destination.Login)
-
-    }
 
 
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NavBar(
-    navigateBack: () -> Unit,
-) {
+fun AYAEFestivalsApp() {
+    //remember : mémoire à court terme du composant
+    // garde l'objet en mémoire et le renvoie à chaque fois que l'interface est réecrite
+    val backStack = remember { mutableStateListOf<Any>(Destination.Login) }
+    val loginViewModel: LoginViewModel = viewModel()
+    val navigateBack = {
+        if (backStack.size > 1) {
+            backStack.removeAt(backStack.size - 1)
+        }
+    }
+
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
+            TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
-                title = {
-                    Text("Small Top App Bar")
-                },
+                title = { Text("AYAE Festivals") },
                 navigationIcon = {
-                    IconButton(onClick = navigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Retour"
-                        )
+                    if (backStack.size > 1) {
+                        IconButton(onClick = navigateBack) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Localized description"
+                            )
+                        }
                     }
-                },
+                }
             )
+        },
+        bottomBar = {
+            BottomAppBar(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.primary,
+            ) {
+                if (backStack.last() != Destination.Login) {
+                    NavigationBar(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.primary,
+                    ) {
+                        Destination.entries.filter{it != Destination.Login}.forEachIndexed { index, destination ->
+                            NavigationBarItem(
+                                selected = backStack.last() == destination,
+                                onClick = {
+
+                                    if(destination == Destination.Logout){
+                                        loginViewModel.performLogout {
+                                            loginViewModel.resetState()
+                                            backStack.clear()
+                                            backStack.add(Destination.Login)
+                                        }
+                                }else if (backStack.last() != destination) {
+                                        backStack.add(destination)
+                                    }
+                                },
+                                icon = {
+                                    Icon(
+                                        destination.icon,
+                                        contentDescription = destination.contentDescription
+                                    )
+                                },
+                                label = { Text(destination.label) }
+                            )
+                        }
+                    }
+                }
+            }
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text("Vous êtes sur la page Home")
+        Box(modifier = Modifier.padding(innerPadding)) {
+            when (backStack.last()) {
+                Destination.Login -> {
+                    LoginScreen(
+                        loginSuccess = {
+                            // pour empêcher le navigateBack de nous faire revenir sur la page de Login
+                            backStack.clear()
+                            backStack.add(Destination.Home)
+                        }
+                    )
+                }
+                Destination.Home -> {
+
+                        HomePage()
+                }
+
+                Destination.Administration -> {
+
+                    Text("Vous êtes sur la page d'administration")
+                }
+
+
+                else -> {
+                    Text("Autre Écran", modifier = Modifier.align(Alignment.Center))
+                }
+            }
         }
     }
 }

@@ -33,7 +33,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun LoginScreen(
-    loginViewModel: LoginViewModel = viewModel()
+    loginViewModel: LoginViewModel = viewModel(),
+    loginSuccess: () ->Unit,
+
 ) {
 
 
@@ -84,10 +86,7 @@ fun LoginScreen(
         }
 
         if (state is UiState.Success) {
-            Text(
-                text = "Succès ! Bienvenue ",
-                color = androidx.compose.ui.graphics.Color.Green,
-                )
+            loginSuccess()
         }
 
 
