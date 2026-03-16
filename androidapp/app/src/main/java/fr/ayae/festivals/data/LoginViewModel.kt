@@ -88,6 +88,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application){
         Log.d("AUTH_CHECK", "Fonction fetchCurrentUser lancée !!")
         viewModelScope.launch {
             try {
+                Log.d("AUTH_CHECK", "Cookies en mémoire : $allCookies")
                 val response = repository.getCurrentUser(getApplication())
                 Log.d("AUTH_CHECK", "Objet complet reçu : $response")
                 userProfile = response

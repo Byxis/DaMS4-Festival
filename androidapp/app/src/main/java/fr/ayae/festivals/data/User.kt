@@ -10,16 +10,10 @@ data class LoginRequest(
 @Serializable
 data class MessageResponse(val message: String)
 
-
 @Serializable
 data class UserResponse(
-    val id: Int? = 0,
-    val email: String? = "",
-    @SerialName("firstName")
-    val prenom: String? = "",
-    @SerialName("lastName")
-    val nom: String? = "",
-    val role: String? = ""
+    @SerialName("email") val email: String,
+    @SerialName("role") val role: String
 )
 
 @Serializable
