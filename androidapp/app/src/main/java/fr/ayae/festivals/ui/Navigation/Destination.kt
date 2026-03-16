@@ -18,6 +18,6 @@ enum class Destination(
     Home("home", "Home", Icons.Default.Home, "Home"),
     Administration("administration", "Administration", Icons.Default.ManageAccounts, "Administration"),
     Login("login", "Login", Icons.Default.Login, "Login"),
-    Logout("logout", "Logout", Icons.Default.ExitToApp, "Logout"),
+    Profile("profile", "Profile", Icons.Default.ManageAccounts, "Profile"),
 
 }

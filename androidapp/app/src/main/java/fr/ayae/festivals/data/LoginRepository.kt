@@ -11,4 +11,8 @@ class LoginRepository {
     suspend fun logout( context: Context): MessageResponse {
         return RetrofitInstance.getApi(context).logout()
     }
+
+    suspend fun getCurrentUser( context: Context): UserResponse{
+        return RetrofitInstance.getApi(context).getCurrentUser()
+    }
 }

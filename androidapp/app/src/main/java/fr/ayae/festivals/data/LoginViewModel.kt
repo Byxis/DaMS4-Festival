@@ -9,7 +9,9 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
@@ -32,6 +34,8 @@ class LoginViewModel(application: Application) : AndroidViewModel(application){
     private val repository = LoginRepository()
     private var internalState : MutableState<UiState> = mutableStateOf(UiState.Loading)
     val state : State<UiState> = internalState
+
+    var userProfile by mutableStateOf<UserResponse?>(null)
 
     fun performLogin(emailValue : String, passwordValue : String) {
         viewModelScope.launch {
@@ -78,6 +82,20 @@ class LoginViewModel(application: Application) : AndroidViewModel(application){
 
     fun resetState(){
         internalState.value = UiState.Empty
+    }
+
+    fun fetchCurrentUser(){
+        Log.d("AUTH_CHECK", "Fonction fetchCurrentUser lancée !!")
+        viewModelScope.launch {
+            try {
+                val response = repository.getCurrentUser(getApplication())
+                Log.d("AUTH_CHECK", "Objet complet reçu : $response")
+                userProfile = response
+            }catch(e: Exception){
+                Log.e("USERS", "Erreur lors de la récupération du profile : ${e.message}")
+
+            }
+        }
     }
 
 

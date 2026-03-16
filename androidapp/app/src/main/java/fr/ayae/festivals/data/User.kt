@@ -1,4 +1,5 @@
 package fr.ayae.festivals.data
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -10,13 +11,15 @@ data class LoginRequest(
 data class MessageResponse(val message: String)
 
 
-
 @Serializable
 data class UserResponse(
-    val email: String,
-    val firstName: String,
-    val lastName: String,
-    val role: String
+    val id: Int? = 0,
+    val email: String? = "",
+    @SerialName("firstName")
+    val prenom: String? = "",
+    @SerialName("lastName")
+    val nom: String? = "",
+    val role: String? = ""
 )
 
 @Serializable

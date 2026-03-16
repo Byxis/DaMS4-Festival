@@ -44,6 +44,7 @@ import fr.ayae.festivals.data.LoginViewModel
 import fr.ayae.festivals.ui.HomePage
 import fr.ayae.festivals.ui.LoginScreen
 import fr.ayae.festivals.ui.Navigation.Destination
+import fr.ayae.festivals.ui.ProfilePage
 import fr.ayae.festivals.ui.theme.AYAEFestivalsTheme
 
 class MainActivity : ComponentActivity() {
@@ -110,13 +111,7 @@ fun AYAEFestivalsApp() {
                                 selected = backStack.last() == destination,
                                 onClick = {
 
-                                    if(destination == Destination.Logout){
-                                        loginViewModel.performLogout {
-                                            loginViewModel.resetState()
-                                            backStack.clear()
-                                            backStack.add(Destination.Login)
-                                        }
-                                }else if (backStack.last() != destination) {
+                                   if (backStack.last() != destination) {
                                         backStack.add(destination)
                                     }
                                 },
@@ -153,6 +148,18 @@ fun AYAEFestivalsApp() {
                 Destination.Administration -> {
 
                     Text("Vous êtes sur la page d'administration")
+                }
+
+                Destination.Profile -> {
+                    ProfilePage(
+                        logoutSuccess = {
+                            loginViewModel.resetState()
+                            backStack.clear()
+                            backStack.add(Destination.Login)
+                        }
+                    )
+
+
                 }
 
 
