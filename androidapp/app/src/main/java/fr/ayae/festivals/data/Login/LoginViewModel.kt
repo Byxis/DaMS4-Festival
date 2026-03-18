@@ -1,23 +1,24 @@
-package fr.ayae.festivals.data
+package fr.ayae.festivals.data.Login
 
 
 import android.app.Application
 import android.content.Context
+import android.util.Base64
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
+import fr.ayae.festivals.data.RetrofitInstance
 import kotlinx.coroutines.delay
+import kotlinx.serialization.json.Json
 import retrofit2.HttpException
 
 
@@ -42,7 +43,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application){
     init {
         // Dès que l'app crée ce ViewModel, on essaie de charger le profil
         loadUserProfile()
-        android.util.Log.d("AUTH_DEBUG", "ViewModel initialisé : tentative de chargement du profil")
+        Log.d("AUTH_DEBUG", "ViewModel initialisé : tentative de chargement du profil")
     }
 
     fun performLogin(emailValue: String, passwordValue: String) {
@@ -53,8 +54,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application){
                 val response = repository.login(request, getApplication())
                 delay(200)
                 loadUserProfile()
-                // On ne lit RIEN ici. Le simple fait d'arriver ici veut dire que
-                // l'intercepteur a reçu le cookie.
+
                 internalState.value = UiState.Success(response.user)
 
             } catch (e: HttpException) {
@@ -92,21 +92,11 @@ class LoginViewModel(application: Application) : AndroidViewModel(application){
     }
 
 
-    fun fetchCurrentUser() {
-        val localProfile = getUserProfileFromLocalToken()
-
-        if (localProfile != null) {
-            android.util.Log.d("AUTH_SUCCESS", "Profil chargé localement : ${localProfile.email}")
-            userProfile = localProfile // Hop, l'affichage se met à jour instantanément !
-        } else {
-            android.util.Log.e("AUTH_ERROR", "Impossible de charger le profil localement")
-        }
-    }
 
 
 
     fun loadUserProfile() {
-        val profile = getUserProfileFromLocalToken() // Ta fonction de décodage base64
+        val profile = getUserProfileFromLocalToken()
         if (profile != null) {
             userProfile = profile
             Log.d("AUTH", "Profil chargé : ${profile.email}")
@@ -128,10 +118,10 @@ class LoginViewModel(application: Application) : AndroidViewModel(application){
 
         return try {
             val parts = jwt.split(".")
-            val payload = String(android.util.Base64.decode(parts[1], android.util.Base64.URL_SAFE))
+            val payload = String(Base64.decode(parts[1], Base64.URL_SAFE))
             Log.d("AUTH_DEBUG", "PAYLOAD DÉCODÉ : $payload")
 
-            val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
+            val json = Json { ignoreUnknownKeys = true }
             val profile = json.decodeFromString<UserProfile>(payload)
 
             Log.d("AUTH_DEBUG", "PROFIL CRÉÉ : ${profile.email}")

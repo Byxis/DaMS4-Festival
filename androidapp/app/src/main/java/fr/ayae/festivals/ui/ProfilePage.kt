@@ -16,7 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import fr.ayae.festivals.data.LoginViewModel
+import fr.ayae.festivals.data.Login.LoginViewModel
 
 @SuppressLint("NotConstructor")
 @Composable

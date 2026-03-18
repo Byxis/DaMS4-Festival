@@ -1,4 +1,4 @@
-package fr.ayae.festivals.data
+package fr.ayae.festivals.data.Login
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

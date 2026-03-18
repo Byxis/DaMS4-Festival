@@ -1,11 +1,11 @@
-package fr.ayae.festivals.data
-import android.app.Application
+package fr.ayae.festivals.data.Login
+
 import android.content.Context
-import androidx.camera.camera2.pipe.core.Log
-import androidx.lifecycle.AndroidViewModel
+import fr.ayae.festivals.data.RetrofitInstance
+
 class LoginRepository {
 
-    suspend fun login(request : LoginRequest, context: Context): LoginResponse{
+    suspend fun login(request : LoginRequest, context: Context): LoginResponse {
         return RetrofitInstance.getApi(context).login(request)
     }
 

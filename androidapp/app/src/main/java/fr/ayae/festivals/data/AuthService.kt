@@ -15,9 +15,13 @@ import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import fr.ayae.festivals.R
+import fr.ayae.festivals.data.Administration.UserAdminPage
+import fr.ayae.festivals.data.Login.LoginRequest
+import fr.ayae.festivals.data.Login.LoginResponse
+import fr.ayae.festivals.data.Login.MessageResponse
+import retrofit2.http.DELETE
 import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.Headers
+import retrofit2.http.Path
 
 
 import javax.net.ssl.TrustManagerFactory
@@ -26,8 +30,6 @@ import javax.net.ssl.TrustManagerFactory
 import java.security.KeyStore
 import java.security.cert.CertificateFactory
 
-import java.util.concurrent.TimeUnit
-
 
 interface APIService {
     @POST("auth/login")
@@ -35,6 +37,12 @@ interface APIService {
 
     @POST("auth/logout")
     suspend fun logout(): MessageResponse
+
+    @GET("users")
+    suspend fun getAllUsers(): List<UserAdminPage>
+
+    @DELETE("users/{id}")
+    suspend fun delete(@Path("id")userID : Int)
 }
 
 object RetrofitInstance {
@@ -102,6 +110,19 @@ object RetrofitInstance {
             .hostnameVerifier { _, _ -> true }
 
             .addInterceptor(SaveCookiesInterceptor(context))
+            .addInterceptor { chain ->
+                val sharedPrefs = context.getSharedPreferences("AppCookies", Context.MODE_PRIVATE)
+                // On récupère la valeur brute (qui contient déjà "access_token=...")
+                val savedCookie = sharedPrefs.getString("access_token", "") ?: ""
+
+                val request = chain.request().newBuilder()
+                    // On l'ajoute au header "Cookie" tel quel
+                    .header("Cookie", savedCookie)
+                    .build()
+
+                Log.d("AUTH_DEBUG", "🚀 Correction envoi : $savedCookie")
+                chain.proceed(request)
+            }
             .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
             .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
             .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
