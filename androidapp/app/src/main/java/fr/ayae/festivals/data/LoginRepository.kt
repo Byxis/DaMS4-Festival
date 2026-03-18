@@ -1,6 +1,7 @@
 package fr.ayae.festivals.data
 import android.app.Application
 import android.content.Context
+import androidx.camera.camera2.pipe.core.Log
 import androidx.lifecycle.AndroidViewModel
 class LoginRepository {
 
@@ -12,7 +13,4 @@ class LoginRepository {
         return RetrofitInstance.getApi(context).logout()
     }
 
-    suspend fun getCurrentUser( context: Context): UserResponse{
-        return RetrofitInstance.getApi(context).getCurrentUser()
-    }
 }

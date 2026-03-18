@@ -2,6 +2,7 @@ package fr.ayae.festivals.data
 
 
 import android.app.Application
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -16,6 +17,7 @@ import androidx.lifecycle.AndroidViewModel
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
+import kotlinx.coroutines.delay
 import retrofit2.HttpException
 
 
@@ -32,26 +34,31 @@ sealed class UiState {
 
 class LoginViewModel(application: Application) : AndroidViewModel(application){
     private val repository = LoginRepository()
+    private var lastTokenReceived: String? = null
     private var internalState : MutableState<UiState> = mutableStateOf(UiState.Loading)
     val state : State<UiState> = internalState
 
-    var userProfile by mutableStateOf<UserResponse?>(null)
+    var userProfile by mutableStateOf<UserProfile?>(null)
+    init {
+        // Dès que l'app crée ce ViewModel, on essaie de charger le profil
+        loadUserProfile()
+        android.util.Log.d("AUTH_DEBUG", "ViewModel initialisé : tentative de chargement du profil")
+    }
 
-    fun performLogin(emailValue : String, passwordValue : String) {
+    fun performLogin(emailValue: String, passwordValue: String) {
         viewModelScope.launch {
             internalState.value = UiState.Loading
             try {
-               val request = LoginRequest(email = emailValue, password = passwordValue)
+                val request = LoginRequest(email = emailValue, password = passwordValue)
                 val response = repository.login(request, getApplication())
+                delay(200)
+                loadUserProfile()
+                // On ne lit RIEN ici. Le simple fait d'arriver ici veut dire que
+                // l'intercepteur a reçu le cookie.
                 internalState.value = UiState.Success(response.user)
-            } catch (e: HttpException) {
 
-                //Identifiants incorrects
-                if (e.code() == 401) {
-                    internalState.value = UiState.Error("Identifiants incorrects")
-                }else {
-                    internalState.value = UiState.Error("Echec de connexion " + e.message)
-                }
+            } catch (e: HttpException) {
+                internalState.value = UiState.Error("Erreur : ${e.code()}")
             }
         }
     }
@@ -84,18 +91,54 @@ class LoginViewModel(application: Application) : AndroidViewModel(application){
         internalState.value = UiState.Empty
     }
 
-    fun fetchCurrentUser(){
-        Log.d("AUTH_CHECK", "Fonction fetchCurrentUser lancée !!")
-        viewModelScope.launch {
-            try {
-                Log.d("AUTH_CHECK", "Cookies en mémoire : $allCookies")
-                val response = repository.getCurrentUser(getApplication())
-                Log.d("AUTH_CHECK", "Objet complet reçu : $response")
-                userProfile = response
-            }catch(e: Exception){
-                Log.e("USERS", "Erreur lors de la récupération du profile : ${e.message}")
 
-            }
+    fun fetchCurrentUser() {
+        val localProfile = getUserProfileFromLocalToken()
+
+        if (localProfile != null) {
+            android.util.Log.d("AUTH_SUCCESS", "Profil chargé localement : ${localProfile.email}")
+            userProfile = localProfile // Hop, l'affichage se met à jour instantanément !
+        } else {
+            android.util.Log.e("AUTH_ERROR", "Impossible de charger le profil localement")
+        }
+    }
+
+
+
+    fun loadUserProfile() {
+        val profile = getUserProfileFromLocalToken() // Ta fonction de décodage base64
+        if (profile != null) {
+            userProfile = profile
+            Log.d("AUTH", "Profil chargé : ${profile.email}")
+        }
+    }
+
+
+    private fun getUserProfileFromLocalToken(): UserProfile? {
+
+        val sharedPrefs = getApplication<Application>().getSharedPreferences("AppCookies", Context.MODE_PRIVATE)
+
+
+        val jwt = sharedPrefs.getString("access_token", null)
+
+        if (jwt.isNullOrEmpty()) {
+            Log.e("AUTH_DEBUG", "Le token est vide dans les prefs !")
+            return null
+        }
+
+        return try {
+            val parts = jwt.split(".")
+            val payload = String(android.util.Base64.decode(parts[1], android.util.Base64.URL_SAFE))
+            Log.d("AUTH_DEBUG", "PAYLOAD DÉCODÉ : $payload")
+
+            val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
+            val profile = json.decodeFromString<UserProfile>(payload)
+
+            Log.d("AUTH_DEBUG", "PROFIL CRÉÉ : ${profile.email}")
+            profile
+        } catch (e: Exception) {
+            Log.e("AUTH_DEBUG", "ERREUR DÉCODAGE : ${e.message}")
+            null
         }
     }
 

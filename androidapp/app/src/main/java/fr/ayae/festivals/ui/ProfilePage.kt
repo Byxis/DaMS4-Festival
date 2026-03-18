@@ -24,10 +24,10 @@ fun ProfilePage(
     loginViewModel: LoginViewModel = viewModel(),
     logoutSuccess: () -> Unit
 ){
-
     LaunchedEffect(Unit) {
-        loginViewModel.fetchCurrentUser()
+        loginViewModel.loadUserProfile()
     }
+
     val user = loginViewModel.userProfile
 
     Column(
@@ -50,3 +50,5 @@ fun ProfilePage(
         }
     }
 }
+
+

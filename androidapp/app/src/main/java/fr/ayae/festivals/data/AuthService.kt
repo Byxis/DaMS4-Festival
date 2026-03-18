@@ -16,6 +16,8 @@ import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import fr.ayae.festivals.R
 import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.Headers
 
 
 import javax.net.ssl.TrustManagerFactory
@@ -33,12 +35,6 @@ interface APIService {
 
     @POST("auth/logout")
     suspend fun logout(): MessageResponse
-
-    @GET("users/me")
-    suspend fun getCurrentUser() : UserResponse
-
-
-
 }
 
 object RetrofitInstance {
@@ -67,7 +63,7 @@ object RetrofitInstance {
             generateSecureOkHttpClient(context)
         } catch (e: Exception) {
             Log.e("RETROFIT_ERROR", "Erreur SSL : ${e.message}")
-            OkHttpClient.Builder().build() // Client par défaut pour éviter le crash
+            OkHttpClient.Builder().build() 
         }
 
         return Retrofit.Builder()
@@ -79,24 +75,24 @@ object RetrofitInstance {
     }
 
     private fun generateSecureOkHttpClient(context: Context): OkHttpClient {
-        // 1. Charger le certificat RACINE (root_ca.pem) et non celui du serveur
+        // Charger le certificat root_ca.pem et non celui du serveur
         val cf = CertificateFactory.getInstance("X.509")
-        val caInput = context.resources.openRawResource(R.raw.root_ca) // LE FICHIER root_ca.pem
+        val caInput = context.resources.openRawResource(R.raw.root_ca)
         val ca = caInput.use { cf.generateCertificate(it) }
 
-        // 2. Créer le KeyStore
+
         val keyStore = KeyStore.getInstance(KeyStore.getDefaultType()).apply {
             load(null, null)
             setCertificateEntry("ca", ca)
         }
 
-        // 3. Créer le TrustManager
+
         val tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply {
             init(keyStore)
         }
         val trustManager = tmf.trustManagers[0] as X509TrustManager
 
-        // 4. Configurer SSLContext
+
         val sslContext = SSLContext.getInstance("TLS").apply {
             init(null, arrayOf(trustManager), java.security.SecureRandom())
         }
@@ -104,16 +100,11 @@ object RetrofitInstance {
         return OkHttpClient.Builder()
             .sslSocketFactory(sslContext.socketFactory, trustManager)
             .hostnameVerifier { _, _ -> true }
-            .cookieJar(cookieJar!!)
 
-            .addInterceptor { chain ->
-                val request = chain.request().newBuilder()
-                    .header("Accept", "application/json")
-                    .header("Content-Type", "application/json")
-                    .build()
-                chain.proceed(request)
-            }
-            .connectTimeout(30, TimeUnit.SECONDS)
+            .addInterceptor(SaveCookiesInterceptor(context))
+            .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+            .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+            .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
             .build()
     }
 
