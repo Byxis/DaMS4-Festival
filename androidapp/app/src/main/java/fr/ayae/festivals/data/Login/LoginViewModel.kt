@@ -58,7 +58,14 @@ class LoginViewModel(application: Application) : AndroidViewModel(application){
                 internalState.value = UiState.Success(response.user)
 
             } catch (e: HttpException) {
-                internalState.value = UiState.Error("Erreur : ${e.code()}")
+                val errorMessage = when (e.code()) {
+                    401 -> "Email ou mot de passe incorrect."
+                    403 -> "Votre compte est suspendu."
+                    404 -> "Serveur introuvable."
+                    500 -> "Erreur serveur, réessayez plus tard."
+                    else -> "Une erreur inconnue est survenue (${e.code()})"
+                }
+                internalState.value = UiState.Error(errorMessage)
             }
         }
     }
