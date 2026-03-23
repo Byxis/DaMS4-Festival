@@ -22,7 +22,21 @@ data class UserResponse(
     @SerialName("email") val email: String,
     @SerialName("role") val role: String
 )
+@Serializable
+data class CreationResponse(
+    val message: String,
+    val user: User
+)
 
+@Serializable
+data class User(
+    @SerialName("id") val id: Int? = null,
+    @SerialName("email") val email: String,
+    @SerialName("role") val role: String,
+    @SerialName("firstName") val firstName: String? = null,
+    @SerialName("lastName") val lastName: String? = null
+
+)
 @Serializable
 data class LoginResponse(
     val message: String,

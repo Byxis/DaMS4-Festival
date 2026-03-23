@@ -60,11 +60,12 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.text.input.KeyboardType
+import fr.ayae.festivals.data.Login.User
 
 @SuppressLint("NotConstructor")
 @Composable
 fun AdministrationPage(adminViewModel: AdminViewModel = viewModel()) {
-    // 1. Charger les données dès que l'écran s'affiche
+
     LaunchedEffect(Unit) {
         adminViewModel.fetchAllUsers()
     }
@@ -77,6 +78,7 @@ fun AdministrationPage(adminViewModel: AdminViewModel = viewModel()) {
     val users = adminViewModel.usersList
 
     var searchQuery by remember { mutableStateOf("") }
+
 
 
 
@@ -101,11 +103,7 @@ fun AdministrationPage(adminViewModel: AdminViewModel = viewModel()) {
     if (showAddUserDialog) {
         AddUserForm(
             onDismiss = { showAddUserDialog = false },
-            onSave = { prenom, nom, email, role ->
-
-
-                showAddUserDialog = false
-            }
+            adminViewModel
         )
     }
 
@@ -209,7 +207,7 @@ fun DeleteConfirmationDialog(
 @Composable
 fun AddUserForm(
     onDismiss: () -> Unit,
-    onSave: (String, String, String, String) -> Unit
+    adminViewModel: AdminViewModel
 ) {
     var prenom by remember { mutableStateOf("") }
     var nom by remember { mutableStateOf("") }
@@ -259,10 +257,29 @@ fun AddUserForm(
 
         },
         confirmButton = {
-            Button(onClick = { onSave(prenom, nom, email, role)},
-                enabled = email.isNotBlank() && role.isNotBlank()) {
+            Button(
+                onClick = {
+
+                    val userToCreate = User(
+                        email = email.trim(),
+                        role = role,
+                        firstName = prenom,
+                        lastName = nom
+                    )
+
+
+                    adminViewModel.createAnUser(userToCreate)
+
+                    // 3. On ferme la popup
+                    onDismiss() // ou showAddUserDialog = false selon ton code
+                },
+                // Le paramètre 'enabled' se met APRÈS l'accolade du onClick, pas dedans
+                enabled = email.isNotBlank() && role.isNotBlank()
+            ) {
+                // Le texte du bouton
                 Text("Enregistrer")
             }
+
         },
         dismissButton = {
             TextButton(onClick = onDismiss) { Text("Annuler") }

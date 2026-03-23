@@ -16,9 +16,13 @@ import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import fr.ayae.festivals.R
 import fr.ayae.festivals.data.Administration.UserAdminPage
+import fr.ayae.festivals.data.Login.CreationResponse
 import fr.ayae.festivals.data.Login.LoginRequest
 import fr.ayae.festivals.data.Login.LoginResponse
 import fr.ayae.festivals.data.Login.MessageResponse
+import fr.ayae.festivals.data.Login.User
+import fr.ayae.festivals.data.Login.UserResponse
+import retrofit2.Response
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -43,6 +47,9 @@ interface APIService {
 
     @DELETE("users/{id}")
     suspend fun delete(@Path("id")userID : Int)
+
+    @POST("users/invite")
+    suspend fun create(@Body newUser: User): Response<CreationResponse>
 }
 
 object RetrofitInstance {

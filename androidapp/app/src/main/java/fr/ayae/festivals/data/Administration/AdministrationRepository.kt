@@ -1,10 +1,11 @@
 package fr.ayae.festivals.data.Administration
 
 import android.content.Context
-import fr.ayae.festivals.data.Login.LoginRequest
-import fr.ayae.festivals.data.Login.LoginResponse
-import fr.ayae.festivals.data.Login.UiState
+import fr.ayae.festivals.data.Login.CreationResponse
+import fr.ayae.festivals.data.Login.User
+import fr.ayae.festivals.data.Login.UserResponse
 import fr.ayae.festivals.data.RetrofitInstance
+import retrofit2.Response
 
 
 class AdministrationRepository {
@@ -16,5 +17,7 @@ class AdministrationRepository {
         return RetrofitInstance.getApi(context).delete(userID)
     }
 
-
+    suspend fun create(context: Context, user: User) : Response<CreationResponse>{
+        return RetrofitInstance.getApi(context).create(user)
+    }
 }
