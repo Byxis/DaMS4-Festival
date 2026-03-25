@@ -5,7 +5,7 @@ import android.util.Log
 import okhttp3.Interceptor
 import okhttp3.Response
 
-// 1. Le Douanier qui SAUVEGARDE le cookie à la réception du Login
+// Sauvegarde le cookie à la réception du Login
 class SaveCookiesInterceptor(private val context: Context) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalResponse = chain.proceed(chain.request())
@@ -18,12 +18,23 @@ class SaveCookiesInterceptor(private val context: Context) : Interceptor {
                 val editor = sharedPrefs.edit()
 
                 for (cookie in cookies) {
-                    if (cookie.contains("access_token")) {
+
                         // On extrait juste la partie "access_token=eyJh...;"
                         val tokenPart = cookie.split(";").firstOrNull() ?: cookie
-                        editor.putString("access_token", tokenPart)
-                        Log.d("AUTH_DEBUG", "INTERCEPTEUR : Cookie sauvegardé ! -> $tokenPart")
+                    when {
+                        // Cas 1 : C'est l'Access Token
+                        cookie.contains("access_token") -> {
+                            editor.putString("access_token", tokenPart)
+                            Log.d("AUTH_DEBUG", "✅ Access Token sauvegardé : $tokenPart")
+                        }
+
+                        // Cas 2 : C'est le Refresh Token
+                        cookie.contains("refresh_token") -> {
+                            editor.putString("refresh_token", tokenPart)
+                            Log.d("AUTH_DEBUG", "✅ Refresh Token sauvegardé : $tokenPart")
+                        }
                     }
+
                 }
                 editor.commit()
             }

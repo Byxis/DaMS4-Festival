@@ -119,9 +119,10 @@ object RetrofitInstance {
             .addInterceptor(SaveCookiesInterceptor(context))
             .addInterceptor { chain ->
                 val sharedPrefs = context.getSharedPreferences("AppCookies", Context.MODE_PRIVATE)
-                // On récupère la valeur brute (qui contient déjà "access_token=...")
+
                 val savedCookie = sharedPrefs.getString("access_token", "") ?: ""
 
+                //ajoute le header pour chaques requetes sortantes
                 val request = chain.request().newBuilder()
                     // On l'ajoute au header "Cookie" tel quel
                     .header("Cookie", savedCookie)
@@ -136,8 +137,6 @@ object RetrofitInstance {
             .build()
     }
 
-    fun clearCookies() {
-        cookieJar?.clear()
-    }
+
 }
 

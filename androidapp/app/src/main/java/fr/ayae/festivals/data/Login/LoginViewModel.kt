@@ -82,6 +82,8 @@ class LoginViewModel(application: Application) : AndroidViewModel(application){
                 Log.e("AUTH", "Erreur Logout: ${e.message}")
                 LogoutSuccess()
             }finally{
+                val sharedPrefs = getApplication<Application>().getSharedPreferences("AppCookies", Context.MODE_PRIVATE)
+                sharedPrefs.edit().clear().apply()
                 val cookieJar = PersistentCookieJar(
                     SetCookieCache(),
                     SharedPrefsCookiePersistor(getApplication<Application>())
