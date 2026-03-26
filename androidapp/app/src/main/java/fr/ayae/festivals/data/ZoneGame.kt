@@ -1,8 +1,6 @@
 package fr.ayae.festivals.data;
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
-import java.util.Date
 
 @Entity(tableName = "zone")
 data class ZoneGame(
