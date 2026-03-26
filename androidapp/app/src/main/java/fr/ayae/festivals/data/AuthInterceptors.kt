@@ -22,13 +22,13 @@ class SaveCookiesInterceptor(private val context: Context) : Interceptor {
                         // On extrait juste la partie "access_token=eyJh...;"
                         val tokenPart = cookie.split(";").firstOrNull() ?: cookie
                     when {
-                        // Cas 1 : C'est l'Access Token
+                        // l'Access Token
                         cookie.contains("access_token") -> {
                             editor.putString("access_token", tokenPart)
                             Log.d("AUTH_DEBUG", "✅ Access Token sauvegardé : $tokenPart")
                         }
 
-                        // Cas 2 : C'est le Refresh Token
+                        // C'est le Refresh Token
                         cookie.contains("refresh_token") -> {
                             editor.putString("refresh_token", tokenPart)
                             Log.d("AUTH_DEBUG", "✅ Refresh Token sauvegardé : $tokenPart")

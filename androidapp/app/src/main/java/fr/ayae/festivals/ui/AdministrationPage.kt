@@ -155,7 +155,7 @@ fun AdministrationPage(adminViewModel: AdminViewModel = viewModel()) {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(users) { user ->
+                items(filteredUsers) { user ->
                     UserCard(user)
 
                     IconButton(onClick = {
@@ -270,8 +270,8 @@ fun AddUserForm(
 
                     adminViewModel.createAnUser(userToCreate)
 
-                    // 3. On ferme la popup
-                    onDismiss() // ou showAddUserDialog = false selon ton code
+
+                    onDismiss()
                 },
                 // Le paramètre 'enabled' se met APRÈS l'accolade du onClick, pas dedans
                 enabled = email.isNotBlank() && role.isNotBlank()
