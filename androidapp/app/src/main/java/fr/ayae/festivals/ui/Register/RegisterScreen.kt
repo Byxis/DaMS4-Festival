@@ -19,6 +19,7 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -27,6 +28,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -46,22 +48,57 @@ import fr.ayae.festivals.ui.Login.UiState
 import androidx.compose.runtime.mutableStateOf
 
 private val internalState : MutableState<UiState> = mutableStateOf(UiState.Loading)
-val state : State<UiState> = internalState
+
 @Composable
 fun RegisterScreen(
+    registerViewModel: RegisterViewModel = viewModel(),
     registerSuccess: () ->Unit,
     onNavigateToLogin: () -> Unit,
 
     ) {
-
-
+    var showSuccessDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember{mutableStateOf("")}
     var confirmedPassword by remember { mutableStateOf("") }
     val isEmailValid = Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    val state by registerViewModel.state
+    LaunchedEffect(state) {
+        if (state is AuthUiState.Success) {
+            showSuccessDialog = true
 
+        }
+    }
+
+    if (showSuccessDialog) {
+        AlertDialog(
+            onDismissRequest = {
+
+                showSuccessDialog = false
+                registerSuccess()
+            },
+            title = {
+                Text(text = "Félicitations !")
+            },
+            text = {
+                Text(text = "Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+
+                        showSuccessDialog = false
+                        registerViewModel.resetState()
+                        registerSuccess()
+                    }
+                ) {
+                    Text("Super !")
+                }
+            }
+        )
+    }
 
 
 
@@ -129,9 +166,9 @@ fun RegisterScreen(
             onValueChange = { email = it },
             placeholder = { Text("email@example.com") },
             shape = RoundedCornerShape(6.dp),
-            isError = isEmailValid,
+            isError = email.isNotEmpty() && !isEmailValid,
             supportingText = {
-                if (isEmailValid) {
+                if (!isEmailValid && !email.isEmpty()) {
                     Text(
                         text = "Format d'email invalide",
                         color = MaterialTheme.colorScheme.error
@@ -202,13 +239,21 @@ fun RegisterScreen(
         }
 
         Button(
-            onClick = {  },
+            onClick = {  registerViewModel.performRegister(
+
+                context = context,
+                firstNameValue = firstName,
+                lastNameValue = lastName,
+                emailValue = email,
+                passwordValue = password)},
             modifier = Modifier.fillMaxWidth(0.7f)
         ) {
 
             Text("Inscription")
 
         }
+
+
         TextButton(onClick = { onNavigateToLogin() }) {
             Text(
                 text = "Déja inscrit ? Connectez-vous ",
@@ -216,9 +261,9 @@ fun RegisterScreen(
             )
         }
 
-        if (state is UiState.Error) {
+        if (state is AuthUiState.Error) {
             Text(
-                text = (state as UiState.Error).message,
+                text = (state as AuthUiState.Error).message,
                 color = Color.Red,
                 modifier = Modifier.padding(top = 8.dp)
             )

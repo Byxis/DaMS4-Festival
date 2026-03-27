@@ -2,6 +2,7 @@ package fr.ayae.festivals
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -146,11 +147,11 @@ fun AYAEFestivalsApp() {
                 Destination.Register->{
                     RegisterScreen(
                             registerSuccess = {
-
+                                Log.d("NAV_DEBUG", "Action reçue par le chef d'orchestre ! On ferme la page.") // <-- MICRO 3
                                 backStack.removeAt(backStack.size - 1)
                             },
                         onNavigateToLogin = {
-                            backStack.add(Destination.Login)
+                            backStack.removeAt(backStack.size - 1)
                         }
                         )
                 }
