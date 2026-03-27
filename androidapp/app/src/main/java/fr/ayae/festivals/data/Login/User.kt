@@ -7,6 +7,16 @@ data class LoginRequest(
     val email: String,
     val password: String
 )
+
+
+@Serializable
+data class RegisterRequest(
+    @SerialName("firstName") val firstName: String? = null,
+    @SerialName("lastName") val lastName: String? = null,
+    @SerialName("email") val email: String,
+    val password: String
+
+)
 @Serializable
 data class MessageResponse(val message: String)
 
@@ -17,11 +27,7 @@ data class UserProfile(
     @SerialName("email") val email: String,
     @SerialName("role") val role: String
 )
-@Serializable
-data class UserResponse(
-    @SerialName("email") val email: String,
-    @SerialName("role") val role: String
-)
+
 @Serializable
 data class CreationResponse(
     val message: String,
@@ -40,5 +46,5 @@ data class User(
 @Serializable
 data class LoginResponse(
     val message: String,
-    val user: UserResponse
+    val user: User
 )

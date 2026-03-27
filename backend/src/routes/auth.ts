@@ -19,8 +19,8 @@ const loginLimiter = rateLimit({
 });
 
 const registerLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,  // 15 minutes
-    limit: 2,                  // Limit each IP to 2 requests
+    windowMs: 15 * 60 * 1000,  
+    limit: 2,                  
     message: {error: 'Too many register attempts, please try again later.'},
     standardHeaders: true,
     legacyHeaders: false,

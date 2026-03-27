@@ -1,4 +1,4 @@
-package fr.ayae.festivals.ui
+package fr.ayae.festivals.ui.Profile
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
@@ -14,9 +14,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import fr.ayae.festivals.data.Login.LoginViewModel
+import fr.ayae.festivals.ui.Login.LoginViewModel
 
 @SuppressLint("NotConstructor")
 @Composable
@@ -24,8 +25,9 @@ fun ProfilePage(
     loginViewModel: LoginViewModel = viewModel(),
     logoutSuccess: () -> Unit
 ){
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
-        loginViewModel.loadUserProfile()
+        loginViewModel.loadUserProfile(context)
     }
 
     val user = loginViewModel.userProfile
@@ -42,7 +44,7 @@ fun ProfilePage(
 
         Spacer(modifier = Modifier.height(20.dp))
         Button(
-            onClick = { loginViewModel.performLogout(logoutSuccess) },
+            onClick = { loginViewModel.performLogout(context, logoutSuccess) },
             modifier = Modifier.fillMaxWidth(0.7f)
         ) {
 

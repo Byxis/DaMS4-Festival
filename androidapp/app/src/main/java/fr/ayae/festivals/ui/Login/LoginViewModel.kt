@@ -1,4 +1,4 @@
-package fr.ayae.festivals.data.Login
+package fr.ayae.festivals.ui.Login
 
 
 import android.app.Application
@@ -13,9 +13,14 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
+import fr.ayae.festivals.data.Login.LoginRepository
+import fr.ayae.festivals.data.Login.LoginRequest
+import fr.ayae.festivals.data.Login.User
+import fr.ayae.festivals.data.Login.UserProfile
 import fr.ayae.festivals.data.RetrofitInstance
 import kotlinx.coroutines.delay
 import kotlinx.serialization.json.Json
@@ -26,34 +31,36 @@ sealed class UiState {
     object Loading : UiState()
     object Empty : UiState()
 
-    data class Success(val user: UserResponse) : UiState()
+    data class Success(val user: User) : UiState()
     data class Error(val message: String) : UiState()
 }
 
 
 
-
-class LoginViewModel(application: Application) : AndroidViewModel(application){
+// utiliser view model au lieu de AndroidViewModel
+class LoginViewModel: ViewModel(){
     private val repository = LoginRepository()
     private var lastTokenReceived: String? = null
     private var internalState : MutableState<UiState> = mutableStateOf(UiState.Loading)
     val state : State<UiState> = internalState
 
     var userProfile by mutableStateOf<UserProfile?>(null)
-    init {
-        // Dès que l'app crée ce ViewModel, on essaie de charger le profil
-        loadUserProfile()
-        Log.d("AUTH_DEBUG", "ViewModel initialisé : tentative de chargement du profil")
-    }
 
-    fun performLogin(emailValue: String, passwordValue: String) {
+
+    fun performLogin(context: Context, passwordValue: String, emailValue: String) {
         viewModelScope.launch {
             internalState.value = UiState.Loading
             try {
+                Log.d("AUTH_DEBUG", "Tentative d'envoi -> Email: [$emailValue] | Mdp: [$passwordValue]")
                 val request = LoginRequest(email = emailValue, password = passwordValue)
-                val response = repository.login(request, getApplication())
+                val response = repository.login( request, context )
+                Log.d("AUTH_DEBUG", "Contenu complet de l'user reçu : ${response.user}")
+                val userEmail = response.user.email
+                val sharedPrefs = context.getSharedPreferences("AppCookies",Context.MODE_PRIVATE)
+                sharedPrefs.edit().putString("current_user_email", userEmail).apply()
+                Log.d("AUTH_DEBUG", "email utilisateur connecté enregistré : $userEmail")
                 delay(200)
-                loadUserProfile()
+                loadUserProfile(context)
 
                 internalState.value = UiState.Success(response.user)
 
@@ -70,11 +77,11 @@ class LoginViewModel(application: Application) : AndroidViewModel(application){
         }
     }
 
-    fun performLogout(LogoutSuccess: () -> Unit){
+    fun performLogout(context : Context, LogoutSuccess: () -> Unit){
         viewModelScope.launch {
             try {
 
-                val response = RetrofitInstance.getApi(getApplication()).logout()
+                val response = RetrofitInstance.getApi(context).logout()
                 Log.d("AUTH", "Serveur dit : ${response.message}")
 
 
@@ -82,11 +89,13 @@ class LoginViewModel(application: Application) : AndroidViewModel(application){
                 Log.e("AUTH", "Erreur Logout: ${e.message}")
                 LogoutSuccess()
             }finally{
-                val sharedPrefs = getApplication<Application>().getSharedPreferences("AppCookies", Context.MODE_PRIVATE)
+                val sharedPrefs = context.getSharedPreferences("AppCookies", Context.MODE_PRIVATE)
                 sharedPrefs.edit().clear().apply()
+
+
                 val cookieJar = PersistentCookieJar(
                     SetCookieCache(),
-                    SharedPrefsCookiePersistor(getApplication<Application>())
+                    SharedPrefsCookiePersistor(context)
                 )
 
                 cookieJar.clear()
@@ -104,8 +113,8 @@ class LoginViewModel(application: Application) : AndroidViewModel(application){
 
 
 
-    fun loadUserProfile() {
-        val profile = getUserProfileFromLocalToken()
+    fun loadUserProfile(context: Context) {
+        val profile = getUserProfileFromLocalToken(context)
         if (profile != null) {
             userProfile = profile
             Log.d("AUTH", "Profil chargé : ${profile.email}")
@@ -113,9 +122,9 @@ class LoginViewModel(application: Application) : AndroidViewModel(application){
     }
 
 
-    private fun getUserProfileFromLocalToken(): UserProfile? {
+    private fun getUserProfileFromLocalToken(context: Context): UserProfile? {
 
-        val sharedPrefs = getApplication<Application>().getSharedPreferences("AppCookies", Context.MODE_PRIVATE)
+        val sharedPrefs = context.getSharedPreferences("AppCookies", Context.MODE_PRIVATE)
 
 
         val jwt = sharedPrefs.getString("access_token", null)

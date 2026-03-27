@@ -18,6 +18,7 @@ enum class Destination(
     Home("home", "Home", Icons.Default.Home, "Home"),
     Administration("administration", "Administration", Icons.Default.ManageAccounts, "Administration"),
     Login("login", "Login", Icons.Default.Login, "Login"),
+    Register("register", "Register", Icons.Default.Login, "Register"),
     Profile("profile", "Profile", Icons.Default.ManageAccounts, "Profile"),
 
 }

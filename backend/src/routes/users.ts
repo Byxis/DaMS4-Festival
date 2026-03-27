@@ -6,6 +6,7 @@ import {requireAdmin} from "../middleware/auth-admin.js";
 
 const router = Router();
 
+
 router.put("/:id", requireAdmin, async (req, res) => {
     const {id} = req.params;
     const {firstName, lastName, email, role} = req.body;

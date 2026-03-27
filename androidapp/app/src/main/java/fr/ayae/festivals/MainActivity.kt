@@ -1,5 +1,6 @@
 package fr.ayae.festivals
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -24,13 +25,15 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
-import fr.ayae.festivals.data.Login.LoginViewModel
-import fr.ayae.festivals.ui.AdministrationPage
+import fr.ayae.festivals.ui.Login.LoginViewModel
+import fr.ayae.festivals.ui.Administration.AdministrationPage
 import fr.ayae.festivals.ui.HomePage
-import fr.ayae.festivals.ui.LoginScreen
+import fr.ayae.festivals.ui.Login.LoginScreen
 import fr.ayae.festivals.ui.Navigation.Destination
-import fr.ayae.festivals.ui.ProfilePage
+import fr.ayae.festivals.ui.Profile.ProfilePage
+import fr.ayae.festivals.ui.Register.RegisterScreen
 import fr.ayae.festivals.ui.theme.AYAEFestivalsTheme
 
 class MainActivity : ComponentActivity() {
@@ -57,6 +60,7 @@ fun AYAEFestivalsApp() {
     val backStack = remember { mutableStateListOf<Any>(Destination.Login) }
     val loginViewModel: LoginViewModel = viewModel()
     val user = loginViewModel.userProfile
+    val context = LocalContext.current
     val navigateBack = {
         if (backStack.size > 1) {
             backStack.removeAt(backStack.size - 1)
@@ -88,7 +92,7 @@ fun AYAEFestivalsApp() {
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.primary,
             ) {
-                if (backStack.last() != Destination.Login) {
+                if (backStack.last() != Destination.Login && backStack.last() != Destination.Register) {
                     NavigationBar(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.primary,
@@ -128,6 +132,10 @@ fun AYAEFestivalsApp() {
                         loginSuccess = {
                             backStack.clear()
                             backStack.add(Destination.Home)
+                        },
+                        onNavigateToRegister = {
+
+                            backStack.add(Destination.Register)
                         }
                     )
                 }
@@ -135,10 +143,23 @@ fun AYAEFestivalsApp() {
                 Destination.Home -> {
                     HomePage()
                 }
+                Destination.Register->{
+                    RegisterScreen(
+                            registerSuccess = {
+
+                                backStack.removeAt(backStack.size - 1)
+                            },
+                        onNavigateToLogin = {
+                            backStack.add(Destination.Login)
+                        }
+                        )
+                }
 
                 Destination.Administration -> {
 
-                        AdministrationPage()
+                        AdministrationPage(
+
+                        )
                 }
 
                 Destination.Profile -> {

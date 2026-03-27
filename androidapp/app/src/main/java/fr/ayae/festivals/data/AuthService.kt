@@ -15,13 +15,13 @@ import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import fr.ayae.festivals.R
-import fr.ayae.festivals.data.Administration.UserAdminPage
 import fr.ayae.festivals.data.Login.CreationResponse
 import fr.ayae.festivals.data.Login.LoginRequest
 import fr.ayae.festivals.data.Login.LoginResponse
 import fr.ayae.festivals.data.Login.MessageResponse
+import fr.ayae.festivals.data.Login.RegisterRequest
 import fr.ayae.festivals.data.Login.User
-import fr.ayae.festivals.data.Login.UserResponse
+
 import retrofit2.Response
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -41,9 +41,12 @@ interface APIService {
 
     @POST("auth/logout")
     suspend fun logout(): MessageResponse
+    @POST("auth/register")
+    suspend fun register(@Body request : RegisterRequest) : LoginResponse
+
 
     @GET("users")
-    suspend fun getAllUsers(): List<UserAdminPage>
+    suspend fun getAllUsers(): List<User>
 
     @DELETE("users/{id}")
     suspend fun delete(@Path("id")userID : Int)

@@ -1,31 +1,32 @@
-package fr.ayae.festivals.data.Administration
+package fr.ayae.festivals.ui.Administration
 
 import android.app.Application
+import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.AndroidViewModel
-import retrofit2.HttpException
-import kotlin.collections.emptyList
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import fr.ayae.festivals.data.Administration.AdministrationRepository
 import fr.ayae.festivals.data.Login.User
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
-
-class AdminViewModel(application: Application) : AndroidViewModel(application){
+class AdminViewModel: ViewModel(){
 
 
     private val repository = AdministrationRepository()
-    init{fetchAllUsers()}
-    var usersList by mutableStateOf<List<UserAdminPage>>(emptyList())
+
+    var usersList by mutableStateOf<List<User>>(emptyList())
         private set
 
-     fun fetchAllUsers() {
+     fun fetchAllUsers(context: Context,) {
          viewModelScope.launch {
              try {
 
-                 val response = repository.getAllUser(getApplication())
+                 val response = repository.getAllUser(context)
                  usersList = response
 
                      val firstUser = usersList[0]
@@ -38,12 +39,12 @@ class AdminViewModel(application: Application) : AndroidViewModel(application){
          }
      }
 
-    fun deleteAnUser(userID: Int) {
+    fun deleteAnUser(context : Context, userID: Int) {
         viewModelScope.launch {
             try {
 
-                val response = repository.delete(getApplication(), userID)
-                fetchAllUsers()
+                val response = repository.delete( context, userID)
+                fetchAllUsers(context)
                 Log.d("ADMIN_DEBUG", "Tentative de suppression d'un utilisateur ...")
             } catch (e: HttpException) {
                 Log.e("ADMIN_DEBUG", "Détail de l'erreur : ${e.localizedMessage}", e)
@@ -52,14 +53,14 @@ class AdminViewModel(application: Application) : AndroidViewModel(application){
 
     }
 
-    fun createAnUser(user: User){
+    fun createAnUser(context : Context, user: User){
         viewModelScope.launch{
             try{
-                val response = repository.create(getApplication(), user)
+                val response = repository.create( context, user)
                 if(response.isSuccessful){
                     Log.d("ADMIN_DEBUG", "Utilisateur créé !")
 
-                    fetchAllUsers()
+                    fetchAllUsers(context)
                 }
                 Log.d("ADMIN_DEBUG", "Tentative de création d'un utilisateur ..")
             } catch (e: HttpException) {
