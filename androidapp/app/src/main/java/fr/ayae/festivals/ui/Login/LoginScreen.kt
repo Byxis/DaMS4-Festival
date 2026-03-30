@@ -121,7 +121,7 @@ fun LoginScreen(
         TextButton(onClick = { onNavigateToRegister() }) {
             Text(
                 text = "Pas encore inscrit ?",
-                color = MaterialTheme.colorScheme.primary // Optionnel : pour le mettre aux couleurs de ton thème
+                color = MaterialTheme.colorScheme.primary
             )
         }
 

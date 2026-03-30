@@ -71,6 +71,30 @@ class AdminViewModel: ViewModel(){
     }
 
 
+    fun updateAnUser(context : Context, user: User){
+        viewModelScope.launch{
+            try{
+
+                    val response = repository.update(context, user)
+                if(response.isSuccessful) {
+
+                    Log.d("ADMIN_DEBUG", "  Utilisateur modifié !")
+
+
+                    fetchAllUsers(context)
+
+                }
+                Log.d("ADMIN_DEBUG", "Tentative de modification d'un utilisateur ..")
+
+
+            } catch (e: HttpException) {
+                Log.e("ADMIN_DEBUG", "Détail de l'erreur : ${e.localizedMessage}", e)
+
+            }
+        }
+    }
+
+
 
 
 

@@ -25,6 +25,7 @@ import fr.ayae.festivals.data.Login.User
 import retrofit2.Response
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 
@@ -53,6 +54,13 @@ interface APIService {
 
     @POST("users/invite")
     suspend fun create(@Body newUser: User): Response<CreationResponse>
+
+    @PUT("users/{id}")
+    suspend fun update(
+        @Path("id") id: Int,
+        @Body userToUpdate: User
+    ): Response<LoginResponse>
+
 }
 
 object RetrofitInstance {

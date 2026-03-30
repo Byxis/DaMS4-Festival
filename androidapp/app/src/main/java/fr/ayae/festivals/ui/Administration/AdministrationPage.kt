@@ -32,7 +32,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -62,11 +64,17 @@ fun AdministrationPage(adminViewModel: AdminViewModel = viewModel()) {
     LaunchedEffect(Unit) {
         adminViewModel.fetchAllUsers(context)
     }
-    var showDialog by remember { mutableStateOf(false) }
 
-    var showAddUserDialog by remember { mutableStateOf(false) }
+    var showUserForm by remember { mutableStateOf(false) }
+    var userToEdit by remember { mutableStateOf<User?>(null) }
+    var deleteDialog by remember { mutableStateOf(false) }
+
+
+
+
 
     var userIdToDelete by remember { mutableIntStateOf(-1) }
+
 
     val users = adminViewModel.usersList
 
@@ -79,32 +87,28 @@ fun AdministrationPage(adminViewModel: AdminViewModel = viewModel()) {
     }
 
 
-
-
-
-
-
     val filteredUsers = adminViewModel.usersList.filter {
         it.email.contains(searchQuery, ignoreCase = true) ||
                 (it.firstName?.contains(searchQuery, ignoreCase = true) ?: false)
     }
 
-    if (showDialog) {
+    if (deleteDialog) {
         DeleteConfirmationDialog(
             onConfirm = {
 
                 adminViewModel.deleteAnUser(context, userIdToDelete)
-                showDialog = false
+                deleteDialog = false
             },
             onDismiss = {
-                showDialog = false
+                deleteDialog = false
             }
         )
     }
-    if (showAddUserDialog) {
-        AddUserForm(
-            onDismiss = { showAddUserDialog = false },
-            adminViewModel
+    if (showUserForm) {
+        UserFormDialog(
+            userToEdit = userToEdit,
+            onDismiss = { showUserForm = false },
+            adminViewModel = adminViewModel
         )
     }
 
@@ -138,7 +142,11 @@ fun AdministrationPage(adminViewModel: AdminViewModel = viewModel()) {
 
 
             FilledIconButton(
-                onClick = { showAddUserDialog = true},
+                onClick = {
+
+                    userToEdit = null
+                    showUserForm = true
+                },
                 modifier = Modifier.size(56.dp),
                 shape = RoundedCornerShape(12.dp)
             ) {
@@ -157,31 +165,49 @@ fun AdministrationPage(adminViewModel: AdminViewModel = viewModel()) {
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(filteredUsers) { user ->
-                    // 1. ON CRÉE UNE LIGNE (Row)
+
                     Row(
-                        modifier = Modifier.fillMaxWidth(), // La ligne prend toute la largeur
-                        verticalAlignment = Alignment.CenterVertically // On centre la poubelle verticalement par rapport à la carte
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
 
-                        // 2. LA CARTE UTILISATEUR
-                        // On l'enveloppe dans une Box avec weight(1f) pour qu'elle prenne
-                        // tout l'espace disponible, sauf celui réservé au bouton.
+
                         Box(modifier = Modifier.weight(1f)) {
                             UserCard(user)
                         }
 
-                        // 3. LE BOUTON POUBELLE (ou le texte "Vous")
+
                         if (user.email != currentEmail) {
                             IconButton(
                                 onClick = {
-                                    userIdToDelete = user.id ?: -1
-                                    showDialog = true
+                                    if (isInternetAvailable(context)) {
+                                        userIdToDelete = user.id ?: -1
+                                        deleteDialog = true
+                                    }else{
+                                        android.widget.Toast.makeText(context, "Impossible de supprimer hors ligne", android.widget.Toast.LENGTH_SHORT).show()
+                                    }
                                 }
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Delete,
                                     contentDescription = "Supprimer",
                                     tint = MaterialTheme.colorScheme.error
+                                )
+                            }
+                            IconButton(
+                                onClick = {
+                                    if (isInternetAvailable(context)) {
+                                        userToEdit = user
+                                        showUserForm = true
+                                    }else{
+                                        android.widget.Toast.makeText(context, "Impossible de modifier hors ligne", android.widget.Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Modifier",
+                                    tint = MaterialTheme.colorScheme.primary
                                 )
                             }
                         } else {
@@ -203,121 +229,6 @@ fun AdministrationPage(adminViewModel: AdminViewModel = viewModel()) {
                 }
             }
         }
-
-
-
-@Composable
-fun DeleteConfirmationDialog(
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(text = "Supprimer l'utilisateur") 
-        },
-        text = { 
-            Text("Voulez-vous vraiment supprimer cet utilisateur ? Cette action est définitive.")
-        },
-        confirmButton = {
-            Button(
-                onClick = onConfirm,
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-            ) {
-                Text("Supprimer", color = Color.White)
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Annuler")
-            }
-        }
-    )
-}
-
-@Composable
-fun AddUserForm(
-    onDismiss: () -> Unit,
-    adminViewModel: AdminViewModel
-) {
-    val context = LocalContext.current
-    var prenom by remember { mutableStateOf("") }
-    var nom by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var role by remember { mutableStateOf("Administrateur") }
-    val roles = listOf("Administrateur", "Editeur", "Editeur de jeu", "Invité")
-    val isEmailValid = Patterns.EMAIL_ADDRESS.matcher(email).matches()
-    val showEmailError = email.isNotEmpty() && !isEmailValid
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Ajouter un utilisateur") },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedTextField(
-                    value = prenom,
-                    onValueChange = { prenom = it },
-                    label = { Text("Prénom (optionnel)") }
-                )
-                OutlinedTextField(
-                    value = nom,
-                    onValueChange = { nom = it },
-                    label = { Text("Nom (optionnel") }
-                )
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text("Email*") },
-                    isError = showEmailError,
-                    supportingText = {
-                        if (showEmailError) {
-                            Text(
-                                text = "Format d'email invalide",
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        }
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    singleLine = true
-                )
-
-                RoleSelector(
-                    currentRole = role,
-                    onRoleChange = { role = it }
-                )
-
-                }
-
-        },
-        confirmButton = {
-            Button(
-                onClick = {
-
-                    val userToCreate = User(
-                        email = email.trim(),
-                        role = role,
-                        firstName = prenom,
-                        lastName = nom
-                    )
-
-
-                    adminViewModel.createAnUser(context, userToCreate)
-
-
-                    onDismiss()
-                },
-                // Le paramètre 'enabled' se met APRÈS l'accolade du onClick, pas dedans
-                enabled = email.isNotBlank() && role.isNotBlank()
-            ) {
-                // Le texte du bouton
-                Text("Enregistrer")
-            }
-
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Annuler") }
-        }
-    )
-}
 
 
 
@@ -370,7 +281,7 @@ fun RoleSelector(currentRole: String, onRoleChange: (String) -> Unit) {
     val options = listOf("Administrateur", "Editeur", "Editeur de jeu", "Invité")
     var expanded by remember { mutableStateOf(false) }
 
-    // Le conteneur principal du Select
+
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },

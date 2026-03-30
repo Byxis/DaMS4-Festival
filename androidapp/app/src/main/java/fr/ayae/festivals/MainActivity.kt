@@ -93,12 +93,12 @@ fun AYAEFestivalsApp() {
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.primary,
             ) {
-                if (backStack.last() != Destination.Login && backStack.last() != Destination.Register) {
+                if (backStack.last() != Destination.Login) {
                     NavigationBar(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.primary,
                     ) {
-                        Destination.entries.filter{it != Destination.Login}.forEachIndexed { index, destination ->
+                        Destination.entries.filter{it != Destination.Login && it!= Destination.Register}.forEachIndexed { index, destination ->
                             val isVisible = destination != Destination.Administration || user?.role == "admin"
                             if (isVisible) {
                                 NavigationBarItem(
