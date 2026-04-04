@@ -93,7 +93,7 @@ fun AYAEFestivalsApp() {
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.primary,
             ) {
-                if (backStack.last() != Destination.Login) {
+                if (backStack.last() != Destination.Login && backStack.last() != Destination.Register) {
                     NavigationBar(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.primary,
