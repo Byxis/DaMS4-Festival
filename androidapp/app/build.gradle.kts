@@ -1,3 +1,5 @@
+import org.gradle.kotlin.dsl.invoke
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -69,17 +71,17 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.coil.compose)
-}
 
-configurations.all {
-    exclude(group = "com.intellij", module = "annotations")
-    implementation("androidx.compose.material3:material3-adaptive-navigation-suite:1.3.0")
-
-    implementation("androidx.compose.material:material-icons-extended")
+    implementation(libs.androidx.material3.adaptive.navigation.suite)
+    implementation(libs.androidx.material.icons.extended)
     implementation(libs.retrofit2)
     implementation(libs.retrofit2.converter.kotlinx.serialization)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
-    implementation("com.github.franmontiel:PersistentCookieJar:v1.0.1")
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.persistent.cookiejar)
+}
+
+configurations.all {
+    exclude(group = "com.intellij", module = "annotations")
 }

@@ -2,6 +2,7 @@ package fr.ayae.festivals.ui.Administration
 
 import android.util.Log
 import android.util.Patterns
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.text.KeyboardOptions
@@ -109,7 +110,7 @@ fun UserFormDialog(
 
                         onDismiss()
                     }else{
-                        android.widget.Toast.makeText(context, "Pas de connexion internet !", android.widget.Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Pas de connexion internet !", Toast.LENGTH_SHORT).show()
                     }
                 },
                 enabled = email.isNotBlank() && role.isNotBlank() && isEmailValid

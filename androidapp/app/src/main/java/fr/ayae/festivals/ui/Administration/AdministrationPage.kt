@@ -2,7 +2,7 @@ package fr.ayae.festivals.ui.Administration
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Patterns
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,26 +26,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import fr.ayae.festivals.ui.Administration.AdminViewModel
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Update
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -53,7 +46,6 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardType
 import fr.ayae.festivals.data.Login.User
 
 
@@ -184,7 +176,7 @@ fun AdministrationPage(adminViewModel: AdminViewModel = viewModel()) {
                                         userIdToDelete = user.id ?: -1
                                         deleteDialog = true
                                     }else{
-                                        android.widget.Toast.makeText(context, "Impossible de supprimer hors ligne", android.widget.Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, "Impossible de supprimer hors ligne", Toast.LENGTH_SHORT).show()
                                     }
                                 }
                             ) {
@@ -200,7 +192,7 @@ fun AdministrationPage(adminViewModel: AdminViewModel = viewModel()) {
                                         userToEdit = user
                                         showUserForm = true
                                     }else{
-                                        android.widget.Toast.makeText(context, "Impossible de modifier hors ligne", android.widget.Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, "Impossible de modifier hors ligne", Toast.LENGTH_SHORT).show()
                                     }
                                 }
                             ) {

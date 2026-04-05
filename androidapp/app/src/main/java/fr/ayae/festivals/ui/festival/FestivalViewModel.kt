@@ -23,12 +23,18 @@ class FestivalViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<FestivalUiState>(FestivalUiState.Loading)
     val uiState: StateFlow<FestivalUiState> = _uiState.asStateFlow()
 
-    init {
-        loadData()
-    }
+    private val reservationRepo = fr.ayae.festivals.data.ReservationRepository()
 
-    private fun loadData() {
+    // Removing init to load data from UI with context
+    // init {
+    //     loadData()
+    // }
+
+    fun loadData(context: android.content.Context) {
         viewModelScope.launch {
+            _uiState.update { FestivalUiState.Loading }
+
+            // Temporary mock festival
             val mockFestival = Festival(
                 id = 1,
                 name = "Festival des Jeux 2026",
@@ -44,24 +50,17 @@ class FestivalViewModel : ViewModel() {
                 logoUrl = null,
                 tarif_zones = emptyList()
             )
-            val mockReservations = listOf(
-                "Gigamic" to Reservation(
-                    id = 1,
-                    festival_id = 1,
-                    entity_id = 101,
-                    table_count = 45,
-                    big_table_count = 10,
-                    town_table_count = 5,
-                    electrical_outlets = 1,
-                    status = "CONFIRMED",
-                    presented_by_them = true,
-                    note = "Besoin d'électricité à proximité.",
-                    interactions = emptyList(),
-                    games = emptyList()
-                )
-            )
+
+            // Fetch actual reservations
+            val fetchedReservations = reservationRepo.getReservationsForFestival(context, mockFestival.id)
+            
+            // Map fetched reservations to the required pairs. Using Entity ID as name since we don't fetch publishers yet.
+            val reservationsList = fetchedReservations?.map {
+                (it.entity_name ?: "Éditeur ${it.entity_id}") to it
+            } ?: emptyList()
+
             _uiState.update {
-                FestivalUiState.Success(festival = mockFestival, reservations = mockReservations)
+                FestivalUiState.Success(festival = mockFestival, reservations = reservationsList)
             }
         }
     }

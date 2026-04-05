@@ -1,7 +1,6 @@
 package fr.ayae.festivals.ui.Login
 
 
-import android.app.Application
 import android.content.Context
 import android.util.Base64
 import android.util.Log
@@ -12,7 +11,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache

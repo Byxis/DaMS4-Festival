@@ -2,13 +2,16 @@ package fr.ayae.festivals.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Entity(tableName = "reservation_games")
 data class ReservationGame(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val reservation_id: Int,
     val game_id: Int,
+    val game_name: String? = null,
     val amount: Int,
     val table_count: Int,
     val big_table_count: Int,
