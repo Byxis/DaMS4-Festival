@@ -200,6 +200,8 @@ router.delete("/:id/contacts/:contactId", requireEditor, async (req: Request, re
     }
 });
 
+
+
 //! PUT /api/others/:id/contacts/:contactId - Update a contact
 router.put("/:id/contacts/:contactId", requireEditor, async (req: Request, res: Response) => {
     const {contactId} = req.params;

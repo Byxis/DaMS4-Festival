@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -13,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "fr.ayae.festivals"
-        minSdk = 35
+        minSdk = 31
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -52,6 +53,9 @@ dependencies {
     implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
     implementation(libs.androidx.room.compiler)
     implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.camera.camera2.pipe)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.compose.foundation.layout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -69,4 +73,13 @@ dependencies {
 
 configurations.all {
     exclude(group = "com.intellij", module = "annotations")
+    implementation("androidx.compose.material3:material3-adaptive-navigation-suite:1.3.0")
+
+    implementation("androidx.compose.material:material-icons-extended")
+    implementation(libs.retrofit2)
+    implementation(libs.retrofit2.converter.kotlinx.serialization)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    implementation("com.github.franmontiel:PersistentCookieJar:v1.0.1")
 }
