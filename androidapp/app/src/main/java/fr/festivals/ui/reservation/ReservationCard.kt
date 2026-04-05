@@ -7,36 +7,81 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Note
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Desk
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Power
+import androidx.compose.material.icons.filled.TableBar
+import androidx.compose.material.icons.filled.TableChart
+import androidx.compose.material.icons.filled.TableRestaurant
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import fr.ayae.festivals.data.Reservation
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Note
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import fr.ayae.festivals.data.Game
 import fr.ayae.festivals.data.GameType
+import fr.ayae.festivals.data.Reservation
 import fr.ayae.festivals.data.ReservationGame
 import fr.ayae.festivals.data.ReservationInteraction
 import fr.ayae.festivals.ui.theme.AYAEFestivalsTheme
 
+/**
+ * Possible statuses for a reservation.
+ */
 enum class ReservationStatus(val label: String, val lightColorHex: Long, val darkColorHex: Long) {
     TO_BE_CONTACTED("À contacter", 0xFFD81C1C, 0xFFF36161),
     CONTACTED("Contacté", 0xFFFB9200, 0xFFF4AF4F),         
@@ -47,6 +92,9 @@ enum class ReservationStatus(val label: String, val lightColorHex: Long, val dar
 }
 
 
+/**
+ * Card displaying all details of a reservation, including interactions and associated games.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReservationCard(
@@ -55,10 +103,13 @@ fun ReservationCard(
     modifier: Modifier = Modifier,
     hasLogo: Boolean = false,
     warnings: List<String> = emptyList(),
+    onNoteChanged: (String) -> Unit = {},
+    onStatusChanged: (String) -> Unit = {},
+    onPresentedByThemChanged: (Boolean) -> Unit = {},
+    onStockChanged: (Int, Int, Int, Int) -> Unit = { _, _, _, _ -> }
 ) {
     var isExpanded by rememberSaveable { mutableStateOf(false) }
     var statusMenuExpanded by rememberSaveable { mutableStateOf(false) }
-    var noteText by remember(reservation.note) { mutableStateOf(reservation.note ?: "") }
     
     val statusOption = try { 
         ReservationStatus.valueOf(reservation.status) 
@@ -155,7 +206,10 @@ fun ReservationCard(
                                         color = optionColor
                                     ) 
                                 },
-                                onClick = { statusMenuExpanded = false }
+                                onClick = { 
+                                    statusMenuExpanded = false 
+                                    onStatusChanged(option.name)
+                                }
                             )
                         }
                     }
@@ -178,7 +232,7 @@ fun ReservationCard(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.offset(x = (-12).dp)
                         ) {
-                            Checkbox(checked = reservation.presented_by_them == true, onCheckedChange = {})
+                            Checkbox(checked = reservation.presented_by_them == true, onCheckedChange = onPresentedByThemChanged)
                             Text("Jeux présentés par l'éditeur / entité", style = MaterialTheme.typography.bodyMedium)
                         }
 
@@ -193,10 +247,22 @@ fun ReservationCard(
                         Spacer(modifier = Modifier.height(12.dp))
 
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            ReservationStockItem("Tables", Icons.Default.TableBar, reservation.table_count)
-                            ReservationStockItem("Grandes Tables", Icons.Default.TableRestaurant, reservation.big_table_count)
-                            ReservationStockItem("Tables Municipales", Icons.Default.Desk, reservation.town_table_count)
-                            ReservationStockItem("Prises électriques", Icons.Default.Power, reservation.electrical_outlets)
+                            ReservationStockItem("Tables", Icons.Default.TableBar, reservation.table_count) {
+                                onStockChanged(it, reservation.big_table_count, reservation.town_table_count, reservation.electrical_outlets)
+                            }
+                            ReservationStockItem("Grandes Tables", Icons.Default.TableRestaurant, reservation.big_table_count) {
+                                onStockChanged(reservation.table_count, it, reservation.town_table_count, reservation.electrical_outlets)
+                            }
+                            ReservationStockItem("Tables Municipales", Icons.Default.Desk, reservation.town_table_count) {
+                                onStockChanged(reservation.table_count, reservation.big_table_count, it, reservation.electrical_outlets)
+                            }
+                            ReservationStockItem(
+                                "Prises électriques",
+                                Icons.Default.Power,
+                                reservation.electrical_outlets
+                            ) {
+                                onStockChanged(reservation.table_count, reservation.big_table_count, reservation.town_table_count, it)
+                            }
                         }
 
                         if (warnings.isNotEmpty()) {
@@ -219,8 +285,8 @@ fun ReservationCard(
                             Text("Notes", style = MaterialTheme.typography.titleMedium)
                         }
                         OutlinedTextField(
-                            value = noteText,
-                            onValueChange = { noteText = it },
+                            value = reservation.note ?: "",
+                            onValueChange = onNoteChanged,
                             label = { Text("Notes") },
                             modifier = Modifier.fillMaxWidth(),
                             minLines = 2,
@@ -330,9 +396,10 @@ fun ReservationCardPreview() {
 fun ReservationStockItem(
     label: String,
     icon: ImageVector,
-    count: Int
+    count: Int,
+    onCountChanged: (Int) -> Unit = {}
 ) {
-    var value by rememberSaveable { mutableStateOf(count.toString()) }
+    var value by remember(count) { mutableStateOf(count.toString()) }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -358,7 +425,14 @@ fun ReservationStockItem(
             OutlinedTextField(
                 value = value,
                 onValueChange = { new ->
-                    if (new.all { it.isDigit() }) value = new
+                    if (new.all { it.isDigit() }) {
+                        value = new
+                        if (new.isNotEmpty()) {
+                            onCountChanged(new.toIntOrNull() ?: 0)
+                        } else {
+                            onCountChanged(0)
+                        }
+                    }
                 },
                 modifier = Modifier.width(72.dp),
                 textStyle = MaterialTheme.typography.titleMedium.copy(

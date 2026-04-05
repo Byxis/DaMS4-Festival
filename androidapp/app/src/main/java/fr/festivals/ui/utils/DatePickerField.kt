@@ -26,6 +26,9 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+/**
+ * A text field that opens a [DatePickerDialog] when tapped.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerField(

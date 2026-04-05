@@ -12,6 +12,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 
+/**
+ * A [Text] composable that automatically scales down its font size to fit within a single line.
+ */
 @Composable
 fun AutoResizedText(
     text: String,

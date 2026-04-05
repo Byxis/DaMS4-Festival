@@ -2,11 +2,40 @@ package fr.ayae.festivals.ui.festival
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddCircleOutline
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.PlaylistAdd
+import androidx.compose.material.icons.filled.SportsEsports
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -16,12 +45,19 @@ import fr.ayae.festivals.data.ZoneGame
 import fr.ayae.festivals.data.ZoneTarif
 import fr.ayae.festivals.ui.theme.AYAEFestivalsTheme
 import fr.ayae.festivals.ui.utils.FestivalDialog
-import androidx.compose.runtime.saveable.rememberSaveable
 import java.util.Locale
 
+/**
+ * A list of tarif zones with their associated game zones.
+ */
 @Composable
 fun ZonesTarifairesList(
     zones: List<ZoneTarif>,
+    onAddGameZone: (Int, String) -> Unit = { _, _ -> },
+    onEditGameZone: (Int, Int, String) -> Unit = { _, _, _ -> },
+    onDeleteGameZone: (Int, Int) -> Unit = { _, _ -> },
+    onEditZoneTarif: (Int, String, Double, Double) -> Unit = { _, _, _, _ -> },
+    onDeleteZoneTarif: (Int) -> Unit = { _ -> },
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -45,15 +81,30 @@ fun ZonesTarifairesList(
             }
         } else {
             zones.forEach { zone ->
-                ZoneTarifCard(zone = zone)
+                ZoneTarifCard(
+                    zone = zone, 
+                    onAddGameZone = onAddGameZone,
+                    onEditGameZone = onEditGameZone,
+                    onDeleteGameZone = onDeleteGameZone,
+                    onEditZoneTarif = onEditZoneTarif,
+                    onDeleteZoneTarif = onDeleteZoneTarif
+                )
             }
         }
     }
 }
 
+/**
+ * Card representing a single [ZoneTarif] and its game zones.
+ */
 @Composable
 fun ZoneTarifCard(
     zone: ZoneTarif,
+    onAddGameZone: (Int, String) -> Unit = { _, _ -> },
+    onEditGameZone: (Int, Int, String) -> Unit = { _, _, _ -> },
+    onDeleteGameZone: (Int, Int) -> Unit = { _, _ -> },
+    onEditZoneTarif: (Int, String, Double, Double) -> Unit = { _, _, _, _ -> },
+    onDeleteZoneTarif: (Int) -> Unit = { _ -> },
     modifier: Modifier = Modifier
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
@@ -200,7 +251,7 @@ fun ZoneTarifCard(
             zone = zone,
             onDismissRequest = { showEditZoneDialog = false },
             onSave = { name, price, outletPrice ->
-                // TODO: viewModel.updateTarifZone(zone.id, name, price, outletPrice)
+                onEditZoneTarif(zone.id ?: 0, name, price, outletPrice)
                 showEditZoneDialog = false
             }
         )
@@ -212,7 +263,7 @@ fun ZoneTarifCard(
             title = "Supprimer la zone",
             onDismissRequest = { showDeleteZoneDialog = false },
             onSaveRequest = {
-                // TODO: viewModel.deleteTarifZone(zone.id)
+                onDeleteZoneTarif(zone.id ?: 0)
                 showDeleteZoneDialog = false
             }
         ) {
@@ -226,7 +277,7 @@ fun ZoneTarifCard(
             gameZone = null,
             onDismissRequest = { showAddGameZoneDialog = false },
             onSave = { name ->
-                // TODO: viewModel.addGameZone(zone.id, name)
+                onAddGameZone(zone.id ?: 0, name)
                 showAddGameZoneDialog = false
             }
         )
@@ -238,7 +289,7 @@ fun ZoneTarifCard(
             gameZone = gz,
             onDismissRequest = { editingGameZone = null },
             onSave = { name ->
-                // TODO: viewModel.updateGameZone(zone.id, gz.id, name)
+                onEditGameZone(zone.id ?: 0, gz.id ?: 0, name)
                 editingGameZone = null
             }
         )
@@ -250,7 +301,7 @@ fun ZoneTarifCard(
             title = "Supprimer la zone de jeu",
             onDismissRequest = { deletingGameZone = null },
             onSaveRequest = {
-                // TODO: viewModel.deleteGameZone(zone.id, gz.id)
+                onDeleteGameZone(zone.id ?: 0, gz.id ?: 0)
                 deletingGameZone = null
             }
         ) {

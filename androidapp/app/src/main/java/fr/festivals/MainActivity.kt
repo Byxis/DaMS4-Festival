@@ -20,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import fr.ayae.festivals.ui.festival.FestivalScreen
 import fr.ayae.festivals.ui.theme.AYAEFestivalsTheme
 
 class MainActivity : ComponentActivity() {
@@ -56,12 +57,7 @@ fun AYAEFestivalsApp() {
             }
         }
     ) {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Greeting(
-                name = "Android",
-                modifier = Modifier.padding(innerPadding)
-            )
-        }
+        FestivalScreen(modifier = Modifier)
     }
 }
 

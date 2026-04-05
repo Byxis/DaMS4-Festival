@@ -9,6 +9,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
+/**
+ * A standard styled [AlertDialog] for the festival application.
+ */
 @Composable
 fun FestivalDialog(
     title: String,
