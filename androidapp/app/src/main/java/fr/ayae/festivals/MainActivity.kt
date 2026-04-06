@@ -126,7 +126,6 @@ fun AYAEFestivalsApp() {
             }
         }
     ) { innerPadding ->
-        FestivalScreen(modifier = Modifier)
         Box(modifier = Modifier.padding(innerPadding)) {
 
             when (backStack.last()) {
@@ -144,7 +143,8 @@ fun AYAEFestivalsApp() {
                 }
 
                 Destination.Home -> {
-                    HomePage()
+
+                    FestivalScreen(modifier = Modifier)
                 }
                 Destination.Register->{
                     RegisterScreen(
