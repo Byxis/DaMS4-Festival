@@ -21,6 +21,9 @@ import fr.ayae.festivals.data.Login.LoginResponse
 import fr.ayae.festivals.data.Login.MessageResponse
 import fr.ayae.festivals.data.Login.RegisterRequest
 import fr.ayae.festivals.data.Login.User
+import fr.ayae.festivals.data.contact.ContactDto
+import fr.ayae.festivals.data.game.GameDto
+import fr.ayae.festivals.data.publisher.PublisherDto
 
 import retrofit2.Response
 import retrofit2.http.DELETE
@@ -64,6 +67,20 @@ interface APIService {
     // --- Reservations ---
     @GET("festivals/{festivalId}/reservations")
     suspend fun getReservations(@Path("festivalId") festivalId: Int): List<fr.ayae.festivals.data.Reservation>
+
+
+    // --- Publishers ---
+    @GET("publishers")
+    suspend fun getAllPublishers(): List<PublisherDto>
+
+    @GET("publishers/{id}")
+    suspend fun getPublisherById(@Path("id") publisherId: Int): PublisherDto
+
+    @GET("publishers/{id}/contacts")
+    suspend fun getContactsForPublisher(@Path("id") publisherId: Int): List<ContactDto>
+
+    @GET("publishers/{id}/games")
+    suspend fun getGamesForPublisher(@Path("id") publisherId: Int): List<GameDto>
 
 }
 
