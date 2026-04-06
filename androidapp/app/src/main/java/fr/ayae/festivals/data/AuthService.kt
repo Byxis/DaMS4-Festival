@@ -23,6 +23,7 @@ import fr.ayae.festivals.data.Login.RegisterRequest
 import fr.ayae.festivals.data.Login.User
 import fr.ayae.festivals.data.contact.ContactDto
 import fr.ayae.festivals.data.game.GameDto
+import fr.ayae.festivals.data.publisher.PublisherCreationRequest
 import fr.ayae.festivals.data.publisher.PublisherDto
 
 import retrofit2.Response
@@ -76,12 +77,22 @@ interface APIService {
     @GET("publishers/{id}")
     suspend fun getPublisherById(@Path("id") publisherId: Int): PublisherDto
 
+    @POST("publishers")
+    suspend fun addPublisher(@Body publisherRequest: PublisherCreationRequest)
+
+    @PUT("publishers/{id}")
+    suspend fun editPublisher(@Path("id") publisherId: Int, @Body publisherRequest: PublisherCreationRequest)
+
+    @DELETE("publishers/{id}")
+    suspend fun deletePublisher(@Path("id") publisherId: Int)
+
+    // --- Contacts ---
     @GET("publishers/{id}/contacts")
     suspend fun getContactsForPublisher(@Path("id") publisherId: Int): List<ContactDto>
 
+    // --- Games ---
     @GET("publishers/{id}/games")
     suspend fun getGamesForPublisher(@Path("id") publisherId: Int): List<GameDto>
-
 }
 
 object RetrofitInstance {
