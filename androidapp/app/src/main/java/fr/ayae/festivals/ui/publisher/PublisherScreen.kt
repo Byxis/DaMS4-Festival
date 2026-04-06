@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -25,29 +26,28 @@ import fr.ayae.festivals.data.publisher.PublisherDto
 
 @Composable
 fun PublisherScreen(
-    // On utilise la factory pour créer le ViewModel
     viewModel: PublisherViewModel = viewModel(
         factory = PublisherViewModelFactory(LocalContext.current.applicationContext as Application)
     )
 ) {
-    // On collecte les états depuis le ViewModel
-    val publishers by viewModel.publishers.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val error by viewModel.error.collectAsState()
+
+    val uiState by viewModel.uiState.collectAsState()
 
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        when {
-            // Affiche un indicateur de chargement
-            isLoading -> CircularProgressIndicator()
 
-            // Affiche un message d'erreur s'il y en a un
-            error != null -> Text(text = error!!, color = MaterialTheme.colorScheme.error)
-
-            // Affiche la liste des éditeurs
-            else -> PublisherList(publishers)
+        when (val state = uiState) {
+            is PublisherUiState.Loading -> {
+                CircularProgressIndicator()
+            }
+            is PublisherUiState.Error -> {
+                Text(text = state.message, color = MaterialTheme.colorScheme.error)
+            }
+            is PublisherUiState.Success -> {
+                PublisherList(publishers = state.publishers)
+            }
         }
     }
 }
@@ -71,7 +71,7 @@ fun PublisherList(publishers: List<PublisherDto>) {
 
 @Composable
 fun PublisherItem(publisher: PublisherDto) {
-    Card(modifier = Modifier.fillMaxSize()) {
+    Card(modifier = Modifier.fillMaxWidth()) { // Changé pour fillMaxWidth pour un meilleur rendu
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = publisher.name, style = MaterialTheme.typography.titleLarge)
             Text(text = "Contacts: ${publisher.contacts.size}", style = MaterialTheme.typography.bodyMedium)
