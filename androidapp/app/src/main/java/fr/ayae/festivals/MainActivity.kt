@@ -1,6 +1,5 @@
 package fr.ayae.festivals
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -30,7 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.ayae.festivals.ui.Login.LoginViewModel
 import fr.ayae.festivals.ui.Administration.AdministrationPage
-import fr.ayae.festivals.ui.HomePage
+import fr.ayae.festivals.ui.HomePage.HomePage
 import fr.ayae.festivals.ui.Login.LoginScreen
 import fr.ayae.festivals.ui.Navigation.Destination
 import fr.ayae.festivals.ui.Profile.ProfilePage
@@ -59,6 +58,7 @@ fun AYAEFestivalsApp() {
     //remember : mémoire à court terme du composant
     // garde l'objet en mémoire et le renvoie à chaque fois que l'interface est réecrite
     val backStack = remember { mutableStateListOf<Any>(Destination.Login) }
+    val showBackstack = false
     val loginViewModel: LoginViewModel = viewModel()
     val user = loginViewModel.userProfile
     val context = LocalContext.current
@@ -77,7 +77,7 @@ fun AYAEFestivalsApp() {
                 ),
                 title = { Text("AYAE Festivals") },
                 navigationIcon = {
-                    if (backStack.size > 1) {
+                    if (backStack.size > 1 && showBackstack) {
                         IconButton(onClick = navigateBack) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -147,7 +147,7 @@ fun AYAEFestivalsApp() {
                 Destination.Register->{
                     RegisterScreen(
                             registerSuccess = {
-                                Log.d("NAV_DEBUG", "Action reçue par le chef d'orchestre ! On ferme la page.") // <-- MICRO 3
+                                Log.d("NAV_DEBUG", "Action reçue => on ferme la page.")
                                 backStack.removeAt(backStack.size - 1)
                             },
                         onNavigateToLogin = {

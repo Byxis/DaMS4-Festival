@@ -61,7 +61,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation("androidx.compose.material3:material3-adaptive-navigation-suite:1.3.0")
-
+    implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("androidx.compose.material:material-icons-extended")
     implementation(libs.retrofit2)
     implementation(libs.retrofit2.converter.kotlinx.serialization)

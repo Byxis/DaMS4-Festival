@@ -10,22 +10,14 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.AndroidViewModel
+
 import androidx.lifecycle.ViewModel
-import com.franmontiel.persistentcookiejar.PersistentCookieJar
-import com.franmontiel.persistentcookiejar.cache.SetCookieCache
-import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
-import fr.ayae.festivals.data.Login.LoginRepository
-import fr.ayae.festivals.data.Login.LoginRequest
+
 import fr.ayae.festivals.data.Login.RegisterRequest
 import fr.ayae.festivals.data.Login.User
-import fr.ayae.festivals.data.Login.UserProfile
+
 import fr.ayae.festivals.data.Register.RegisterRepository
-import fr.ayae.festivals.data.RetrofitInstance
-import kotlinx.coroutines.delay
-import kotlinx.serialization.json.Json
+
 import retrofit2.HttpException
 
 

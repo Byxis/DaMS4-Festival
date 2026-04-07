@@ -20,7 +20,7 @@ import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersisto
 import fr.ayae.festivals.data.Login.LoginRepository
 import fr.ayae.festivals.data.Login.LoginRequest
 import fr.ayae.festivals.data.Login.User
-import fr.ayae.festivals.data.Login.UserProfile
+
 import fr.ayae.festivals.data.RetrofitInstance
 import kotlinx.coroutines.delay
 import kotlinx.serialization.json.Json
@@ -44,7 +44,7 @@ class LoginViewModel: ViewModel(){
     private var internalState : MutableState<UiState> = mutableStateOf(UiState.Loading)
     val state : State<UiState> = internalState
 
-    var userProfile by mutableStateOf<UserProfile?>(null)
+    var userProfile by mutableStateOf<User?>(null)
 
 
     fun performLogin(context: Context, passwordValue: String, emailValue: String) {
@@ -122,7 +122,7 @@ class LoginViewModel: ViewModel(){
     }
 
 
-    private fun getUserProfileFromLocalToken(context: Context): UserProfile? {
+    private fun getUserProfileFromLocalToken(context: Context): User? {
 
         val sharedPrefs = context.getSharedPreferences("AppCookies", Context.MODE_PRIVATE)
 
@@ -140,7 +140,7 @@ class LoginViewModel: ViewModel(){
             Log.d("AUTH_DEBUG", "PAYLOAD DÉCODÉ : $payload")
 
             val json = Json { ignoreUnknownKeys = true }
-            val profile = json.decodeFromString<UserProfile>(payload)
+            val profile = json.decodeFromString<User>(payload)
 
             Log.d("AUTH_DEBUG", "PROFIL CRÉÉ : ${profile.email}")
             profile

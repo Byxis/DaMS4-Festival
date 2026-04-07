@@ -16,6 +16,7 @@ import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import fr.ayae.festivals.R
 import fr.ayae.festivals.data.Login.CreationResponse
+import fr.ayae.festivals.data.Login.Festival
 import fr.ayae.festivals.data.Login.LoginRequest
 import fr.ayae.festivals.data.Login.LoginResponse
 import fr.ayae.festivals.data.Login.MessageResponse
@@ -60,6 +61,10 @@ interface APIService {
         @Path("id") id: Int,
         @Body userToUpdate: User
     ): Response<LoginResponse>
+
+
+    @GET("festivals/")
+    suspend fun getAllFestivals():List<Festival>
 
 }
 
@@ -147,7 +152,9 @@ object RetrofitInstance {
             .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
             .build()
     }
-
+    fun getSecureClient(context: Context): OkHttpClient {
+        return generateSecureOkHttpClient(context)
+    }
 
 }
 

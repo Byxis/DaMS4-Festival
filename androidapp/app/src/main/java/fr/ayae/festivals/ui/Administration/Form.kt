@@ -36,13 +36,20 @@ fun UserFormDialog(
     var prenom by remember { mutableStateOf(userToEdit?.firstName ?: "") }
     var nom by remember { mutableStateOf(userToEdit?.lastName ?: "") }
     var email by remember { mutableStateOf(userToEdit?.email ?: "") }
-    var role by remember { mutableStateOf(userToEdit?.role ?: "Administrateur") }
+    val roleTraduit = when (userToEdit?.role?.lowercase()) {
+        "admin" -> "Administrateur"
+        "guest" -> "Invité"
+        "publisher" -> "Editeur"
+        "editeur de jeu" -> "Editeur de jeu"
+        null -> "Administrateur"
+        else -> userToEdit.role.replaceFirstChar { it.uppercase() }
+    }
 
-    val roles = listOf("Administrateur", "Editeur", "Editeur de jeu", "Invité")
+    var role by remember { mutableStateOf(roleTraduit) }
     val isEmailValid = Patterns.EMAIL_ADDRESS.matcher(email).matches()
     val showEmailError = email.isNotEmpty() && !isEmailValid
 
-    // Petite variable pratique pour savoir dans quel mode on est
+
     val isEditMode = userToEdit != null
 
     AlertDialog(
