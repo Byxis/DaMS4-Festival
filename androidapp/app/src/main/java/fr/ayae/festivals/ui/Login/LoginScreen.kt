@@ -35,7 +35,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.ayae.festivals.R
 
 @Composable
 fun LoginScreen(
@@ -84,7 +86,7 @@ fun LoginScreen(
             ) {
 
                 Text(
-                    text = "Connexion",
+                    text = stringResource(R.string.login_title),
                     color = Color.White,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold
@@ -94,7 +96,7 @@ fun LoginScreen(
 
 
                 Text(
-                    text = "Entrez vos informations de connexion",
+                    text = stringResource(R.string.login_subtitle),
                     color = textGray,
                     fontSize = 14.sp
                 )
@@ -106,7 +108,7 @@ fun LoginScreen(
                     value = email,
                     onValueChange = { email = it },
 
-                    label = { Text("Email*") },
+                    label = { Text(stringResource(R.string.login_email_label)) },
                     shape = RoundedCornerShape(6.dp),
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
@@ -129,7 +131,7 @@ fun LoginScreen(
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("Mot de passe*") },
+                    label = { Text(stringResource(R.string.login_password_label)) },
                     visualTransformation = PasswordVisualTransformation(),
                     shape = RoundedCornerShape(6.dp),
                     modifier = Modifier.fillMaxWidth(),
@@ -162,7 +164,7 @@ fun LoginScreen(
                     ),
                     border = BorderStroke(1.dp, borderColor)
                 ) {
-                    Text("Connexion", fontSize = 16.sp)
+                    Text(stringResource(R.string.login_title), fontSize = 16.sp)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -170,7 +172,7 @@ fun LoginScreen(
 
                 TextButton(onClick = { onNavigateToRegister() }) {
                     Text(
-                        text = "Pas encore inscrit ?",
+                        text = stringResource(R.string.login_not_registered),
                         color = textGray,
                         textDecoration = TextDecoration.Underline, // 🚨 Ajout du soulignement
                         fontSize = 14.sp

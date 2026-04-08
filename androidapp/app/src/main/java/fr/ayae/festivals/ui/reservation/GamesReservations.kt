@@ -51,6 +51,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import fr.ayae.festivals.data.Game
 import fr.ayae.festivals.data.GameType
+import androidx.compose.ui.res.stringResource
+import fr.ayae.festivals.R
 import fr.ayae.festivals.data.Reservation.ReservationGame
 import fr.ayae.festivals.ui.theme.AYAEFestivalsTheme
 import fr.ayae.festivals.ui.utils.AutoResizedText
@@ -59,11 +61,11 @@ import fr.ayae.festivals.ui.utils.FestivalDialog
 /**
  * Status options for a game in a reservation.
  */
-enum class ReservationGameStatusOption(val label: String, val lightColorHex: Long, val darkColorHex: Long) {
-    ASKED("Demandé", 0xFFFB9200, 0xFFF4AF4F),         
-    CONFIRMED("Confirmé", 0xFF009508, 0xFF37F140),         
-    RECEIVED("Reçu", 0xFF60FB00, 0xFF9DF567),           
-    CANCELLED("Annulé", 0xFFD81C1C, 0xFFF36161)               
+enum class ReservationGameStatusOption(val labelRes: Int, val lightColorHex: Long, val darkColorHex: Long) {
+    ASKED(R.string.reservation_game_status_asked, 0xFFFB9200, 0xFFF4AF4F),         
+    CONFIRMED(R.string.reservation_game_status_confirmed, 0xFF009508, 0xFF37F140),         
+    RECEIVED(R.string.reservation_game_status_received, 0xFF60FB00, 0xFF9DF567),           
+    CANCELLED(R.string.reservation_game_status_cancelled, 0xFFD81C1C, 0xFFF36161)               
 }
 
 /**
@@ -95,7 +97,7 @@ fun GamesReservations(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                "Jeux",
+                stringResource(R.string.reservation_games_title),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.weight(1f)
             )
@@ -108,8 +110,8 @@ fun GamesReservations(
             value = searchQuery,
             onValueChange = { searchQuery = it },
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("Rechercher un jeu...") },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Rechercher") },
+            placeholder = { Text(stringResource(R.string.reservation_game_search_placeholder)) },
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.festival_sort_by)) },
             singleLine = true
         )
 
@@ -125,7 +127,7 @@ fun GamesReservations(
                 onCheckedChange = { showGamesWithNoStatus = it }
             )
             Text(
-                text = "Afficher les jeux sans statut",
+                text = stringResource(R.string.reservation_game_show_no_status),
                 style = MaterialTheme.typography.bodyMedium
             )
         }
@@ -144,7 +146,7 @@ fun GamesReservations(
             ) {
                 Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Ajouter")
+                Text(stringResource(R.string.action_add))
             }
             OutlinedButton(
                 onClick = { showManageGamesDialog = true },
@@ -153,7 +155,7 @@ fun GamesReservations(
             ) {
                 Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Gérer")
+                Text(stringResource(R.string.action_edit))
             }
         }
 
@@ -182,7 +184,7 @@ fun GamesReservations(
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    "Aucun jeu trouvé",
+                    stringResource(R.string.reservation_game_none_found),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -203,7 +205,7 @@ fun GamesReservations(
 
     if (showAddGameDialog) {
         FestivalDialog(
-            title = "Ajouter un jeu",
+            title = stringResource(R.string.reservation_game_add_title),
             onDismissRequest = { showAddGameDialog = false },
             onSaveRequest = { showAddGameDialog = false }
         ) {
@@ -211,7 +213,7 @@ fun GamesReservations(
                 OutlinedTextField(
                     value = "",
                     onValueChange = {},
-                    label = { Text("Rechercher un jeu à ajouter") },
+                    label = { Text(stringResource(R.string.reservation_game_search_placeholder)) },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -220,11 +222,11 @@ fun GamesReservations(
 
     if (showManageGamesDialog) {
         FestivalDialog(
-            title = "Gérer les jeux",
+            title = stringResource(R.string.reservation_game_manage_title),
             onDismissRequest = { showManageGamesDialog = false },
             onSaveRequest = { showManageGamesDialog = false }
         ) {
-            Text("Interface de gestion par lots de l'ensemble des jeux demandés.")
+            Text(stringResource(R.string.reservation_game_manage_desc))
         }
         }
 }
@@ -303,7 +305,7 @@ fun GameListItem(
                 MaterialTheme.colorScheme.surfaceVariant
             }
 
-            val statusLabel = gameStatusOption?.label ?: "Non défini"
+            val statusLabel = if (gameStatusOption != null) stringResource(gameStatusOption.labelRes) else stringResource(R.string.reservation_status_undefined)
             Column(modifier = Modifier.weight(1f)) {
                 AutoResizedText(
                     text = game.name,
@@ -311,7 +313,7 @@ fun GameListItem(
                     fontWeight = FontWeight.Bold
                 )
                 AutoResizedText(
-                    text = game.type.label + " - " + statusLabel,
+                    text = stringResource(game.type.labelRes) + " - " + statusLabel,
                     style = MaterialTheme.typography.labelSmall,
                     color = Color(0xFF2C6869)
                 )
@@ -367,7 +369,7 @@ fun EditGameQuantitiesDialog(
     var statusMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
     FestivalDialog(
-        title = "Modifier les quantités – ${game.name}",
+        title = stringResource(R.string.reservation_game_edit_quantities_title, game.name),
         onDismissRequest = onDismissRequest,
         onSaveRequest = {
             onSave(
@@ -385,13 +387,13 @@ fun EditGameQuantitiesDialog(
             OutlinedTextField(
                 value = amountText,
                 onValueChange = { amountText = it },
-                label = { Text("Quantité d'exemplaires") },
+                label = { Text(stringResource(R.string.reservation_game_amount_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
             
             // Status Selector
-            Text("Statut du jeu", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.outline)
+            Text(stringResource(R.string.reservation_game_status_label), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.outline)
             
             Box {
                 val gameStatusOption = try { 
@@ -422,7 +424,7 @@ fun EditGameQuantitiesDialog(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = gameStatusOption?.label ?: "Non défini",
+                            text = if (gameStatusOption != null) stringResource(gameStatusOption.labelRes) else stringResource(R.string.reservation_status_undefined),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
                             color = statusColor
@@ -441,7 +443,7 @@ fun EditGameQuantitiesDialog(
                 ) {
                     ReservationGameStatusOption.values().forEach { option ->
                         DropdownMenuItem(
-                            text = { Text(option.label) },
+                            text = { Text(stringResource(option.labelRes)) },
                             onClick = {
                                 status = option.name
                                 statusMenuExpanded = false
@@ -451,27 +453,27 @@ fun EditGameQuantitiesDialog(
                 }
             }
             Divider()
-            Text("Tables allouées", style = MaterialTheme.typography.labelMedium,
+            Text(stringResource(R.string.reservation_game_tables_allocated), style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.outline)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = tableCountText,
                     onValueChange = { tableCountText = it },
-                    label = { Text("Standards") },
+                    label = { Text(stringResource(R.string.reservation_game_standards)) },
                     modifier = Modifier.weight(1f),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 OutlinedTextField(
                     value = bigTableCountText,
                     onValueChange = { bigTableCountText = it },
-                    label = { Text("Grandes") },
+                    label = { Text(stringResource(R.string.festival_big_tables_label)) },
                     modifier = Modifier.weight(1f),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 OutlinedTextField(
                     value = townTableText,
                     onValueChange = { townTableText = it },
-                    label = { Text("Mairies") },
+                    label = { Text(stringResource(R.string.festival_town_tables_label)) },
                     modifier = Modifier.weight(1f),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
@@ -480,14 +482,14 @@ fun EditGameQuantitiesDialog(
                 OutlinedTextField(
                     value = outletsText,
                     onValueChange = { outletsText = it },
-                    label = { Text("Prises élec.") },
+                    label = { Text(stringResource(R.string.reservation_game_outlets_short)) },
                     modifier = Modifier.weight(1f),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 OutlinedTextField(
                     value = floorSpaceText,
                     onValueChange = { floorSpaceText = it },
-                    label = { Text("Sol (m²)") },
+                    label = { Text(stringResource(R.string.reservation_game_floor_space)) },
                     modifier = Modifier.weight(1f),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                 )

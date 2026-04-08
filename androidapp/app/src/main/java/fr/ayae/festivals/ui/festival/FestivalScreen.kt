@@ -70,6 +70,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.res.stringResource
+import fr.ayae.festivals.R
 import coil.compose.AsyncImage
 import fr.ayae.festivals.data.Festivals.Festival
 import fr.ayae.festivals.data.Reservation.Reservation
@@ -105,7 +107,7 @@ fun FestivalScreen(
         }
         is FestivalUiState.Error -> {
             Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Erreur : ${state.message}", color = MaterialTheme.colorScheme.error)
+                Text(stringResource(R.string.home_error_prefix, state.message), color = MaterialTheme.colorScheme.error)
             }
         }
         is FestivalUiState.Success -> {
@@ -191,12 +193,12 @@ fun FestivalScreenContent(
                         .padding(8.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "Mode hors ligne. Modifications verrouillées.",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
-                    )
+                Text(
+                    text = stringResource(R.string.festival_offline_banner),
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp
+                )
                 }
             }
 
@@ -211,7 +213,7 @@ fun FestivalScreenContent(
                         AsyncImage(
                             model = "${fr.ayae.festivals.data.RetrofitInstance.BASE_URL.removeSuffix("/")}${data.logoUrl}",
                             imageLoader = customImageLoader,
-                            contentDescription = "Affiche du festival",
+                            contentDescription = stringResource(R.string.festival_tab_details),
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
                         )
@@ -228,7 +230,7 @@ fun FestivalScreenContent(
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Spacer(modifier = Modifier.height(8.dp))
-                            Text("Aucune image", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(stringResource(R.string.festival_no_image), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 }
@@ -242,7 +244,7 @@ fun FestivalScreenContent(
                     )
                     if (!isOffline) {
                         IconButton(onClick = { showEditFestivalDialog = true }) {
-                            Icon(Icons.Default.Edit, contentDescription = "Modifier le festival", tint = MaterialTheme.colorScheme.primary)
+                            Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.festival_edit_title), tint = MaterialTheme.colorScheme.primary)
                         }
                     }
                 }
@@ -254,14 +256,14 @@ fun FestivalScreenContent(
                         Icon(Icons.Default.Event, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
-                            Text("Date :", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
+                            Text(stringResource(R.string.festival_date_label), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
                             if (data.start_date != null && data.end_date != null) {
                                 Text(
-                                    "Du ${fr.ayae.festivals.ui.HomePage.formatIsoDate(data.start_date)} au ${fr.ayae.festivals.ui.HomePage.formatIsoDate(data.end_date)}",
+                                    stringResource(R.string.home_date_range, fr.ayae.festivals.ui.HomePage.formatIsoDate(data.start_date), fr.ayae.festivals.ui.HomePage.formatIsoDate(data.end_date)),
                                     style = MaterialTheme.typography.bodyLarge
                                 )
                             } else {
-                                Text("Dates non définies", style = MaterialTheme.typography.bodyLarge)
+                                Text(stringResource(R.string.festival_dates_undefined), style = MaterialTheme.typography.bodyLarge)
                             }
                         }
                     }
@@ -269,7 +271,7 @@ fun FestivalScreenContent(
                         Icon(Icons.Default.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
-                            Text("Lieu :", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
+                            Text(stringResource(R.string.festival_location_title), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
                             data.location?.let { Text(it, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.primary) }
                         }
                     }
@@ -277,7 +279,7 @@ fun FestivalScreenContent(
 
                 Divider(modifier = Modifier.padding(vertical = 24.dp))
 
-                Text("Espace de table", style = MaterialTheme.typography.titleLarge)
+                Text(stringResource(R.string.festival_space_title), style = MaterialTheme.typography.titleLarge)
                 Spacer(modifier = Modifier.height(16.dp))
 
                 val standardReserved = reservations.sumOf { it.second.table_count }
@@ -285,9 +287,9 @@ fun FestivalScreenContent(
                 val townReserved = reservations.sumOf { it.second.town_table_count }
 
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    StockItem("Tables", Icons.Default.TableBar, standardReserved to (data.table_count ?: 0), data.table_surface?.toString() ?: "4") { if (!isOffline) editingSurfaceType = "Tables" }
-                    StockItem("Grandes Tables", Icons.Default.TableRestaurant, bigReserved to data.big_table_count, data.big_table_surface?.toString() ?: "4") { if (!isOffline) editingSurfaceType = "Grandes Tables" }
-                    StockItem("Tables Municipales", Icons.Default.Desk, townReserved to data.town_table_count, data.town_table_surface?.toString() ?: "4") { if (!isOffline) editingSurfaceType = "Tables Municipales" }
+                    StockItem(stringResource(R.string.festival_tables_label), Icons.Default.TableBar, standardReserved to (data.table_count ?: 0), data.table_surface?.toString() ?: "4") { if (!isOffline) editingSurfaceType = "Tables" }
+                    StockItem(stringResource(R.string.festival_big_tables_label), Icons.Default.TableRestaurant, bigReserved to data.big_table_count, data.big_table_surface?.toString() ?: "4") { if (!isOffline) editingSurfaceType = "Grandes Tables" }
+                    StockItem(stringResource(R.string.festival_town_tables_municipal), Icons.Default.Desk, townReserved to data.town_table_count, data.town_table_surface?.toString() ?: "4") { if (!isOffline) editingSurfaceType = "Tables Municipales" }
                 }
             }
             // endregion
@@ -300,10 +302,10 @@ fun FestivalScreenContent(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Zones tarifaires", style = MaterialTheme.typography.titleLarge)
+                Text(stringResource(R.string.festival_zones_title), style = MaterialTheme.typography.titleLarge)
                 if (!isOffline) {
                     IconButton(onClick = { showAddZoneDialog = true }) {
-                        Icon(Icons.Default.AddCircleOutline, contentDescription = "Ajouter une zone", tint = MaterialTheme.colorScheme.primary)
+                        Icon(Icons.Default.AddCircleOutline, contentDescription = stringResource(R.string.festival_add_zone), tint = MaterialTheme.colorScheme.primary)
                     }
                 }
             }
@@ -328,9 +330,9 @@ fun FestivalScreenContent(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Réservations", style = MaterialTheme.typography.titleLarge)
+                    Text(stringResource(R.string.festival_reservations_title), style = MaterialTheme.typography.titleLarge)
                     IconButton(onClick = { }) {
-                        Icon(Icons.Default.Sort, contentDescription = "Trier par")
+                        Icon(Icons.Default.Sort, contentDescription = stringResource(R.string.festival_sort_by))
                     }
                 }
 
@@ -365,7 +367,7 @@ fun FestivalScreenContent(
                     ) {
                         Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Ajouter une entité")
+                        Text(stringResource(R.string.festival_add_entity))
                     }
                     OutlinedButton(
                         onClick = { showImportEntityDialog = true },
@@ -374,7 +376,7 @@ fun FestivalScreenContent(
                     ) {
                         Icon(Icons.Default.FileUpload, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Importer une entité")
+                        Text(stringResource(R.string.festival_import_entity))
                     }
                 }
             }
@@ -521,7 +523,7 @@ fun EditFestivalDialog(
     }
 
     FestivalDialog(
-        title = "Modifier le festival",
+        title = stringResource(R.string.festival_edit_title),
         onDismissRequest = onDismissRequest,
         onSaveRequest = {
             onSave(name, location, startDate, endDate,
@@ -533,24 +535,24 @@ fun EditFestivalDialog(
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedTextField(value = name, onValueChange = { name = it },
-                label = { Text("Nom du festival") }, modifier = Modifier.fillMaxWidth())
+                label = { Text(stringResource(R.string.festival_name_label)) }, modifier = Modifier.fillMaxWidth())
             OutlinedTextField(value = location, onValueChange = { location = it },
-                label = { Text("Lieu") }, modifier = Modifier.fillMaxWidth())
+                label = { Text(stringResource(R.string.festival_location_label)) }, modifier = Modifier.fillMaxWidth())
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                DatePickerField(label = "Début", value = startDate, modifier = Modifier.weight(1f), onDateSelected = { startDate = it })
-                DatePickerField(label = "Fin", value = endDate, modifier = Modifier.weight(1f), onDateSelected = { endDate = it })
+                DatePickerField(label = stringResource(R.string.festival_start_label), value = startDate, modifier = Modifier.weight(1f), onDateSelected = { startDate = it })
+                DatePickerField(label = stringResource(R.string.festival_end_label), value = endDate, modifier = Modifier.weight(1f), onDateSelected = { endDate = it })
             }
             Divider()
-            Text("Stocks de tables", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.outline)
+            Text(stringResource(R.string.festival_stocks_title), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.outline)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(value = tableCount, onValueChange = { tableCount = it },
-                    label = { Text("Tables") }, modifier = Modifier.weight(1f),
+                    label = { Text(stringResource(R.string.festival_tables_label)) }, modifier = Modifier.weight(1f),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
                 OutlinedTextField(value = bigTableCount, onValueChange = { bigTableCount = it },
-                    label = { Text("Grandes") }, modifier = Modifier.weight(1f),
+                    label = { Text(stringResource(R.string.festival_big_tables_label)) }, modifier = Modifier.weight(1f),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
                 OutlinedTextField(value = townTableCount, onValueChange = { townTableCount = it },
-                    label = { Text("Mairies") }, modifier = Modifier.weight(1f),
+                    label = { Text(stringResource(R.string.festival_town_tables_label)) }, modifier = Modifier.weight(1f),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
             }
             Divider(modifier = Modifier.padding(vertical = 4.dp))
@@ -560,7 +562,7 @@ fun EditFestivalDialog(
             ) {
                 Icon(Icons.Default.Image, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(if (imageUri != null) "Image sélectionnée" else "Changer l'affiche")
+                Text(if (imageUri != null) stringResource(R.string.festival_image_selected) else stringResource(R.string.festival_image_change))
             }
         }
     }
@@ -577,19 +579,19 @@ fun EditZoneTarifDialog(
     var outletPrice by rememberSaveable { mutableStateOf(zone?.electricalOutletPrice?.toString() ?: "0") }
 
     FestivalDialog(
-        title = if (zone != null) "Modifier la zone tarifaire" else "Ajouter une zone tarifaire",
+        title = if (zone != null) stringResource(R.string.zone_edit_title) else stringResource(R.string.zone_add_title),
         onDismissRequest = onDismissRequest,
         onSaveRequest = { onSave(name, price.toDoubleOrNull() ?: 0.0, outletPrice.toDoubleOrNull() ?: 0.0) }
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedTextField(value = name, onValueChange = { name = it },
-                label = { Text("Nom de la zone") }, modifier = Modifier.fillMaxWidth())
+                label = { Text(stringResource(R.string.zone_name_label)) }, modifier = Modifier.fillMaxWidth())
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(value = price, onValueChange = { price = it },
-                    label = { Text("Prix (€)") }, modifier = Modifier.weight(1f),
+                    label = { Text(stringResource(R.string.zone_price_label)) }, modifier = Modifier.weight(1f),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal))
                 OutlinedTextField(value = outletPrice, onValueChange = { outletPrice = it },
-                    label = { Text("Forfait prise (€)") }, modifier = Modifier.weight(1f),
+                    label = { Text(stringResource(R.string.zone_outlet_price_label)) }, modifier = Modifier.weight(1f),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal))
             }
         }
@@ -606,14 +608,14 @@ fun EditSurfaceDialog(
     var surface by rememberSaveable { mutableStateOf(currentValue) }
 
     FestivalDialog(
-        title = "Surface – $label",
+        title = stringResource(R.string.festival_surface_title, label),
         onDismissRequest = onDismissRequest,
         onSaveRequest = { onSave(surface.toDoubleOrNull() ?: 4.0) }
     ) {
         OutlinedTextField(
             value = surface,
             onValueChange = { surface = it },
-            label = { Text("Surface par table (m²)") },
+            label = { Text(stringResource(R.string.festival_surface_label)) },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
         )
@@ -678,7 +680,7 @@ fun StockItem(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
-                Text("réservées", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
+                Text(stringResource(R.string.festival_reserved_count), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
             }
         }
     }

@@ -63,6 +63,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
+import fr.ayae.festivals.R
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import fr.ayae.festivals.data.Game
@@ -75,13 +77,13 @@ import fr.ayae.festivals.ui.theme.AYAEFestivalsTheme
 /**
  * Possible statuses for a reservation.
  */
-enum class ReservationStatus(val label: String, val lightColorHex: Long, val darkColorHex: Long) {
-    TO_BE_CONTACTED("À contacter", 0xFFD81C1C, 0xFFF36161),
-    CONTACTED("Contacté", 0xFFFB9200, 0xFFF4AF4F),         
-    IN_DISCUSSION("En discussion", 0xFFF0E400, 0xFFFFF75E),
-    FACTURED("Facturé", 0xFF60FB00, 0xFF9DF567),           
-    CONFIRMED("Confirmé", 0xFF009508, 0xFF37F140),         
-    ABSENT("Absent", 0xFF757575, 0xFFB7B7B7)               
+enum class ReservationStatus(val labelRes: Int, val lightColorHex: Long, val darkColorHex: Long) {
+    TO_BE_CONTACTED(R.string.reservation_status_to_be_contacted, 0xFFD81C1C, 0xFFF36161),
+    CONTACTED(R.string.reservation_status_contacted, 0xFFFB9200, 0xFFF4AF4F),         
+    IN_DISCUSSION(R.string.reservation_status_in_discussion, 0xFFF0E400, 0xFFFFF75E),
+    FACTURED(R.string.reservation_status_factured, 0xFF60FB00, 0xFF9DF567),           
+    CONFIRMED(R.string.reservation_status_confirmed, 0xFF009508, 0xFF37F140),         
+    ABSENT(R.string.reservation_status_absent, 0xFF757575, 0xFFB7B7B7)               
 }
 
 
@@ -135,7 +137,7 @@ fun ReservationCard(
             ) {
                 Icon(
                     imageVector = if (isExpanded) Icons.Default.ExpandMore else Icons.Default.ChevronRight,
-                    contentDescription = "Expand",
+                    contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary
                 )
                 
@@ -182,7 +184,7 @@ fun ReservationCard(
                                 .padding(horizontal = 12.dp, vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = statusOption.label, style = MaterialTheme.typography.labelMedium)
+                            Text(text = stringResource(statusOption.labelRes), style = MaterialTheme.typography.labelMedium)
                             Spacer(modifier = Modifier.width(4.dp))
                             Icon(Icons.Default.ArrowDropDown, contentDescription = null, modifier = Modifier.size(16.dp))
                         }
@@ -197,7 +199,7 @@ fun ReservationCard(
                             DropdownMenuItem(
                                 text = { 
                                     Text(
-                                        text = option.label, 
+                                        text = stringResource(option.labelRes), 
                                         color = optionColor
                                     ) 
                                 },
@@ -228,7 +230,7 @@ fun ReservationCard(
                             modifier = Modifier.offset(x = (-12).dp)
                         ) {
                             Checkbox(checked = reservation.presented_by_them == true, onCheckedChange = { if(!isOffline) onPresentedByThemChanged(it) }, enabled = !isOffline)
-                            Text("Jeux présentés par l'éditeur / entité", style = MaterialTheme.typography.bodyMedium)
+                            Text(stringResource(R.string.reservation_presented_label), style = MaterialTheme.typography.bodyMedium)
                         }
 
                         Spacer(modifier = Modifier.height(12.dp))
@@ -237,22 +239,22 @@ fun ReservationCard(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.TableChart, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Stock de tables", style = MaterialTheme.typography.titleMedium)
+                            Text(stringResource(R.string.festival_stocks_title), style = MaterialTheme.typography.titleMedium)
                         }
                         Spacer(modifier = Modifier.height(12.dp))
 
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            ReservationStockItem("Tables", Icons.Default.TableBar, reservation.table_count, isOffline) {
+                            ReservationStockItem(stringResource(R.string.festival_tables_label), Icons.Default.TableBar, reservation.table_count, isOffline) {
                                 onStockChanged(it, reservation.big_table_count, reservation.town_table_count, reservation.electrical_outlets)
                             }
-                            ReservationStockItem("Grandes Tables", Icons.Default.TableRestaurant, reservation.big_table_count, isOffline) {
+                            ReservationStockItem(stringResource(R.string.festival_big_tables_label), Icons.Default.TableRestaurant, reservation.big_table_count, isOffline) {
                                 onStockChanged(reservation.table_count, it, reservation.town_table_count, reservation.electrical_outlets)
                             }
-                            ReservationStockItem("Tables Municipales", Icons.Default.Desk, reservation.town_table_count, isOffline) {
+                            ReservationStockItem(stringResource(R.string.festival_town_tables_label), Icons.Default.Desk, reservation.town_table_count, isOffline) {
                                 onStockChanged(reservation.table_count, reservation.big_table_count, it, reservation.electrical_outlets)
                             }
                             ReservationStockItem(
-                                "Prises électriques",
+                                stringResource(R.string.reservation_outlets_label),
                                 Icons.Default.Power,
                                 reservation.electrical_outlets,
                                 isOffline
@@ -278,12 +280,12 @@ fun ReservationCard(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.AutoMirrored.Filled.Note, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Notes", style = MaterialTheme.typography.titleMedium)
+                            Text(stringResource(R.string.reservation_note_label), style = MaterialTheme.typography.titleMedium)
                         }
                         OutlinedTextField(
                             value = reservation.note ?: "",
                             onValueChange = onNoteChanged,
-                            label = { Text("Notes") },
+                            label = { Text(stringResource(R.string.reservation_note_label)) },
                             modifier = Modifier.fillMaxWidth(),
                             minLines = 2,
                             maxLines = 5,

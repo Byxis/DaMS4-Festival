@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import fr.ayae.festivals.FestivalsApplication
+import fr.ayae.festivals.R
 import fr.ayae.festivals.data.Reservation.ReservationRepository
 import fr.ayae.festivals.data.Festivals.UpdateFestivalRequest
 import fr.ayae.festivals.data.Reservation.UpdateReservationGameRequest
@@ -110,7 +111,7 @@ class FestivalViewModel(private val repository: ReservationRepository) : ViewMod
                     if (state is FestivalUiState.Success) {
                         state.copy(isOffline = true)
                     } else {
-                        FestivalUiState.Error("Serveur injoignable.")
+                        FestivalUiState.Error(appContext?.getString(R.string.error_server) ?: "Serveur injoignable.")
                     }
                 }
             } catch (e: Exception) {

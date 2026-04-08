@@ -42,6 +42,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.ImageLoader
 import coil.compose.AsyncImage
+import androidx.compose.ui.res.stringResource
+import fr.ayae.festivals.R
 import fr.ayae.festivals.data.Festivals.Festival
 import fr.ayae.festivals.data.RetrofitInstance
 
@@ -72,7 +74,7 @@ fun HomePage(
             .padding(16.dp)
     ) {
         Text(
-            text = "Festivals à venir",
+            text = stringResource(R.string.home_title),
             color = Color.White,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
@@ -88,7 +90,7 @@ fun HomePage(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
-            placeholder = { Text("Rechercher un festival...", color = Color.Gray) },
+            placeholder = { Text(stringResource(R.string.home_search_placeholder), color = Color.Gray) },
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
@@ -113,7 +115,7 @@ fun HomePage(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Mode hors ligne. Affichage des données en cache.",
+                    text = stringResource(R.string.home_offline_banner),
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp
@@ -130,7 +132,7 @@ fun HomePage(
 
             is festivalState.Empty -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Aucun festival pour le moment.", color = Color(0xFFAAAAAA))
+                    Text(stringResource(R.string.home_no_festivals), color = Color(0xFFAAAAAA))
                 }
             }
 
@@ -216,9 +218,13 @@ fun FestivalCard(festival: Festival, onNavigateToFestival: (Int) -> Unit) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     val datesText = if (festival.start_date != null && festival.end_date != null) {
-                        "Du ${formatIsoDate(festival.start_date!!)} au ${formatIsoDate(festival.end_date!!)}"
+                        stringResource(
+                            R.string.home_date_range,
+                            formatIsoDate(festival.start_date!!),
+                            formatIsoDate(festival.end_date!!)
+                        )
                     } else {
-                        "Dates à venir"
+                        stringResource(R.string.home_dates_upcoming)
                     }
 
                     Text(

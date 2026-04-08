@@ -41,6 +41,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import fr.ayae.festivals.R
 import fr.ayae.festivals.data.Reservation.ZoneGame
 import fr.ayae.festivals.data.Reservation.ZoneTarif
 import fr.ayae.festivals.ui.theme.AYAEFestivalsTheme
@@ -77,7 +79,7 @@ fun ZonesTarifairesList(
                 ) {
                     Icon(Icons.Default.PlaylistAdd, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("Aucune zone tarifaire disponible.", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(R.string.zone_none_available), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
                 }
             }
         } else {
@@ -173,10 +175,10 @@ fun ZoneTarifCard(
                 Row {
                     if (!isOffline) {
                         IconButton(onClick = { showEditZoneDialog = true }) {
-                            Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.action_edit), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         IconButton(onClick = { showDeleteZoneDialog = true }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
+                            Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.action_delete), tint = MaterialTheme.colorScheme.error)
                         }
                     }
                 }
@@ -193,23 +195,23 @@ fun ZoneTarifCard(
                     Divider(modifier = Modifier.padding(bottom = 8.dp))
                     
                     Row(modifier = Modifier.fillMaxWidth()) {
-                        InfoItem(label = "Surface", value = String.format(Locale.FRANCE, "%.1f m²", totalSurface), modifier = Modifier.weight(1f))
-                        InfoItem(label = "Forfait Prise", value = "${zone.electricalOutletPrice} €", modifier = Modifier.weight(1f))
+                        InfoItem(label = stringResource(R.string.reservation_game_surface), value = String.format(Locale.FRANCE, "%.1f m²", totalSurface), modifier = Modifier.weight(1f))
+                        InfoItem(label = stringResource(R.string.zone_outlet_price_label), value = "${zone.electricalOutletPrice} €", modifier = Modifier.weight(1f))
                     }
                     
                     Row(modifier = Modifier.fillMaxWidth()) {
-                        InfoItem(label = "Tables", value = "$totalTables", modifier = Modifier.weight(1f))
-                        InfoItem(label = "Grandes Tables", value = "$totalBigTables", modifier = Modifier.weight(1f))
-                        InfoItem(label = "Tables Mairies", value = "$totalTownTables", modifier = Modifier.weight(1f))
+                        InfoItem(label = stringResource(R.string.festival_tables_label), value = "$totalTables", modifier = Modifier.weight(1f))
+                        InfoItem(label = stringResource(R.string.festival_big_tables_label), value = "$totalBigTables", modifier = Modifier.weight(1f))
+                        InfoItem(label = stringResource(R.string.festival_town_tables_municipal), value = "$totalTownTables", modifier = Modifier.weight(1f))
                     }
                     
                     if (gameZones.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("Zones de jeu", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                            Text(stringResource(R.string.zone_game_zones_label), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
                             if (!isOffline) {
                                 IconButton(onClick = { showAddGameZoneDialog = true }, modifier = Modifier.size(24.dp)) {
-                                    Icon(Icons.Default.AddCircleOutline, contentDescription = "Add Game Zone", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                                    Icon(Icons.Default.AddCircleOutline, contentDescription = stringResource(R.string.zone_add_game_zone), tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
                                 }
                             }
                         }
@@ -230,10 +232,10 @@ fun ZoneTarifCard(
                                     Spacer(modifier = Modifier.width(8.dp))
                                     if (!isOffline) {
                                         IconButton(onClick = { editingGameZone = gz }, modifier = Modifier.size(24.dp)) {
-                                            Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(16.dp))
+                                            Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.action_edit), tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(16.dp))
                                         }
                                         IconButton(onClick = { deletingGameZone = gz }, modifier = Modifier.size(24.dp)) {
-                                            Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(16.dp))
+                                            Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.action_delete), tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(16.dp))
                                         }
                                     }
                                 }
@@ -248,7 +250,7 @@ fun ZoneTarifCard(
                         ) {
                             Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Ajouter une zone de jeu")
+                            Text(stringResource(R.string.zone_add_game_zone))
                         }
                     }
                 }
@@ -271,14 +273,14 @@ fun ZoneTarifCard(
     // Delete zone tarifaire
     if (showDeleteZoneDialog) {
         FestivalDialog(
-            title = "Supprimer la zone",
+            title = stringResource(R.string.action_delete),
             onDismissRequest = { showDeleteZoneDialog = false },
             onSaveRequest = {
                 onDeleteZoneTarif(zone.id ?: 0)
                 showDeleteZoneDialog = false
             }
         ) {
-            Text("Voulez-vous vraiment supprimer la zone \"${zone.name}\" ?")
+            Text(stringResource(R.string.zone_delete_confirm, zone.name))
         }
     }
 
@@ -309,14 +311,14 @@ fun ZoneTarifCard(
     // Delete game zone
     deletingGameZone?.let { gz ->
         FestivalDialog(
-            title = "Supprimer la zone de jeu",
+            title = stringResource(R.string.action_delete),
             onDismissRequest = { deletingGameZone = null },
             onSaveRequest = {
                 onDeleteGameZone(zone.id ?: 0, gz.id ?: 0)
                 deletingGameZone = null
             }
         ) {
-            Text("Voulez-vous vraiment supprimer la zone de jeu \"${gz.name}\" ?")
+            Text(stringResource(R.string.zone_game_zone_delete_confirm, gz.name))
         }
     }
 }
@@ -338,7 +340,7 @@ fun EditGameZoneDialog(
     var name by rememberSaveable { mutableStateOf(gameZone?.name ?: "") }
 
     FestivalDialog(
-        title = if (gameZone != null) "Modifier la zone de jeu" else "Ajouter une zone de jeu",
+        title = if (gameZone != null) stringResource(R.string.zone_edit_game_zone) else stringResource(R.string.zone_add_game_zone),
         onDismissRequest = onDismissRequest,
         onSaveRequest = { onSave(name) }
     ) {
@@ -346,7 +348,7 @@ fun EditGameZoneDialog(
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Nom de la sous-zone de jeu") },
+                label = { Text(stringResource(R.string.zone_game_zone_name_placeholder)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
