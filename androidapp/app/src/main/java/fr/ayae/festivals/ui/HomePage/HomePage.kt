@@ -1,7 +1,6 @@
 package fr.ayae.festivals.ui.HomePage
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,16 +42,15 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.ImageLoader
 import coil.compose.AsyncImage
-import fr.ayae.festivals.data.Festival
+import androidx.compose.ui.res.stringResource
+import fr.ayae.festivals.R
+import fr.ayae.festivals.data.Festivals.Festival
 import fr.ayae.festivals.data.RetrofitInstance
-import java.text.SimpleDateFormat
-import java.util.Locale
-import java.util.TimeZone
 
 @SuppressLint("NotConstructor")
 @Composable
 fun HomePage(
-    festivalViewModel: FestivalViewModel = viewModel(),
+    festivalViewModel: FestivalViewModel = viewModel(factory = FestivalViewModel.Factory),
     onNavigateToFestival: (Int) -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -76,7 +74,7 @@ fun HomePage(
             .padding(16.dp)
     ) {
         Text(
-            text = "Festivals à venir",
+            text = stringResource(R.string.home_title),
             color = Color.White,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
@@ -92,7 +90,7 @@ fun HomePage(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
-            placeholder = { Text("Rechercher un festival...", color = Color.Gray) },
+            placeholder = { Text(stringResource(R.string.home_search_placeholder), color = Color.Gray) },
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
@@ -106,6 +104,24 @@ fun HomePage(
             )
         )
 
+        val isOffline = (state as? festivalState.Success)?.isOffline == true
+        if (isOffline) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+                    .background(Color(0xFFB71C1C), shape = RoundedCornerShape(8.dp))
+                    .padding(8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.home_offline_banner),
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp
+                )
+            }
+        }
 
         when (state) {
             is festivalState.Loading -> {
@@ -116,7 +132,7 @@ fun HomePage(
 
             is festivalState.Empty -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Aucun festival pour le moment.", color = Color(0xFFAAAAAA))
+                    Text(stringResource(R.string.home_no_festivals), color = Color(0xFFAAAAAA))
                 }
             }
 
@@ -202,9 +218,13 @@ fun FestivalCard(festival: Festival, onNavigateToFestival: (Int) -> Unit) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     val datesText = if (festival.start_date != null && festival.end_date != null) {
-                        "Du ${formatIsoDate(festival.start_date!!)} au ${formatIsoDate(festival.end_date!!)}"
+                        stringResource(
+                            R.string.home_date_range,
+                            formatIsoDate(festival.start_date!!),
+                            formatIsoDate(festival.end_date!!)
+                        )
                     } else {
-                        "Dates à venir"
+                        stringResource(R.string.home_dates_upcoming)
                     }
 
                     Text(

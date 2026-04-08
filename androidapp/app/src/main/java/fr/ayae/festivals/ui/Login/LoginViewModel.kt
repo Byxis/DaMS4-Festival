@@ -75,28 +75,32 @@ class LoginViewModel: ViewModel(){
         }
     }
 
-    fun performLogout(context : Context, LogoutSuccess: () -> Unit){
+    fun performLogout(context: Context, LogoutSuccess: () -> Unit) {
         viewModelScope.launch {
             try {
-
                 val response = RetrofitInstance.getApi(context).logout()
                 Log.d("AUTH", "Serveur dit : ${response.message}")
-
-
             } catch (e: Exception) {
                 Log.e("AUTH", "Erreur Logout: ${e.message}")
-                LogoutSuccess()
-            }finally{
+            } finally {
                 val sharedPrefs = context.getSharedPreferences("AppCookies", Context.MODE_PRIVATE)
                 sharedPrefs.edit().clear().apply()
 
-
-                val cookieJar = PersistentCookieJar(
-                    SetCookieCache(),
-                    SharedPrefsCookiePersistor(context)
+                val cookieJar = com.franmontiel.persistentcookiejar.PersistentCookieJar(
+                    com.franmontiel.persistentcookiejar.cache.SetCookieCache(),
+                    com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor(context)
                 )
-
                 cookieJar.clear()
+
+                // Clear local Room cache
+                try {
+                    val db = fr.ayae.festivals.data.db.AppDatabase.getDatabase(context)
+                    db.reservationDao().clearAll()
+                    db.festivalDao().clearAll()
+                } catch (dbEx: Exception) {
+                    Log.e("AUTH", "Erreur clear DB: ${dbEx.message}")
+                }
+
                 resetState()
                 LogoutSuccess()
             }

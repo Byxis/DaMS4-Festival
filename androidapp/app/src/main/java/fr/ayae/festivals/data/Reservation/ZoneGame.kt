@@ -1,4 +1,4 @@
-package fr.ayae.festivals.data;
+package fr.ayae.festivals.data.Reservation
 
 import kotlinx.serialization.Serializable
 

@@ -1,3 +1,153 @@
 <resources>
-    <string name="app_name">AYAE Festivals</string>
+    <string name="app_name" translatable="false">AYAE Festivals</string>
+    <string name="login_title">Connexion</string>
+    <string name="login_subtitle">Entrez vos informations de connexion</string>
+    <string name="login_email_label">Email*</string>
+    <string name="login_password_label">Mot de passe*</string>
+    <string name="login_not_registered">Pas encore inscrit ?</string>
+    <string name="register_title">Inscription</string>
+    <string name="register_subtitle">Créez votre compte</string>
+    <string name="register_first_name_label">Prénom*</string>
+    <string name="register_last_name_label">Nom*</string>
+    <string name="register_confirm_password_label">Confirmer le mot de passe*</string>
+    <string name="register_already_registered">Déjà inscrit ? Connectez-vous</string>
+    <string name="register_success_title">Félicitations !</string>
+    <string name="register_success_message">Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.</string>
+    <string name="register_success_ok">Super !</string>
+    <string name="register_error_email_format">Format d\'email invalide</string>
+    <string name="register_error_password_mismatch">Les mots de passe ne correspondent pas</string>
+
+
+
+    <!-- Home Page -->
+    <string name="home_title">Festivals à venir</string>
+    <string name="home_search_placeholder">Rechercher un festival...</string>
+    <string name="home_offline_banner">Mode hors ligne. Affichage des données en cache.</string>
+    <string name="home_no_festivals">Aucun festival pour le moment.</string>
+    <string name="home_load_error">Impossible de charger les données.</string>
+    <string name="home_dates_upcoming">Dates à venir</string>
+    <string name="home_date_range">Du %1$s au %2$s</string>
+    <string name="home_error_prefix">Erreur : %1$s</string>
+
+    <!-- Festival Details -->
+    <string name="festival_tab_details">Détails</string>
+    <string name="festival_tab_zones">Zones</string>
+    <string name="festival_tab_reservations">Réservations</string>
+    <string name="festival_offline_banner">Mode hors ligne. Modifications désactivées.</string>
+    <string name="festival_edit_title">Modifier le festival</string>
+    <string name="festival_name_label">Nom du festival</string>
+    <string name="festival_location_label">Lieu</string>
+    <string name="festival_start_label">Début</string>
+    <string name="festival_end_label">Fin</string>
+    <string name="festival_stocks_title">Stocks de tables</string>
+    <string name="festival_tables_label">Tables</string>
+    <string name="festival_big_tables_label">Grandes</string>
+    <string name="festival_town_tables_label">Mairies</string>
+    <string name="festival_image_selected">Image sélectionnée</string>
+    <string name="festival_image_change">Changer l\'affiche</string>
+    <string name="festival_no_image">Aucune image</string>
+    <string name="festival_date_label">Date :</string>
+    <string name="festival_dates_undefined">Dates non définies</string>
+    <string name="festival_location_title">Lieu :</string>
+    <string name="festival_space_title">Espace de table</string>
+    <string name="festival_town_tables_municipal">Tables Municipales</string>
+    <string name="festival_zones_title">Zones tarifaires</string>
+    <string name="festival_add_zone">Ajouter une zone</string>
+    <string name="festival_reservations_title">Réservations</string>
+    <string name="festival_sort_by">Trier par</string>
+    <string name="festival_add_entity">Ajouter une entité</string>
+    <string name="festival_import_entity">Importer une entité</string>
+    <string name="festival_add_reservation">Nouvelle réservation</string>
+    <string name="festival_surface_title">Surface – %1$s</string>
+    <string name="festival_surface_label">Surface par table (m²)</string>
+    <string name="festival_surface_edit">Modifier la surface</string>
+    <string name="festival_reserved_count">réservées</string>
+    <string name="festival_warning_under">Toutes les %1$s n\'ont pas été attribuées : %2$d/%3$d</string>
+    <string name="festival_warning_over">Trop de %1$s attribuées : %2$d/%3$d</string>
+    <string name="festival_table_standard">tables</string>
+    <string name="festival_table_big">grandes tables</string>
+    <string name="festival_table_town">tables mairies</string>
+
+
+    <!-- Zones -->
+    <string name="zone_add_title">Ajouter une zone tarifaire</string>
+    <string name="zone_edit_title">Modifier la zone tarifaire</string>
+    <string name="zone_name_label">Nom de la zone</string>
+    <string name="zone_price_label">Prix (€)</string>
+    <string name="zone_outlet_price_label">Forfait prise (€)</string>
+    <string name="zone_add_game_zone">Ajouter une zone de jeux</string>
+    <string name="zone_edit_game_zone">Modifier la zone de jeux</string>
+    <string name="zone_game_name_label">Nom de la zone de jeux</string>
+    <string name="zone_none_available">Aucune zone tarifaire disponible.</string>
+    <string name="zone_game_zones_label">Zones de jeu</string>
+    <string name="zone_delete_confirm">Voulez-vous vraiment supprimer la zone \"%1$s\" ?</string>
+    <string name="zone_game_zone_delete_confirm">Voulez-vous vraiment supprimer la zone de jeu \"%1$s\" ?</string>
+    <string name="zone_game_zone_name_placeholder">Nom de la sous-zone de jeu</string>
+
+
+    <!-- Reservations -->
+    <string name="reservation_editor_label">Éditeur</string>
+    <string name="reservation_status_label">Statut</string>
+    <string name="reservation_presented_label">Jeux présentés par l\'éditeur / entité</string>
+    <string name="reservation_note_label">Notes</string>
+    <string name="reservation_note_placeholder">Notes sur la réservation...</string>
+    <string name="reservation_outlets_label">Prises électriques</string>
+    <string name="reservation_status_to_be_contacted">À contacter</string>
+    <string name="reservation_status_contacted">Contacté</string>
+    <string name="reservation_status_in_discussion">En discussion</string>
+    <string name="reservation_status_factured">Facturé</string>
+    <string name="reservation_status_confirmed">Confirmé</string>
+    <string name="reservation_status_absent">Absent</string>
+    <string name="reservation_status_undefined">Non défini</string>
+    <string name="reservation_tables_summary">%1$d T | %2$d G | %3$d M</string>
+
+
+    <string name="reservation_outlets_summary">%1$d prises</string>
+    <string name="reservation_games_title">Jeux réservés</string>
+    <string name="reservation_add_game">Ajouter des jeux</string>
+    <string name="reservation_game_search_placeholder">Rechercher un jeu...</string>
+    <string name="reservation_game_show_no_status">Afficher les jeux sans statut</string>
+    <string name="reservation_game_none_found">Aucun jeu trouvé</string>
+    <string name="reservation_game_add_title">Ajouter un jeu</string>
+    <string name="reservation_game_manage_title">Gérer les jeux</string>
+    <string name="reservation_game_manage_desc">Interface de gestion par lots de l\'ensemble des jeux demandés.</string>
+    <string name="reservation_game_status_asked">Demandé</string>
+    <string name="reservation_game_status_confirmed">Confirmé</string>
+    <string name="reservation_game_status_received">Reçu</string>
+    <string name="reservation_game_status_cancelled">Annulé</string>
+    <string name="reservation_game_edit_quantities_title">Modifier les quantités – %1$s</string>
+    <string name="reservation_game_amount_label">Quantité d\'exemplaires</string>
+    <string name="reservation_game_status_label">Statut du jeu</string>
+    <string name="reservation_game_tables_allocated">Tables allouées</string>
+    <string name="reservation_game_standards">Standards</string>
+    <string name="reservation_game_outlets_short">Prises élec.</string>
+    <string name="reservation_game_floor_space">Sol (m²)</string>
+    <string name="reservation_game_amount">Quantité</string>
+
+    <string name="reservation_game_tables">Tables (T/G/M)</string>
+    <string name="reservation_game_outlets">Prises</string>
+    <string name="reservation_game_surface">Surface (m²)</string>
+    <string name="game_type_all_audiences">Tout Public</string>
+    <string name="game_type_party_game">Ambiance</string>
+    <string name="game_type_experts">Experts</string>
+    <string name="game_type_children">Enfants</string>
+    <string name="game_type_classics">Classiques</string>
+    <string name="game_type_initiates">Initiés</string>
+    <string name="game_type_role_playing">Jeu de rôle</string>
+    <string name="game_type_unknown">Inconnu</string>
+
+
+    <!-- Dialogs / Actions -->
+    <string name="action_save">Enregistrer</string>
+    <string name="action_cancel">Annuler</string>
+    <string name="action_delete">Supprimer</string>
+    <string name="action_edit">Modifier</string>
+    <string name="action_add">Ajouter</string>
+    <string name="action_ok">OK</string>
+
+    <!-- Errors -->
+    <string name="error_unknown">Une erreur est survenue.</string>
+    <string name="error_offline">Vous êtes hors ligne.</string>
+    <string name="error_server">Serveur injoignable.</string>
+
 </resources>

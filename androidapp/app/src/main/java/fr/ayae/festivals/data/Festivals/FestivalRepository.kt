@@ -1,7 +1,6 @@
 package fr.ayae.festivals.data.Festivals
 
 import android.content.Context
-import fr.ayae.festivals.data.Festival
 import fr.ayae.festivals.data.RetrofitInstance
 
 class FestivalRepository {
