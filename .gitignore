@@ -3,6 +3,8 @@
 # Certs files
 **/certs/
 **/.env
+androidapp/app/src/main/java/fr/ayae/festivals/res/raw/root_ca.pem
+**/raw/
 
 # Compiled output
 */dist
