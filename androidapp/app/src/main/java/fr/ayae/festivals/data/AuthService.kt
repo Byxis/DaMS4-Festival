@@ -21,6 +21,12 @@ import fr.ayae.festivals.data.Login.LoginResponse
 import fr.ayae.festivals.data.Login.MessageResponse
 import fr.ayae.festivals.data.Login.RegisterRequest
 import fr.ayae.festivals.data.Login.User
+import fr.ayae.festivals.data.contact.ContactDto
+import fr.ayae.festivals.data.contact.ContactRequest
+import fr.ayae.festivals.data.game.GameCreationRequest
+import fr.ayae.festivals.data.game.GameDto
+import fr.ayae.festivals.data.publisher.PublisherCreationRequest
+import fr.ayae.festivals.data.publisher.PublisherDto
 
 import retrofit2.Response
 import retrofit2.http.DELETE
@@ -63,6 +69,52 @@ interface APIService {
 
     @GET("festivals/{festivalId}/reservations")
     suspend fun getReservations(@Path("festivalId") festivalId: Int): List<fr.ayae.festivals.data.Reservation>
+
+
+    // --- Publishers ---
+    @GET("publishers")
+    suspend fun getAllPublishers(): List<PublisherDto>
+
+    @GET("publishers/{id}")
+    suspend fun getPublisherById(@Path("id") publisherId: Int): PublisherDto
+
+    @POST("publishers")
+    suspend fun addPublisher(@Body publisherRequest: PublisherCreationRequest)
+
+    @PUT("publishers/{id}")
+    suspend fun editPublisher(@Path("id") publisherId: Int, @Body publisherRequest: PublisherCreationRequest)
+
+    @DELETE("publishers/{id}")
+    suspend fun deletePublisher(@Path("id") publisherId: Int)
+
+    // --- Contacts ---
+    @GET("publishers/{id}/contacts")
+    suspend fun getContactsForPublisher(@Path("id") publisherId: Int): List<ContactDto>
+
+    @POST("publishers/{id}/contacts")
+    suspend fun addContactToPublisher(@Path("id") publisherId: Int,
+        @Body contactRequest: ContactRequest
+    ): ContactDto
+
+    @PUT("publishers/{id}/contacts/{contactId}")
+    suspend fun updateContact(
+        @Path("id") publisherId: Int,
+        @Path("contactId") contactId: Int,
+        @Body contactRequest: ContactRequest
+    ): ContactDto
+
+    @DELETE("publishers/{id}/contacts/{contactId}")
+    suspend fun deleteContact(
+        @Path("id") publisherId: Int,
+        @Path("contactId") contactId: Int
+    ): Response<Unit>
+
+    // --- Games ---
+    @GET("games/filterByPublisherID/{publisherId}")
+    suspend fun getGamesForPublisher(@Path("publisherId") publisherId: Int): List<GameDto>
+
+    @POST("publishers/addGameToPublisher")
+    suspend fun addGameToPublisher(@Body gameRequest: GameCreationRequest): GameDto
 
     @POST("festivals/{festivalId}/reservations")
     suspend fun addReservation(
@@ -137,7 +189,6 @@ interface APIService {
 
     @GET("festivals/")
     suspend fun getAllFestivals():List<Festival>
-
 }
 
 object RetrofitInstance {

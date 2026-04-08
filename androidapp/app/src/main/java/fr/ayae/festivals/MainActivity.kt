@@ -36,6 +36,7 @@ import fr.ayae.festivals.ui.Navigation.Destination
 import fr.ayae.festivals.ui.Profile.ProfilePage
 import fr.ayae.festivals.ui.Register.RegisterScreen
 import fr.ayae.festivals.ui.theme.AYAEFestivalsTheme
+import fr.ayae.festivals.ui.publisher.PublisherScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -143,6 +144,8 @@ fun AYAEFestivalsApp() {
                 }
 
                 Destination.Home -> {
+
+                    FestivalScreen(modifier = Modifier)
                     HomePage(onNavigateToFestival = { id -> backStack.add("Festival/$id") })
                 }
                 is String -> {
@@ -182,6 +185,10 @@ fun AYAEFestivalsApp() {
                             backStack.add(Destination.Login)
                         }
                     )
+                }
+
+                Destination.Publisher -> {
+                    PublisherScreen()
                 }
 
                 else -> {
