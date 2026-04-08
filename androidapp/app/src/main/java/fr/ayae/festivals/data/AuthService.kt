@@ -15,12 +15,23 @@ import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import fr.ayae.festivals.R
+import fr.ayae.festivals.data.Festivals.Festival
+import fr.ayae.festivals.data.Festivals.UpdateFestivalRequest
 import fr.ayae.festivals.data.Login.CreationResponse
 import fr.ayae.festivals.data.Login.LoginRequest
 import fr.ayae.festivals.data.Login.LoginResponse
 import fr.ayae.festivals.data.Login.MessageResponse
 import fr.ayae.festivals.data.Login.RegisterRequest
 import fr.ayae.festivals.data.Login.User
+import fr.ayae.festivals.data.Reservation.AddGameZoneRequest
+import fr.ayae.festivals.data.Reservation.AddReservationRequest
+import fr.ayae.festivals.data.Reservation.AddZoneTarifRequest
+import fr.ayae.festivals.data.Reservation.Reservation
+import fr.ayae.festivals.data.Reservation.ReservationGame
+import fr.ayae.festivals.data.Reservation.UpdateReservationGameRequest
+import fr.ayae.festivals.data.Reservation.UpdateReservationRequest
+import fr.ayae.festivals.data.Reservation.ZoneGame
+import fr.ayae.festivals.data.Reservation.ZoneTarif
 
 import retrofit2.Response
 import retrofit2.http.DELETE
@@ -62,29 +73,29 @@ interface APIService {
     ): Response<LoginResponse>
 
     @GET("festivals/{festivalId}/reservations")
-    suspend fun getReservations(@Path("festivalId") festivalId: Int): List<fr.ayae.festivals.data.Reservation>
+    suspend fun getReservations(@Path("festivalId") festivalId: Int): List<Reservation>
 
     @POST("festivals/{festivalId}/reservations")
     suspend fun addReservation(
         @Path("festivalId") festivalId: Int,
         @Body request: AddReservationRequest
-    ): fr.ayae.festivals.data.Reservation
+    ): Reservation
 
     @PUT("festivals/{festivalId}/reservations/{reservationId}")
     suspend fun updateReservation(
         @Path("festivalId") festivalId: Int,
         @Path("reservationId") reservationId: Int,
         @Body request: UpdateReservationRequest
-    ): fr.ayae.festivals.data.Reservation
+    ): Reservation
 
     @GET("festivals/{festivalId}")
-    suspend fun getFestival(@Path("festivalId") festivalId: Int): fr.ayae.festivals.data.Festival
+    suspend fun getFestival(@Path("festivalId") festivalId: Int): Festival
 
     @PUT("festivals/{festivalId}")
     suspend fun updateFestival(
         @Path("festivalId") festivalId: Int,
         @Body request: UpdateFestivalRequest
-    ): fr.ayae.festivals.data.Festival
+    ): Festival
 
     @POST("festivals/{festivalId}/tarif-zones")
     suspend fun addZoneTarif(
@@ -133,7 +144,7 @@ interface APIService {
         @Path("reservationId") reservationId: Int,
         @Path("reservationGameId") reservationGameId: Int,
         @Body request: UpdateReservationGameRequest
-    ): fr.ayae.festivals.data.ReservationGame
+    ): ReservationGame
 
     @GET("festivals/")
     suspend fun getAllFestivals():List<Festival>

@@ -51,7 +51,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import fr.ayae.festivals.data.Game
 import fr.ayae.festivals.data.GameType
-import fr.ayae.festivals.data.ReservationGame
+import fr.ayae.festivals.data.Reservation.ReservationGame
 import fr.ayae.festivals.ui.theme.AYAEFestivalsTheme
 import fr.ayae.festivals.ui.utils.AutoResizedText
 import fr.ayae.festivals.ui.utils.FestivalDialog
@@ -74,6 +74,7 @@ enum class ReservationGameStatusOption(val label: String, val lightColorHex: Lon
 fun GamesReservations(
     modifier: Modifier = Modifier,
     games: List<Pair<Game, ReservationGame?>> = emptyList(),
+    isOffline: Boolean = false,
     onGameUpdated: (reservationGameId: Int, amount: Int, tables: Int, bigTables: Int, townTables: Int, outlets: Int, floorSpace: Double, status: String) -> Unit = { _, _, _, _, _, _, _, _ -> }
 ) {
     var searchQuery by rememberSaveable { mutableStateOf("") }
@@ -138,6 +139,7 @@ fun GamesReservations(
         ) {
             Button(
                 onClick = { showAddGameDialog = true },
+                enabled = !isOffline,
                 modifier = Modifier.weight(1f)
             ) {
                 Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -146,6 +148,7 @@ fun GamesReservations(
             }
             OutlinedButton(
                 onClick = { showManageGamesDialog = true },
+                enabled = !isOffline,
                 modifier = Modifier.weight(1f)
             ) {
                 Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -192,7 +195,7 @@ fun GamesReservations(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(displayedGames) { (game, reservationGame) ->
-                    GameListItem(game = game, reservationGame = reservationGame, onGameUpdated = onGameUpdated)
+                    GameListItem(game = game, reservationGame = reservationGame, isOffline = isOffline, onGameUpdated = onGameUpdated)
                 }
             }
         }
@@ -234,6 +237,7 @@ fun GameListItem(
     game: Game,
     reservationGame: ReservationGame?,
     modifier: Modifier = Modifier,
+    isOffline: Boolean = false,
     onGameUpdated: (reservationGameId: Int, amount: Int, tables: Int, bigTables: Int, townTables: Int, outlets: Int, floorSpace: Double, status: String) -> Unit = { _, _, _, _, _, _, _, _ -> }
 ) {
     var showEditQuantitiesDialog by rememberSaveable { mutableStateOf(false) }
@@ -315,12 +319,14 @@ fun GameListItem(
             Spacer(modifier = Modifier.width(8.dp))
 
             // Edit button
-            IconButton(onClick = { showEditQuantitiesDialog = true }) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = "Edit game quantities",
-                    tint = MaterialTheme.colorScheme.primary
-                )
+            if (!isOffline) {
+                IconButton(onClick = { showEditQuantitiesDialog = true }) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Edit game quantities",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
         }
     }

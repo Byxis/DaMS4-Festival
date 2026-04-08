@@ -67,9 +67,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import fr.ayae.festivals.data.Game
 import fr.ayae.festivals.data.GameType
-import fr.ayae.festivals.data.Reservation
-import fr.ayae.festivals.data.ReservationGame
-import fr.ayae.festivals.data.ReservationInteraction
+import fr.ayae.festivals.data.Reservation.Reservation
+import fr.ayae.festivals.data.Reservation.ReservationGame
+import fr.ayae.festivals.data.Reservation.ReservationInteraction
 import fr.ayae.festivals.ui.theme.AYAEFestivalsTheme
 
 /**
@@ -100,7 +100,8 @@ fun ReservationCard(
     onStatusChanged: (String) -> Unit = {},
     onPresentedByThemChanged: (Boolean) -> Unit = {},
     onStockChanged: (Int, Int, Int, Int) -> Unit = { _, _, _, _ -> },
-    onGameUpdated: (reservationGameId: Int, amount: Int, tables: Int, bigTables: Int, townTables: Int, outlets: Int, floorSpace: Double, status: String) -> Unit = { _, _, _, _, _, _, _, _ -> }
+    onGameUpdated: (reservationGameId: Int, amount: Int, tables: Int, bigTables: Int, townTables: Int, outlets: Int, floorSpace: Double, status: String) -> Unit = { _, _, _, _, _, _, _, _ -> },
+    isOffline: Boolean = false
 ) {
     var isExpanded by rememberSaveable { mutableStateOf(false) }
     var statusMenuExpanded by rememberSaveable { mutableStateOf(false) }
@@ -177,7 +178,7 @@ fun ReservationCard(
                     ) {
                         Row(
                             modifier = Modifier
-                                .clickable { statusMenuExpanded = true }
+                                .clickable { if (!isOffline) statusMenuExpanded = true }
                                 .padding(horizontal = 12.dp, vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -226,7 +227,7 @@ fun ReservationCard(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.offset(x = (-12).dp)
                         ) {
-                            Checkbox(checked = reservation.presented_by_them == true, onCheckedChange = onPresentedByThemChanged)
+                            Checkbox(checked = reservation.presented_by_them == true, onCheckedChange = { if(!isOffline) onPresentedByThemChanged(it) }, enabled = !isOffline)
                             Text("Jeux présentés par l'éditeur / entité", style = MaterialTheme.typography.bodyMedium)
                         }
 
@@ -241,19 +242,20 @@ fun ReservationCard(
                         Spacer(modifier = Modifier.height(12.dp))
 
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            ReservationStockItem("Tables", Icons.Default.TableBar, reservation.table_count) {
+                            ReservationStockItem("Tables", Icons.Default.TableBar, reservation.table_count, isOffline) {
                                 onStockChanged(it, reservation.big_table_count, reservation.town_table_count, reservation.electrical_outlets)
                             }
-                            ReservationStockItem("Grandes Tables", Icons.Default.TableRestaurant, reservation.big_table_count) {
+                            ReservationStockItem("Grandes Tables", Icons.Default.TableRestaurant, reservation.big_table_count, isOffline) {
                                 onStockChanged(reservation.table_count, it, reservation.town_table_count, reservation.electrical_outlets)
                             }
-                            ReservationStockItem("Tables Municipales", Icons.Default.Desk, reservation.town_table_count) {
+                            ReservationStockItem("Tables Municipales", Icons.Default.Desk, reservation.town_table_count, isOffline) {
                                 onStockChanged(reservation.table_count, reservation.big_table_count, it, reservation.electrical_outlets)
                             }
                             ReservationStockItem(
                                 "Prises électriques",
                                 Icons.Default.Power,
-                                reservation.electrical_outlets
+                                reservation.electrical_outlets,
+                                isOffline
                             ) {
                                 onStockChanged(reservation.table_count, reservation.big_table_count, reservation.town_table_count, it)
                             }
@@ -285,6 +287,7 @@ fun ReservationCard(
                             modifier = Modifier.fillMaxWidth(),
                             minLines = 2,
                             maxLines = 5,
+                            enabled = !isOffline,
                             textStyle = MaterialTheme.typography.bodyMedium
                         )
 
@@ -308,6 +311,7 @@ fun ReservationCard(
                                 it
                             ) 
                         } ?: emptyList(),
+                        isOffline = isOffline,
                         onGameUpdated = onGameUpdated
                     )
                 }
@@ -392,6 +396,7 @@ fun ReservationStockItem(
     label: String,
     icon: ImageVector,
     count: Int,
+    isOffline: Boolean = false,
     onCountChanged: (Int) -> Unit = {}
 ) {
     var value by remember(count) { mutableStateOf(count.toString()) }
@@ -437,6 +442,7 @@ fun ReservationStockItem(
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number
                 ),
+                enabled = !isOffline,
                 singleLine = true,
                 shape = MaterialTheme.shapes.small,
                 colors = OutlinedTextFieldDefaults.colors(

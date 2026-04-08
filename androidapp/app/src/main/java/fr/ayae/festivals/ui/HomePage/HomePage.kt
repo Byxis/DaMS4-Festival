@@ -1,7 +1,6 @@
 package fr.ayae.festivals.ui.HomePage
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,16 +42,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.ImageLoader
 import coil.compose.AsyncImage
-import fr.ayae.festivals.data.Festival
+import fr.ayae.festivals.data.Festivals.Festival
 import fr.ayae.festivals.data.RetrofitInstance
-import java.text.SimpleDateFormat
-import java.util.Locale
-import java.util.TimeZone
 
 @SuppressLint("NotConstructor")
 @Composable
 fun HomePage(
-    festivalViewModel: FestivalViewModel = viewModel(),
+    festivalViewModel: FestivalViewModel = viewModel(factory = FestivalViewModel.Factory),
     onNavigateToFestival: (Int) -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -106,6 +102,24 @@ fun HomePage(
             )
         )
 
+        val isOffline = (state as? festivalState.Success)?.isOffline == true
+        if (isOffline) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+                    .background(Color(0xFFB71C1C), shape = RoundedCornerShape(8.dp))
+                    .padding(8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Mode hors ligne. Affichage des données en cache.",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp
+                )
+            }
+        }
 
         when (state) {
             is festivalState.Loading -> {
