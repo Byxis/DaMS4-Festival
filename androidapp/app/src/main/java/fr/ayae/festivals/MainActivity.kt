@@ -144,10 +144,8 @@ fun AYAEFestivalsApp() {
                 }
 
                 Destination.Home -> {
-<<<<<<< android-publisher-page
 
                     FestivalScreen(modifier = Modifier)
-=======
                     HomePage(onNavigateToFestival = { id -> backStack.add("Festival/$id") })
                 }
                 is String -> {
@@ -159,7 +157,6 @@ fun AYAEFestivalsApp() {
                     } else {
                         Text("Autre Écran", modifier = Modifier.align(Alignment.Center))
                     }
->>>>>>> dev
                 }
                 Destination.Register->{
                     RegisterScreen(

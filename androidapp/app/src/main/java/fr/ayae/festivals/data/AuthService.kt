@@ -70,7 +70,6 @@ interface APIService {
     @GET("festivals/{festivalId}/reservations")
     suspend fun getReservations(@Path("festivalId") festivalId: Int): List<fr.ayae.festivals.data.Reservation>
 
-<<<<<<< android-publisher-page
 
     // --- Publishers ---
     @GET("publishers")
@@ -116,7 +115,7 @@ interface APIService {
 
     @POST("publishers/addGameToPublisher")
     suspend fun addGameToPublisher(@Body gameRequest: GameCreationRequest): GameDto
-=======
+
     @POST("festivals/{festivalId}/reservations")
     suspend fun addReservation(
         @Path("festivalId") festivalId: Int,
@@ -190,8 +189,6 @@ interface APIService {
 
     @GET("festivals/")
     suspend fun getAllFestivals():List<Festival>
-
->>>>>>> dev
 }
 
 object RetrofitInstance {
