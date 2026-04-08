@@ -22,6 +22,7 @@ nav3Core = "1.0.1"
 lifecycleViewmodelNav3 = "2.10.0"
 kotlinSerialization = "2.3.20"
 kotlinxSerializationCore = "1.10.0"
+ksp = "2.3.6"
 persistentCookieJar = "v1.0.1"
 cameraCamera2Pipe = "1.7.0-alpha01"
 appcompat = "1.7.1"
@@ -68,6 +69,7 @@ androidx-camera-camera2-pipe = { group = "androidx.camera", name = "camera-camer
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
 [plugins]
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

@@ -43,15 +43,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.ImageLoader
 import coil.compose.AsyncImage
-import fr.ayae.festivals.data.Festival
+import fr.ayae.festivals.data.Festivals.Festival
 import fr.ayae.festivals.data.RetrofitInstance
-import java.text.SimpleDateFormat
-import java.util.Locale
-import java.util.TimeZone
+
 @SuppressLint("NotConstructor")
 @Composable
 fun HomePage(
-    festivalViewModel: FestivalViewModel = viewModel(),
+    festivalViewModel: FestivalViewModel = viewModel(factory = FestivalViewModel.Factory),
     onNavigateToFestival: (Int) -> Unit = {}
 ) {
     val context = LocalContext.current

@@ -31,7 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
-import fr.ayae.festivals.data.ReservationInteraction
+import fr.ayae.festivals.data.Reservation.ReservationInteraction
 import fr.ayae.festivals.ui.theme.AYAEFestivalsTheme
 
 /**

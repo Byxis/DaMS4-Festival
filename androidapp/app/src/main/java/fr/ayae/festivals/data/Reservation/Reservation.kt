@@ -1,4 +1,4 @@
-package fr.ayae.festivals.data
+package fr.ayae.festivals.data.Reservation
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @Entity(tableName = "reservations")
 data class Reservation(
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     val id: Int = 0,
     val festival_id: Int,
     val entity_id: Int,
