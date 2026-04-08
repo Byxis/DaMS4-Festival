@@ -48,7 +48,6 @@ import fr.ayae.festivals.data.RetrofitInstance
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
-
 @SuppressLint("NotConstructor")
 @Composable
 fun HomePage(
@@ -61,28 +60,20 @@ fun HomePage(
     }
 
     val state by festivalViewModel.state
-
-
     var searchQuery by remember { mutableStateOf("") }
-
-    val bgDark = Color(0xFF121416)
-    val cyanAccent = Color(0xFF00E5FF)
-    val surfaceDark = Color(0xFF1E2124)
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(bgDark)
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
     ) {
         Text(
             text = "Festivals à venir",
-            color = Color.White,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
         )
-
 
         OutlinedTextField(
             value = searchQuery,
@@ -92,31 +83,24 @@ fun HomePage(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
-            placeholder = { Text("Rechercher un festival...", color = Color.Gray) },
+            placeholder = { Text("Rechercher un festival...") },
             singleLine = true,
-            shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = surfaceDark,
-                unfocusedContainerColor = surfaceDark,
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White,
-                focusedBorderColor = cyanAccent,
-                unfocusedBorderColor = Color.Transparent,
-                cursorColor = cyanAccent
-            )
+            shape = RoundedCornerShape(12.dp)
         )
-
 
         when (state) {
             is festivalState.Loading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = cyanAccent)
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                 }
             }
 
             is festivalState.Empty -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Aucun festival pour le moment.", color = Color(0xFFAAAAAA))
+                    Text(
+                        text = "Aucun festival pour le moment.",
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                    )
                 }
             }
 
@@ -137,7 +121,6 @@ fun HomePage(
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-
                     items(filteredFestivals) { festival ->
                         FestivalCard(festival, onNavigateToFestival)
                     }
@@ -146,13 +129,10 @@ fun HomePage(
         }
     }
 }
+
 @Composable
 fun FestivalCard(festival: Festival, onNavigateToFestival: (Int) -> Unit) {
-    val surfaceDark = Color(0xFF1E2124)
-    val cyanAccent = Color(0xFF00E5FF)
-    val textGray = Color(0xFFAAAAAA)
     val context = LocalContext.current
-
 
     val customImageLoader = remember {
         ImageLoader.Builder(context)
@@ -161,12 +141,12 @@ fun FestivalCard(festival: Festival, onNavigateToFestival: (Int) -> Unit) {
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth().clickable { onNavigateToFestival(festival.id) },
-        colors = CardDefaults.cardColors(containerColor = surfaceDark),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onNavigateToFestival(festival.id) },
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         shape = RoundedCornerShape(12.dp)
     ) {
-        val baseUrl = fr.ayae.festivals.data.RetrofitInstance.BASE_URL
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -174,13 +154,11 @@ fun FestivalCard(festival: Festival, onNavigateToFestival: (Int) -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-
             Column(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
                     text = festival.name,
-                    color = Color.White,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -190,7 +168,7 @@ fun FestivalCard(festival: Festival, onNavigateToFestival: (Int) -> Unit) {
                 if (!festival.location.isNullOrEmpty()) {
                     Text(
                         text = "📍 ${festival.location}",
-                        color = textGray,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 14.sp
                     )
                 }
@@ -209,16 +187,14 @@ fun FestivalCard(festival: Festival, onNavigateToFestival: (Int) -> Unit) {
 
                     Text(
                         text = datesText,
-                        color = cyanAccent,
+                        color = MaterialTheme.colorScheme.primary,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
                     )
                 }
             }
 
-
             if (festival.logoUrl != null) {
-
                 Spacer(modifier = Modifier.width(16.dp))
 
                 AsyncImage(
@@ -229,7 +205,7 @@ fun FestivalCard(festival: Festival, onNavigateToFestival: (Int) -> Unit) {
                     modifier = Modifier
                         .size(120.dp)
                         .clip(RoundedCornerShape(8.dp))
-                        .background(Color.DarkGray),
+                        .background(MaterialTheme.colorScheme.surface),
                     onError = { error ->
                         android.util.Log.e("COIL_DEBUG", "Coil n'a pas pu charger l'image : ${error.result.throwable.message}")
                     }

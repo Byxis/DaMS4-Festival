@@ -40,7 +40,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-
 @Composable
 fun RegisterScreen(
     registerViewModel: RegisterViewModel = viewModel(),
@@ -58,12 +57,6 @@ fun RegisterScreen(
     val isEmailValid = Patterns.EMAIL_ADDRESS.matcher(email).matches()
     val state by registerViewModel.state
     val scrollState = rememberScrollState()
-
-    val bgColor = Color(0xFF141618)
-    val cardColor = Color(0xFF1C1E21)
-    val borderColor = Color(0xFF333333)
-    val cyanAccent = Color(0xFF00E5FF)
-    val textGray = Color(0xFFAAAAAA)
 
     LaunchedEffect(state) {
         if (state is AuthUiState.Success) {
@@ -100,7 +93,8 @@ fun RegisterScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(bgColor),
+
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
         Card(
@@ -108,8 +102,9 @@ fun RegisterScreen(
                 .fillMaxWidth(0.85f)
                 .padding(vertical = 16.dp),
             shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = cardColor),
-            border = BorderStroke(1.dp, borderColor)
+
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
         ) {
             Column(
                 modifier = Modifier
@@ -121,16 +116,16 @@ fun RegisterScreen(
             ) {
                 Text(
                     text = "Inscription",
-                    color = Color.White,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold
+
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
                     text = "Créez votre compte",
-                    color = textGray,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 14.sp
                 )
 
@@ -142,18 +137,8 @@ fun RegisterScreen(
                     label = { Text("Prénom*") },
                     shape = RoundedCornerShape(6.dp),
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = cyanAccent,
-                        unfocusedBorderColor = borderColor,
-                        focusedLabelColor = cyanAccent,
-                        unfocusedLabelColor = textGray,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        cursorColor = cyanAccent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent
-                    )
+                    singleLine = true
+
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -164,18 +149,8 @@ fun RegisterScreen(
                     label = { Text("Nom*") },
                     shape = RoundedCornerShape(6.dp),
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = cyanAccent,
-                        unfocusedBorderColor = borderColor,
-                        focusedLabelColor = cyanAccent,
-                        unfocusedLabelColor = textGray,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        cursorColor = cyanAccent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent
-                    )
+                    singleLine = true
+
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -195,22 +170,8 @@ fun RegisterScreen(
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = cyanAccent,
-                        unfocusedBorderColor = borderColor,
-                        focusedLabelColor = cyanAccent,
-                        unfocusedLabelColor = textGray,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        cursorColor = cyanAccent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent,
-                        errorBorderColor = MaterialTheme.colorScheme.error,
-                        errorLabelColor = MaterialTheme.colorScheme.error,
-                        errorTextColor = Color.White,
-                        errorSupportingTextColor = MaterialTheme.colorScheme.error
-                    )
+                    singleLine = true
+
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -222,18 +183,8 @@ fun RegisterScreen(
                     visualTransformation = PasswordVisualTransformation(),
                     shape = RoundedCornerShape(6.dp),
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = cyanAccent,
-                        unfocusedBorderColor = borderColor,
-                        focusedLabelColor = cyanAccent,
-                        unfocusedLabelColor = textGray,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        cursorColor = cyanAccent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent
-                    )
+                    singleLine = true
+
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -245,18 +196,8 @@ fun RegisterScreen(
                     visualTransformation = PasswordVisualTransformation(),
                     shape = RoundedCornerShape(6.dp),
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = cyanAccent,
-                        unfocusedBorderColor = borderColor,
-                        focusedLabelColor = cyanAccent,
-                        unfocusedLabelColor = textGray,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        cursorColor = cyanAccent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent
-                    )
+                    singleLine = true
+
                 )
 
                 if (confirmedPassword.isNotEmpty() && confirmedPassword != password) {
@@ -286,11 +227,11 @@ fun RegisterScreen(
                         .fillMaxWidth()
                         .height(50.dp),
                     shape = RoundedCornerShape(8.dp),
+
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = bgColor,
-                        contentColor = cyanAccent
-                    ),
-                    border = BorderStroke(1.dp, borderColor)
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
                 ) {
                     Text("Inscription", fontSize = 16.sp)
                 }
@@ -300,7 +241,7 @@ fun RegisterScreen(
                 TextButton(onClick = { onNavigateToLogin() }) {
                     Text(
                         text = "Déjà inscrit ? Connectez-vous",
-                        color = textGray,
+                        color = MaterialTheme.colorScheme.primary,
                         textDecoration = TextDecoration.Underline,
                         fontSize = 14.sp
                     )
