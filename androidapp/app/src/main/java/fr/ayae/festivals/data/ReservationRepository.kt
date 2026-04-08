@@ -108,4 +108,19 @@ class ReservationRepository {
             null
         }
     }
+
+    suspend fun updateReservationGame(
+        context: Context,
+        festivalId: Int,
+        reservationId: Int,
+        reservationGameId: Int,
+        request: UpdateReservationGameRequest
+    ): ReservationGame? {
+        return try {
+            RetrofitInstance.getApi(context).updateReservationGame(festivalId, reservationId, reservationGameId, request)
+        } catch (e: Exception) {
+            Log.e("AuthService", "Erreur updateReservationGame: ${e.message}")
+            null
+        }
+    }
 }

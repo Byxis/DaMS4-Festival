@@ -16,6 +16,7 @@ import java.util.Date
 import fr.ayae.festivals.data.ReservationRepository
 import fr.ayae.festivals.data.UpdateFestivalRequest
 import fr.ayae.festivals.data.UpdateReservationRequest
+import fr.ayae.festivals.data.UpdateReservationGameRequest
 
 /**
  * ViewModel for the Festival screen, responsible for managing the festival data
@@ -102,6 +103,58 @@ class FestivalViewModel : ViewModel() {
             if (state !is FestivalUiState.Success) return@update state
             state.copy(reservations = state.reservations.map { (name, res) ->
                 if (res.id == reservationId) name to res.copy(status = newStatus) else name to res
+            })
+        }
+    }
+
+    fun updateGameInReservation(
+        reservationId: Int,
+        reservationGameId: Int,
+        amount: Int,
+        tableCount: Int,
+        bigTableCount: Int,
+        townTableCount: Int,
+        electricalOutlets: Int,
+        floorSpace: Double,
+        status: String
+    ) {
+        viewModelScope.launch {
+            val state = _uiState.value
+            if (state is FestivalUiState.Success) {
+                appContext?.let { ctx ->
+                    reservationRepo.updateReservationGame(
+                        ctx, state.festival.id, reservationId, reservationGameId,
+                        UpdateReservationGameRequest(
+                            amount = amount,
+                            table_count = tableCount,
+                            big_table_count = bigTableCount,
+                            town_table_count = townTableCount,
+                            electrical_outlets = electricalOutlets,
+                            floor_space = floorSpace,
+                            status = status
+                        )
+                    )
+                }
+            }
+        }
+        _uiState.update { state ->
+            if (state !is FestivalUiState.Success) return@update state
+            state.copy(reservations = state.reservations.map { (name, res) ->
+                if (res.id != reservationId) return@map name to res
+                val updatedGames = res.games?.map { game ->
+                    if (game.id == reservationGameId) {
+                        game.copy(
+                            amount = amount,
+                            table_count = tableCount,
+                            big_table_count = bigTableCount,
+                            town_table_count = townTableCount,
+                            electrical_outlets = electricalOutlets,
+                            floor_space = floorSpace,
+                            status = status
+                        )
+                    } else game
+                }
+                name to res.copy(games = updatedGames)
             })
         }
     }

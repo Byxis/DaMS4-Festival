@@ -1,6 +1,7 @@
 package fr.ayae.festivals.ui.reservation
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Inbox
@@ -25,6 +27,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import fr.ayae.festivals.data.Game
 import fr.ayae.festivals.data.GameType
 import fr.ayae.festivals.data.ReservationGame
+import fr.ayae.festivals.ui.theme.AYAEFestivalsTheme
 import fr.ayae.festivals.ui.utils.AutoResizedText
 import fr.ayae.festivals.ui.utils.FestivalDialog
 
@@ -68,7 +73,8 @@ enum class ReservationGameStatusOption(val label: String, val lightColorHex: Lon
 @Composable
 fun GamesReservations(
     modifier: Modifier = Modifier,
-    games: List<Pair<Game, ReservationGame?>> = emptyList()
+    games: List<Pair<Game, ReservationGame?>> = emptyList(),
+    onGameUpdated: (reservationGameId: Int, amount: Int, tables: Int, bigTables: Int, townTables: Int, outlets: Int, floorSpace: Double, status: String) -> Unit = { _, _, _, _, _, _, _, _ -> }
 ) {
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var showGamesWithNoStatus by rememberSaveable { mutableStateOf(false) }
@@ -186,7 +192,7 @@ fun GamesReservations(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(displayedGames) { (game, reservationGame) ->
-                    GameListItem(game = game, reservationGame = reservationGame)
+                    GameListItem(game = game, reservationGame = reservationGame, onGameUpdated = onGameUpdated)
                 }
             }
         }
@@ -227,7 +233,8 @@ fun GamesReservations(
 fun GameListItem(
     game: Game,
     reservationGame: ReservationGame?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onGameUpdated: (reservationGameId: Int, amount: Int, tables: Int, bigTables: Int, townTables: Int, outlets: Int, floorSpace: Double, status: String) -> Unit = { _, _, _, _, _, _, _, _ -> }
 ) {
     var showEditQuantitiesDialog by rememberSaveable { mutableStateOf(false) }
     var statusMenuExpanded by rememberSaveable { mutableStateOf(false) }
@@ -323,8 +330,11 @@ fun GameListItem(
             game = game,
             reservationGame = reservationGame,
             onDismissRequest = { showEditQuantitiesDialog = false },
-            onSave = { amount, tables, bigTables, townTables, outlets, floorSpace ->
+            onSave = { amount, tables, bigTables, townTables, outlets, floorSpace, status ->
                 showEditQuantitiesDialog = false
+                if (reservationGame != null) {
+                    onGameUpdated(reservationGame.id, amount, tables, bigTables, townTables, outlets, floorSpace, status)
+                }
             }
         )
     }
@@ -339,7 +349,7 @@ fun EditGameQuantitiesDialog(
     reservationGame: ReservationGame?,
     onDismissRequest: () -> Unit,
     onSave: (amount: Int, tableCount: Int, bigTableCount: Int,
-             townTableCount: Int, electricalOutlets: Int, floorSpace: Double) -> Unit
+             townTableCount: Int, electricalOutlets: Int, floorSpace: Double, status: String) -> Unit
 ) {
     var amountText        by rememberSaveable { mutableStateOf(reservationGame?.amount?.toString()            ?: "0") }
     var tableCountText    by rememberSaveable { mutableStateOf(reservationGame?.table_count?.toString()       ?: "0") }
@@ -347,6 +357,8 @@ fun EditGameQuantitiesDialog(
     var townTableText     by rememberSaveable { mutableStateOf(reservationGame?.town_table_count?.toString()  ?: "0") }
     var outletsText       by rememberSaveable { mutableStateOf(reservationGame?.electrical_outlets?.toString()?: "0") }
     var floorSpaceText    by rememberSaveable { mutableStateOf(reservationGame?.floor_space?.toString()       ?: "0") }
+    var status            by rememberSaveable { mutableStateOf(reservationGame?.status ?: "") }
+    var statusMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
     FestivalDialog(
         title = "Modifier les quantités – ${game.name}",
@@ -358,7 +370,8 @@ fun EditGameQuantitiesDialog(
                 bigTableCountText.toIntOrNull() ?: 0,
                 townTableText.toIntOrNull()  ?: 0,
                 outletsText.toIntOrNull()    ?: 0,
-                floorSpaceText.toDoubleOrNull() ?: 0.0
+                floorSpaceText.toDoubleOrNull() ?: 0.0,
+                status
             )
         }
     ) {
@@ -370,6 +383,67 @@ fun EditGameQuantitiesDialog(
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
+            
+            // Status Selector
+            Text("Statut du jeu", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.outline)
+            
+            Box {
+                val gameStatusOption = try { 
+                    if (status.isNotBlank()) ReservationGameStatusOption.valueOf(status) else null 
+                } catch(_: Exception) { null }
+                
+                val isDarkTheme = androidx.compose.foundation.isSystemInDarkTheme()
+                val statusColor = if (gameStatusOption != null) {
+                    Color(if (isDarkTheme) gameStatusOption.darkColorHex else gameStatusOption.lightColorHex)
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                }
+                val statusBgColor = if (gameStatusOption != null) {
+                    statusColor.copy(alpha = 0.12f)
+                } else {
+                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                }
+                
+                Surface(
+                    onClick = { statusMenuExpanded = true },
+                    shape = MaterialTheme.shapes.small,
+                    color = statusBgColor,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = gameStatusOption?.label ?: "Non défini",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = statusColor
+                        )
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = null,
+                            tint = statusColor
+                        )
+                    }
+                }
+                
+                DropdownMenu(
+                    expanded = statusMenuExpanded,
+                    onDismissRequest = { statusMenuExpanded = false }
+                ) {
+                    ReservationGameStatusOption.values().forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(option.label) },
+                            onClick = {
+                                status = option.name
+                                statusMenuExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
             Divider()
             Text("Tables allouées", style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.outline)
@@ -424,7 +498,7 @@ fun EditGameQuantitiesDialog(
 )
 @Composable
 fun GamesReservationsPreview() {
-    fr.ayae.festivals.ui.theme.AYAEFestivalsTheme {
+    AYAEFestivalsTheme {
         Surface(modifier = Modifier.padding(16.dp)) {
             GamesReservations(
                 games = listOf(

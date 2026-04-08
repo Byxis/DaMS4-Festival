@@ -127,6 +127,14 @@ interface APIService {
         @Path("gameZoneId") gameZoneId: Int
     ): Response<Unit>
 
+    @PUT("festivals/{festivalId}/reservations/{reservationId}/games/{reservationGameId}")
+    suspend fun updateReservationGame(
+        @Path("festivalId") festivalId: Int,
+        @Path("reservationId") reservationId: Int,
+        @Path("reservationGameId") reservationGameId: Int,
+        @Body request: UpdateReservationGameRequest
+    ): fr.ayae.festivals.data.ReservationGame
+
     @GET("festivals/")
     suspend fun getAllFestivals():List<Festival>
 

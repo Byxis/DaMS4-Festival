@@ -115,6 +115,7 @@ fun FestivalScreen(
                 onSurfaceChanged = viewModel::updateFestivalSurface,
                 onPresentedByThemChanged = viewModel::updateReservationPresented,
                 onReservationStockChanged = viewModel::updateReservationStock,
+                onGameUpdated = { resId, rgId, amt, t, bt, tt, o, fs, st -> viewModel.updateGameInReservation(resId, rgId, amt, t, bt, tt, o, fs, st) },
                 onAddEntity = viewModel::addEntityReservation,
                 onAddZoneTarif = viewModel::addZoneTarif,
                 onEditZoneTarif = viewModel::updateZoneTarif,
@@ -142,6 +143,7 @@ fun FestivalScreenContent(
     onSurfaceChanged: (String, Double) -> Unit = { _, _ -> },
     onPresentedByThemChanged: (Int, Boolean) -> Unit = { _, _ -> },
     onReservationStockChanged: (Int, Int, Int, Int, Int) -> Unit = { _, _, _, _, _ -> },
+    onGameUpdated: (reservationId: Int, reservationGameId: Int, amount: Int, tables: Int, bigTables: Int, townTables: Int, outlets: Int, floorSpace: Double, status: String) -> Unit = { _, _, _, _, _, _, _, _, _ -> },
     onAddEntity: (String) -> Unit = {},
     onAddZoneTarif: (String, Double, Double) -> Unit = { _, _, _ -> },
     onEditZoneTarif: (Int, String, Double, Double) -> Unit = { _, _, _, _ -> },
@@ -316,6 +318,7 @@ fun FestivalScreenContent(
                         onStatusChanged = { status -> onStatusChanged(res.id, status) },
                         onPresentedByThemChanged = { presented -> onPresentedByThemChanged(res.id, presented) },
                         onStockChanged = { t, bt, tt, o -> onReservationStockChanged(res.id, t, bt, tt, o) },
+                        onGameUpdated = { rgId, amt, t, bt, tt, o, fs, st -> onGameUpdated(res.id, rgId, amt, t, bt, tt, o, fs, st) },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
