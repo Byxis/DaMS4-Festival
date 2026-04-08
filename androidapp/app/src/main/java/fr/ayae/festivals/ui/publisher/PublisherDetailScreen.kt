@@ -1,5 +1,4 @@
 package fr.ayae.festivals.ui.publisher
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,7 +24,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -34,6 +32,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import fr.ayae.festivals.data.publisher.PublisherDto
+import fr.ayae.festivals.ui.game.GameList
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,3 +107,4 @@ fun PublisherDetailScreen(
         }
     }
 }
+

@@ -1,6 +1,7 @@
 package fr.ayae.festivals.ui.publisher
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -22,6 +23,7 @@ class PublisherViewModel(private val repository: PublisherRepository) : ViewMode
         fetchPublishers()
     }
 
+
     fun fetchPublishers() {
         viewModelScope.launch {
             _uiState.value = PublisherUiState.Loading
@@ -29,7 +31,49 @@ class PublisherViewModel(private val repository: PublisherRepository) : ViewMode
                 val publishers = repository.getPublishers()
                 _uiState.value = PublisherUiState.Success(publishers)
             } catch (e: Exception) {
-                _uiState.value = PublisherUiState.Error("Erreur de chargement des éditeurs: ${e.message}")
+                updateErrorState("Erreur de chargement des éditeurs: ${e.message}")
+            }
+        }
+    }
+
+    fun fetchPublisherDetails(publisherId: Int) {
+        viewModelScope.launch {
+            // Indiquer qu'un chargement de détails est en cours
+            _uiState.update { currentState ->
+                if (currentState is PublisherUiState.Success) {
+                    currentState.copy(fetchingDetailsForId = publisherId)
+                } else {
+                    currentState
+                }
+            }
+
+            try {
+                val detailedPublisher = repository.getPublisherDetails(publisherId)
+                _uiState.update { currentState ->
+                    if (currentState is PublisherUiState.Success) {
+                        val updatedList = currentState.publishers.map {
+                            if (it.id == publisherId) detailedPublisher else it
+                        }
+                        // L'éditeur sélectionné est maintenant celui avec les détails
+                        currentState.copy(
+                            publishers = updatedList,
+                            selectedPublisher = detailedPublisher,
+                            fetchingDetailsForId = null // Fin du chargement
+                        )
+                    } else {
+                        currentState
+                    }
+                }
+            } catch (e: Exception) {
+                updateErrorState("Erreur de chargement des détails: ${e.message}")
+                // S'assurer de réinitialiser l'état de chargement en cas d'erreur
+                _uiState.update { currentState ->
+                    if (currentState is PublisherUiState.Success) {
+                        currentState.copy(fetchingDetailsForId = null)
+                    } else {
+                        currentState
+                    }
+                }
             }
         }
     }
@@ -38,9 +82,9 @@ class PublisherViewModel(private val repository: PublisherRepository) : ViewMode
         viewModelScope.launch {
             try {
                 repository.addPublisher(name)
-                fetchPublishers() // Recharger la liste après l'ajout
+                fetchPublishers()
             } catch (e: Exception) {
-                _uiState.value = PublisherUiState.Error("Erreur lors de l'ajout de l'éditeur: ${e.message}")
+                updateErrorState("Erreur lors de l'ajout: ${e.message}")
             }
         }
     }
@@ -49,29 +93,36 @@ class PublisherViewModel(private val repository: PublisherRepository) : ViewMode
         viewModelScope.launch {
             try {
                 repository.editPublisher(publisherId, newName)
-                fetchPublishers() // Recharger la liste après la modification
+                fetchPublishers()
             } catch (e: Exception) {
-                _uiState.value = PublisherUiState.Error("Erreur lors de la modification de l'éditeur: ${e.message}")
+                updateErrorState("Erreur lors de la modification: ${e.message}")
             }
         }
     }
+
     fun deletePublisher(publisherId: Int) {
         viewModelScope.launch {
             try {
                 repository.deletePublisher(publisherId)
-                fetchPublishers() // Recharger la liste après la suppression
+                fetchPublishers()
             } catch (e: Exception) {
-                _uiState.value = PublisherUiState.Error("Erreur lors de la suppression de l'éditeur: ${e.message}")
+                updateErrorState("Erreur lors de la suppression: ${e.message}")
             }
         }
     }
 
     fun selectPublisher(publisher: PublisherDto) {
-        _uiState.update { currentState ->
-            if (currentState is PublisherUiState.Success) {
-                currentState.copy(selectedPublisher = publisher)
-            } else {
-                currentState
+        // On charge les détails uniquement si nécessaire
+        if (publisher.games.isEmpty() && publisher.contacts.isEmpty()) {
+            fetchPublisherDetails(publisher.id)
+        } else {
+            // Sinon, on sélectionne juste l'éditeur qui est déjà complet
+            _uiState.update { currentState ->
+                if (currentState is PublisherUiState.Success) {
+                    currentState.copy(selectedPublisher = publisher)
+                } else {
+                    currentState
+                }
             }
         }
     }
@@ -79,9 +130,19 @@ class PublisherViewModel(private val repository: PublisherRepository) : ViewMode
     fun clearSelection() {
         _uiState.update { currentState ->
             if (currentState is PublisherUiState.Success) {
-                currentState.copy(selectedPublisher = null)
+                currentState.copy(selectedPublisher = null, errorMessage = null)
             } else {
                 currentState
+            }
+        }
+    }
+
+    private fun updateErrorState(message: String) {
+        _uiState.update { currentState ->
+            if (currentState is PublisherUiState.Success) {
+                currentState.copy(errorMessage = message)
+            } else {
+                PublisherUiState.Error(message)
             }
         }
     }

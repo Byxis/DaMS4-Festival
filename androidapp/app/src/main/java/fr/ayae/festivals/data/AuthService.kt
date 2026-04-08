@@ -91,8 +91,8 @@ interface APIService {
     suspend fun getContactsForPublisher(@Path("id") publisherId: Int): List<ContactDto>
 
     // --- Games ---
-    @GET("publishers/{id}/games")
-    suspend fun getGamesForPublisher(@Path("id") publisherId: Int): List<GameDto>
+    @GET("games/filterByPublisherID/{publisherId}")
+    suspend fun getGamesForPublisher(@Path("publisherId") publisherId: Int): List<GameDto>
 }
 
 object RetrofitInstance {

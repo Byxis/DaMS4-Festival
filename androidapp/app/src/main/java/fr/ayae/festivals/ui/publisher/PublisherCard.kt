@@ -2,7 +2,6 @@ package fr.ayae.festivals.ui.publisher
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -46,12 +45,18 @@ import fr.ayae.festivals.data.publisher.PublisherDto
 @Composable
 fun PublisherCard(
     publisher: PublisherDto,
+    isFetchingDetails: Boolean,
     onCardClick: () -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isExpanded by rememberSaveable { mutableStateOf(false) }
+    var isExpanded by rememberSaveable(publisher.id) { mutableStateOf(false) }
+
+    // Si les détails sont chargés, on force l'expansion de la carte
+    if (publisher.games.isNotEmpty() || publisher.contacts.isNotEmpty()) {
+        isExpanded = true
+    }
 
     Card(
         modifier = modifier
@@ -64,10 +69,11 @@ fun PublisherCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onCardClick() }
+                    .clickable(onClick = onCardClick)
                     .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                // Le bouton pour étendre/réduire
                 IconButton(onClick = { isExpanded = !isExpanded }) {
                     Icon(
                         imageVector = if (isExpanded) Icons.Default.ExpandMore else Icons.Default.KeyboardArrowRight,
@@ -98,14 +104,20 @@ fun PublisherCard(
                     modifier = Modifier.weight(1f)
                 )
 
-                IconButton(onClick = onEditClick) {
-                    Icon(Icons.Default.Edit, contentDescription = "Modifier", tint = MaterialTheme.colorScheme.primary)
-                }
-                IconButton(onClick = onDeleteClick) {
-                    Icon(Icons.Default.Delete, contentDescription = "Supprimer", tint = MaterialTheme.colorScheme.error)
+                // Affiche un spinner si les détails sont en cours de chargement pour cette carte
+                if (isFetchingDetails) {
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                } else {
+                    IconButton(onClick = onEditClick) {
+                        Icon(Icons.Default.Edit, contentDescription = "Modifier", tint = MaterialTheme.colorScheme.primary)
+                    }
+                    IconButton(onClick = onDeleteClick) {
+                        Icon(Icons.Default.Delete, contentDescription = "Supprimer", tint = MaterialTheme.colorScheme.error)
+                    }
                 }
             }
 
+            // Contenu extensible
             AnimatedVisibility(visible = isExpanded) {
                 Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                     Divider()
