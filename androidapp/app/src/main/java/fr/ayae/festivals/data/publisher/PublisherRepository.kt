@@ -3,6 +3,7 @@ package fr.ayae.festivals.data.publisher
 import android.util.Log
 import fr.ayae.festivals.data.APIService
 import fr.ayae.festivals.data.contact.ContactDto
+import fr.ayae.festivals.data.game.GameCreationRequest
 import fr.ayae.festivals.data.game.GameDto
 
 class PublisherRepository(private val apiService: APIService) {
@@ -29,6 +30,13 @@ class PublisherRepository(private val apiService: APIService) {
             emptyList()
         }
     }
+
+    suspend fun addGameToPublisher(gameRequest: GameCreationRequest): GameDto {
+        Log.d("ADD_GAME_REPO", "▶️ Appel de l'API pour ajouter un jeu. Requête: $gameRequest")
+        return apiService.addGameToPublisher(gameRequest)
+    }
+
+
     //CRUD PUBLISHER
     suspend fun addPublisher(name: String) {
         // L'API attend un objet, nous créons un DTO simple pour l'ajout.

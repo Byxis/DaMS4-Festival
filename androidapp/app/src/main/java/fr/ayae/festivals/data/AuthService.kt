@@ -22,6 +22,7 @@ import fr.ayae.festivals.data.Login.MessageResponse
 import fr.ayae.festivals.data.Login.RegisterRequest
 import fr.ayae.festivals.data.Login.User
 import fr.ayae.festivals.data.contact.ContactDto
+import fr.ayae.festivals.data.game.GameCreationRequest
 import fr.ayae.festivals.data.game.GameDto
 import fr.ayae.festivals.data.publisher.PublisherCreationRequest
 import fr.ayae.festivals.data.publisher.PublisherDto
@@ -93,6 +94,9 @@ interface APIService {
     // --- Games ---
     @GET("games/filterByPublisherID/{publisherId}")
     suspend fun getGamesForPublisher(@Path("publisherId") publisherId: Int): List<GameDto>
+
+    @POST("publishers/addGameToPublisher")
+    suspend fun addGameToPublisher(@Body gameRequest: GameCreationRequest): GameDto
 }
 
 object RetrofitInstance {

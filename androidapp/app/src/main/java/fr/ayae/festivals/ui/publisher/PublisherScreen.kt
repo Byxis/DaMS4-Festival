@@ -62,6 +62,7 @@ fun PublisherScreen(
             if (state.selectedPublisher != null) {
                 PublisherDetailScreen(
                     publisher = state.selectedPublisher,
+                    onAddGame = { request -> viewModel.addGameToPublisher(request) },
                     onNavigateBack = { viewModel.clearSelection() }
                 )
             } else {

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import fr.ayae.festivals.data.RetrofitInstance
+import fr.ayae.festivals.data.game.GameCreationRequest
 import fr.ayae.festivals.data.publisher.PublisherDto
 import fr.ayae.festivals.data.publisher.PublisherRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -123,6 +124,21 @@ class PublisherViewModel(private val repository: PublisherRepository) : ViewMode
                 } else {
                     currentState
                 }
+            }
+        }
+    }
+    fun addGameToPublisher(request: GameCreationRequest) {
+        viewModelScope.launch {
+            Log.d("ADD_GAME_VM", "🚀 Tentative d'ajout d'un jeu. Requête: $request")
+            try {
+                val newGame = repository.addGameToPublisher(request)
+                Log.d("ADD_GAME_VM", "✅ Jeu ajouté avec succès via le repo. Réponse: $newGame")
+                Log.d("ADD_GAME_VM", "🔄 Rafraîchissement des détails pour l'éditeur ID: ${request.publisherId}")
+                // Après l'ajout, on rafraîchit les détails de l'éditeur pour voir le nouveau jeu
+                fetchPublisherDetails(request.publisherId)
+            } catch (e: Exception) {
+                Log.e("ADD_GAME_VM", "❌ Erreur dans le ViewModel lors de l'ajout du jeu.", e)
+                updateErrorState("Erreur lors de l'ajout du jeu: ${e.message}")
             }
         }
     }
