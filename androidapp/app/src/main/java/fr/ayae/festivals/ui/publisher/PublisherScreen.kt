@@ -63,6 +63,17 @@ fun PublisherScreen(
                 PublisherDetailScreen(
                     publisher = state.selectedPublisher,
                     onAddGame = { request -> viewModel.addGameToPublisher(request) },
+                    // --- MODIFICATIONS POUR LES CONTACTS ---
+                    onAddContact = { request ->
+                        viewModel.addContact(state.selectedPublisher.id, request)
+                    },
+                    onUpdateContact = { contact, request ->
+                        viewModel.updateContact(state.selectedPublisher.id, contact.id, request)
+                    },
+                    onDeleteContact = { contact ->
+                        viewModel.deleteContact(state.selectedPublisher.id, contact.id)
+                    },
+                    // --- FIN DES MODIFICATIONS ---
                     onNavigateBack = { viewModel.clearSelection() }
                 )
             } else {

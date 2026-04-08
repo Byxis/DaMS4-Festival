@@ -3,6 +3,7 @@ package fr.ayae.festivals.data.publisher
 import android.util.Log
 import fr.ayae.festivals.data.APIService
 import fr.ayae.festivals.data.contact.ContactDto
+import fr.ayae.festivals.data.contact.ContactRequest
 import fr.ayae.festivals.data.game.GameCreationRequest
 import fr.ayae.festivals.data.game.GameDto
 
@@ -50,6 +51,20 @@ class PublisherRepository(private val apiService: APIService) {
     }
     suspend fun deletePublisher(publisherId: Int) {
         apiService.deletePublisher(publisherId)
+    }
+
+    // CRUD CONTACT
+
+    suspend fun addContact(publisherId: Int, contactRequest: ContactRequest): ContactDto {
+        return apiService.addContactToPublisher(publisherId, contactRequest)
+    }
+
+    suspend fun updateContact(publisherId: Int, contactId: Int, contactRequest: ContactRequest): ContactDto {
+        return apiService.updateContact(publisherId, contactId, contactRequest)
+    }
+
+    suspend fun deleteContact(publisherId: Int, contactId: Int) {
+        apiService.deleteContact(publisherId, contactId)
     }
 
 }

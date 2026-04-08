@@ -2,15 +2,21 @@ package fr.ayae.festivals.ui.publisher
 
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -18,7 +24,11 @@ import fr.ayae.festivals.data.contact.ContactDto
 import fr.ayae.festivals.ui.components.InfoRow
 
 @Composable
-fun ContactList(contacts: List<ContactDto>) {
+fun ContactList(
+    contacts: List<ContactDto>,
+    onEditClick: (ContactDto) -> Unit,
+    onDeleteClick: (ContactDto) -> Unit
+) {
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         Text(
             text = "Contacts (${contacts.size})",
@@ -36,11 +46,20 @@ fun ContactList(contacts: List<ContactDto>) {
             )
         } else {
             contacts.forEach { contact ->
-                InfoRow(
-                    icon = Icons.Default.Person,
-                    label = "${contact.name} ${contact.familyName.uppercase()}",
-                    value = contact.role ?: "N/A"
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    InfoRow(
+                        modifier = Modifier.weight(1f),
+                        icon = Icons.Default.Person,
+                        label = "${contact.name} ${contact.familyName.uppercase()}",
+                        value = contact.role ?: "N/A"
+                    )
+                    IconButton(onClick = { onEditClick(contact) }) {
+                        Icon(Icons.Default.Edit, contentDescription = "Modifier contact")
+                    }
+                    IconButton(onClick = { onDeleteClick(contact) }) {
+                        Icon(Icons.Default.Delete, contentDescription = "Supprimer contact", tint = MaterialTheme.colorScheme.error)
+                    }
+                }
                 Spacer(modifier = Modifier.height(4.dp))
             }
         }

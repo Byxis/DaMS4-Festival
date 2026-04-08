@@ -15,6 +15,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Business
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -23,6 +25,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -30,13 +33,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
+import fr.ayae.festivals.data.contact.ContactDto
+import fr.ayae.festivals.data.contact.ContactRequest
 import fr.ayae.festivals.data.game.GameCreationRequest
 import fr.ayae.festivals.data.publisher.PublisherDto
 import fr.ayae.festivals.ui.game.GameAddDialog
@@ -48,9 +55,15 @@ import fr.ayae.festivals.ui.game.GameList
 fun PublisherDetailScreen(
     publisher: PublisherDto,
     onAddGame : (GameCreationRequest) -> Unit,
+    onAddContact: (ContactRequest) -> Unit,
+    onUpdateContact: (ContactDto, ContactRequest) -> Unit,
+    onDeleteContact: (ContactDto) -> Unit,
     onNavigateBack: () -> Unit
 ) {
     var showAddGameDialog by remember { mutableStateOf(false) }
+    var showContactDialog by remember { mutableStateOf<ContactDto?>(null) } // Pour la modification
+    var showAddContactDialog by remember { mutableStateOf(false) } // Pour l'ajout
+    var showDeleteContactDialog by remember { mutableStateOf<ContactDto?>(null) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -84,6 +97,43 @@ fun PublisherDetailScreen(
                 }
             )
         }
+
+        if (showAddContactDialog) {
+            ContactEditDialog(
+                title = "Ajouter un contact",
+                onDismissRequest = { showAddContactDialog = false },
+                onSave = { request ->
+                    onAddContact(request)
+                    showAddContactDialog = false
+                }
+            )
+        }
+
+        // Dialogue pour modifier un contact
+        showContactDialog?.let { contact ->
+            ContactEditDialog(
+                title = "Modifier le contact",
+                contact = contact,
+                onDismissRequest = { showContactDialog = null },
+                onSave = { request ->
+                    onUpdateContact(contact, request)
+                    showContactDialog = null
+                }
+            )
+        }
+
+        // Dialogue pour confirmer la suppression d'un contact
+        showDeleteContactDialog?.let { contact ->
+            ConfirmContactDeleteDialog(
+                itemName = "${contact.name} ${contact.familyName}",
+                onDismiss = { showDeleteContactDialog = null },
+                onConfirm = {
+                    onDeleteContact(contact)
+                    showDeleteContactDialog = null
+                }
+            )
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -122,8 +172,31 @@ fun PublisherDetailScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // --- MODIFICATION : AJOUT DU BOUTON "AJOUTER CONTACT" ---
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Contacts (${publisher.contacts.size})",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                IconButton(onClick = { showAddContactDialog = true }) {
+                    Icon(Icons.Default.Add, contentDescription = "Ajouter un contact")
+                }
+            }
+            // --- FIN DE LA MODIFICATION ---
+
             // Section Contacts
-            ContactList(contacts = publisher.contacts)
+            ContactList(
+                contacts = publisher.contacts,
+                onEditClick = { contact -> showContactDialog = contact },
+                onDeleteClick = { contact -> showDeleteContactDialog = contact }
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -133,3 +206,13 @@ fun PublisherDetailScreen(
     }
 }
 
+@Composable
+fun ConfirmContactDeleteDialog(itemName: String, onDismiss: () -> Unit, onConfirm: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Confirmer la suppression") },
+        text = { Text("Êtes-vous sûr de vouloir supprimer \"$itemName\" ? Cette action est irréversible.") },
+        confirmButton = { Button(onClick = onConfirm) { Text("Supprimer") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Annuler") } }
+    )
+}

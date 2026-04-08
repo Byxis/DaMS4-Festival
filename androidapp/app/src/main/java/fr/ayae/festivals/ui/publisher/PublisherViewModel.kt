@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import fr.ayae.festivals.data.RetrofitInstance
+import fr.ayae.festivals.data.contact.ContactRequest
 import fr.ayae.festivals.data.game.GameCreationRequest
 import fr.ayae.festivals.data.publisher.PublisherDto
 import fr.ayae.festivals.data.publisher.PublisherRepository
@@ -139,6 +140,47 @@ class PublisherViewModel(private val repository: PublisherRepository) : ViewMode
             } catch (e: Exception) {
                 Log.e("ADD_GAME_VM", "❌ Erreur dans le ViewModel lors de l'ajout du jeu.", e)
                 updateErrorState("Erreur lors de l'ajout du jeu: ${e.message}")
+            }
+        }
+    }
+
+    //Contacts
+
+    fun addContact(publisherId: Int, request: ContactRequest) {
+        Log.d("PublisherViewModel", "Tentative d'ajout du contact: ${request.name} pour l'éditeur $publisherId")
+        viewModelScope.launch {
+            try {
+                repository.addContact(publisherId, request)
+                Log.d("PublisherViewModel", "Contact ajouté avec succès via l'API. Rafraîchissement des données.")
+                // Rafraîchir les détails pour voir le nouveau contact
+                fetchPublisherDetails(publisherId)
+
+            } catch (e: Exception) {
+                updateErrorState("Erreur lors de l'ajout du contact: ${e.message}")
+            }
+
+
+        }
+    }
+
+    fun updateContact(publisherId: Int, contactId: Int, request: ContactRequest) {
+        viewModelScope.launch {
+            try {
+                repository.updateContact(publisherId, contactId, request)
+                fetchPublisherDetails(publisherId)
+            } catch (e: Exception) {
+                updateErrorState("Erreur lors de la modification du contact: ${e.message}")
+            }
+        }
+    }
+
+    fun deleteContact(publisherId: Int, contactId: Int) {
+        viewModelScope.launch {
+            try {
+                repository.deleteContact(publisherId, contactId)
+                fetchPublisherDetails(publisherId)
+            } catch (e: Exception) {
+                updateErrorState("Erreur lors de la suppression du contact: ${e.message}")
             }
         }
     }

@@ -19,7 +19,8 @@ fun InfoRow(
     icon: ImageVector,
     label: String,
     value: String,
-    valueIcon: ImageVector? = null
+    valueIcon: ImageVector? = null,
+    modifier: Modifier
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(

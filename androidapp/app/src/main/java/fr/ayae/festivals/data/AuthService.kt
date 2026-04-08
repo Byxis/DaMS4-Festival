@@ -22,6 +22,7 @@ import fr.ayae.festivals.data.Login.MessageResponse
 import fr.ayae.festivals.data.Login.RegisterRequest
 import fr.ayae.festivals.data.Login.User
 import fr.ayae.festivals.data.contact.ContactDto
+import fr.ayae.festivals.data.contact.ContactRequest
 import fr.ayae.festivals.data.game.GameCreationRequest
 import fr.ayae.festivals.data.game.GameDto
 import fr.ayae.festivals.data.publisher.PublisherCreationRequest
@@ -90,6 +91,24 @@ interface APIService {
     // --- Contacts ---
     @GET("publishers/{id}/contacts")
     suspend fun getContactsForPublisher(@Path("id") publisherId: Int): List<ContactDto>
+
+    @POST("publishers/{id}/contacts")
+    suspend fun addContactToPublisher(@Path("id") publisherId: Int,
+        @Body contactRequest: ContactRequest
+    ): ContactDto
+
+    @PUT("publishers/{id}/contacts/{contactId}")
+    suspend fun updateContact(
+        @Path("id") publisherId: Int,
+        @Path("contactId") contactId: Int,
+        @Body contactRequest: ContactRequest
+    ): ContactDto
+
+    @DELETE("publishers/{id}/contacts/{contactId}")
+    suspend fun deleteContact(
+        @Path("id") publisherId: Int,
+        @Path("contactId") contactId: Int
+    ): Response<Unit>
 
     // --- Games ---
     @GET("games/filterByPublisherID/{publisherId}")
