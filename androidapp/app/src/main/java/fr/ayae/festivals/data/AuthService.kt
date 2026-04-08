@@ -61,12 +61,15 @@ interface APIService {
         @Body userToUpdate: User
     ): Response<LoginResponse>
 
-    // --- Reservations ---
     @GET("festivals/{festivalId}/reservations")
     suspend fun getReservations(@Path("festivalId") festivalId: Int): List<fr.ayae.festivals.data.Reservation>
 
     @GET("festivals/{festivalId}")
     suspend fun getFestival(@Path("festivalId") festivalId: Int): fr.ayae.festivals.data.Festival
+
+    @GET("festivals/")
+    suspend fun getAllFestivals():List<Festival>
+
 }
 
 object RetrofitInstance {

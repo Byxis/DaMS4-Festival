@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModel
 import fr.ayae.festivals.data.Login.RegisterRequest
 import fr.ayae.festivals.data.Login.User
 import fr.ayae.festivals.data.Register.RegisterRepository
+
 import retrofit2.HttpException
 
 
@@ -62,11 +63,9 @@ class RegisterViewModel: ViewModel(){
                     else -> "Une erreur inconnue est survenue (${e.code()})"
                 }
                 internalState.value = AuthUiState.Error(errorMessage)
-
+    
             } catch (e: Exception) {
-                // 🚨 LE FILET DE SÉCURITÉ MAGIQUE 🚨
-                // Attrape TOUT le reste (problème réseau, JSON mal formé, etc.)
-                Log.e("REGISTER_DEBUG", "Crash silencieux évité : ${e.message}", e)
+                Log.e("REGISTER_DEBUG", "Problème lors du register: ${e.message}", e)
                 internalState.value = AuthUiState.Error("Impossible de joindre le serveur : ${e.localizedMessage}")
             }
         }
