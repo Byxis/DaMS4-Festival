@@ -2,6 +2,7 @@ package fr.ayae.festivals.ui.Navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.Boy
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Login
@@ -16,6 +17,7 @@ enum class Destination(
     val contentDescription: String
 ) {
     Home("home", "Home", Icons.Default.Home, "Home"),
+    Publisher("publisher", "Editeurs", Icons.Default.Boy, "Publishers"),
     Administration("administration", "Administration", Icons.Default.ManageAccounts, "Administration"),
     Login("login", "Login", Icons.Default.Login, "Login"),
     Register("register", "Register", Icons.Default.Login, "Register"),
