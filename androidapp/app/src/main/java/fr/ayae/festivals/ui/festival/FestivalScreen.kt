@@ -51,6 +51,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -136,7 +137,7 @@ fun FestivalScreenContent(
     reservations: List<Pair<String, Reservation>>,
     onNoteChanged: (Int, String) -> Unit = { _, _ -> },
     onStatusChanged: (Int, String) -> Unit = { _, _ -> },
-    onFestivalDetailsChanged: (String, String, Date, Date, Int, Int, Int, Uri?) -> Unit = { _, _, _, _, _, _, _, _ -> },
+    onFestivalDetailsChanged: (String, String, String, String, Int, Int, Int, Uri?) -> Unit = { _, _, _, _, _, _, _, _ -> },
     onSurfaceChanged: (String, Double) -> Unit = { _, _ -> },
     onPresentedByThemChanged: (Int, Boolean) -> Unit = { _, _ -> },
     onReservationStockChanged: (Int, Int, Int, Int, Int) -> Unit = { _, _, _, _, _ -> },
@@ -218,7 +219,7 @@ fun FestivalScreenContent(
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text("Date :", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
-                            Text("${fmt.format(data.start_date)} - ${fmt.format(data.end_date)}", style = MaterialTheme.typography.bodyLarge)
+                            Text("${data.start_date ?: "?"} - ${data.end_date ?: "?"}", style = MaterialTheme.typography.bodyLarge)
                         }
                     }
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -226,7 +227,7 @@ fun FestivalScreenContent(
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text("Lieu :", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
-                            Text(data.location, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.primary)
+                            data.location?.let { Text(it, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.primary) }
                         }
                     }
                 }
@@ -241,7 +242,7 @@ fun FestivalScreenContent(
                 val townReserved = reservations.sumOf { it.second.town_table_count }
 
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    StockItem("Tables", Icons.Default.TableBar, standardReserved to data.table_count, data.table_surface?.toString() ?: "4") { editingSurfaceType = "Tables" }
+                    StockItem("Tables", Icons.Default.TableBar, standardReserved to (data.table_count ?: 0), data.table_surface?.toString() ?: "4") { editingSurfaceType = "Tables" }
                     StockItem("Grandes Tables", Icons.Default.TableRestaurant, bigReserved to data.big_table_count, data.big_table_surface?.toString() ?: "4") { editingSurfaceType = "Grandes Tables" }
                     StockItem("Tables Municipales", Icons.Default.Desk, townReserved to data.town_table_count, data.town_table_surface?.toString() ?: "4") { editingSurfaceType = "Tables Municipales" }
                 }
@@ -358,10 +359,7 @@ fun FestivalScreenContent(
             festival = data,
             onDismissRequest = { showEditFestivalDialog = false },
             onSave = { name, location, startDate, endDate, tableCount, bigTableCount, townTableCount, imageUri ->
-                val dateFmt = SimpleDateFormat("yyyy-MM-dd", Locale.FRANCE)
-                val start = runCatching { dateFmt.parse(startDate) }.getOrNull() ?: data.start_date
-                val end = runCatching { dateFmt.parse(endDate) }.getOrNull() ?: data.end_date
-                onFestivalDetailsChanged(name, location, start, end, tableCount, bigTableCount, townTableCount, imageUri)
+                onFestivalDetailsChanged(name, location, startDate, endDate, tableCount, bigTableCount, townTableCount, imageUri)
                 showEditFestivalDialog = false
             }
         )
@@ -460,9 +458,9 @@ fun EditFestivalDialog(
 ) {
     val fmt = SimpleDateFormat("yyyy-MM-dd", Locale.FRANCE)
     var name by rememberSaveable { mutableStateOf(festival.name) }
-    var location by rememberSaveable { mutableStateOf(festival.location) }
-    var startDate by rememberSaveable { mutableStateOf(fmt.format(festival.start_date)) }
-    var endDate by rememberSaveable { mutableStateOf(fmt.format(festival.end_date)) }
+    var location by rememberSaveable { mutableStateOf(festival.location ?: "") }
+    var startDate by remember { mutableStateOf(festival.start_date ?: "2026-06-15") }
+    var endDate by remember { mutableStateOf(festival.end_date ?: "2026-06-17") }
     var tableCount by rememberSaveable { mutableStateOf(festival.table_count.toString()) }
     var bigTableCount by rememberSaveable { mutableStateOf(festival.big_table_count.toString()) }
     var townTableCount by rememberSaveable { mutableStateOf(festival.town_table_count.toString()) }
@@ -689,8 +687,8 @@ fun FestivalScreenPreview() {
                 id = 1,
                 name = "Festival des Jeux 2026",
                 location = "Salle des Fêtes, Paris",
-                start_date = Date(),
-                end_date = Date(),
+                start_date = "2026-06-15",
+                end_date = "2026-06-17",
                 table_count = 100,
                 big_table_count = 20,
                 town_table_count = 5,

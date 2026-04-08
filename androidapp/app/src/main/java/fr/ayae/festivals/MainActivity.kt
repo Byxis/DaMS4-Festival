@@ -125,10 +125,9 @@ fun AYAEFestivalsApp() {
             }
         }
     ) { innerPadding ->
-        FestivalScreen(modifier = Modifier)
         Box(modifier = Modifier.padding(innerPadding)) {
 
-            when (backStack.last()) {
+            when (val currentRoute = backStack.last()) {
                 Destination.Login -> {
                     LoginScreen(
                         loginSuccess = {
@@ -143,7 +142,10 @@ fun AYAEFestivalsApp() {
                 }
 
                 Destination.Home -> {
-                    HomePage()
+                    HomePage(onNavigateToFestival = { backStack.add("Festival") })
+                }
+                "Festival" -> {
+                    FestivalScreen()
                 }
                 Destination.Register->{
                     RegisterScreen(

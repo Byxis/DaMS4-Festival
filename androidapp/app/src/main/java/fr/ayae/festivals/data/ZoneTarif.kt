@@ -1,8 +1,8 @@
 package fr.ayae.festivals.data
 
-import androidx.room.Entity
+import kotlinx.serialization.Serializable
 
-@Entity(tableName = "festivals")
+@Serializable
 data class ZoneTarif(
     val id: Int?,
     val name: String,

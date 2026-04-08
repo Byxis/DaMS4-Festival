@@ -34,13 +34,15 @@ class FestivalViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.update { FestivalUiState.Loading }
 
-            // Temporary mock festival
-            val mockFestival = Festival(
+            // Try to fetch actual festival
+            val fetchedFestival = reservationRepo.getFestival(context, 1)
+
+            val festivalData = fetchedFestival ?: Festival(
                 id = 1,
                 name = "Festival des Jeux 2026",
                 location = "Salle des Fêtes, Paris",
-                start_date = Date(),
-                end_date = Date(),
+                start_date = "2026-06-15",
+                end_date = "2026-06-17",
                 table_count = 100,
                 big_table_count = 20,
                 town_table_count = 5,
@@ -52,7 +54,7 @@ class FestivalViewModel : ViewModel() {
             )
 
             // Fetch actual reservations
-            val fetchedReservations = reservationRepo.getReservationsForFestival(context, mockFestival.id)
+            val fetchedReservations = reservationRepo.getReservationsForFestival(context, festivalData.id)
             
             // Map fetched reservations to the required pairs. Using Entity ID as name since we don't fetch publishers yet.
             val reservationsList = fetchedReservations?.map {
@@ -60,7 +62,7 @@ class FestivalViewModel : ViewModel() {
             } ?: emptyList()
 
             _uiState.update {
-                FestivalUiState.Success(festival = mockFestival, reservations = reservationsList)
+                FestivalUiState.Success(festival = festivalData, reservations = reservationsList)
             }
         }
     }
@@ -111,8 +113,8 @@ class FestivalViewModel : ViewModel() {
     fun updateFestivalDetails(
         name: String,
         location: String,
-        startDate: Date,
-        endDate: Date,
+        startDate: String,
+        endDate: String,
         tableCount: Int,
         bigTableCount: Int,
         townTableCount: Int,
