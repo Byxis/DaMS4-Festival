@@ -13,39 +13,38 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Date
+import fr.ayae.festivals.data.ReservationRepository
+import fr.ayae.festivals.data.UpdateFestivalRequest
+import fr.ayae.festivals.data.UpdateReservationRequest
 
 /**
  * ViewModel for the Festival screen, responsible for managing the festival data
  * and related operations (reservations, zones, etc.).
  */
 class FestivalViewModel : ViewModel() {
+    private val reservationRepo = ReservationRepository()
+    private var appContext: android.content.Context? = null
 
     private val _uiState = MutableStateFlow<FestivalUiState>(FestivalUiState.Loading)
     val uiState: StateFlow<FestivalUiState> = _uiState.asStateFlow()
 
-    private val reservationRepo = fr.ayae.festivals.data.ReservationRepository()
-
-    // Removing init to load data from UI with context
-    // init {
-    //     loadData()
-    // }
-
-    fun loadData(context: android.content.Context) {
+    fun loadData(context: android.content.Context, festivalId: Int = 1) {
+        appContext = context.applicationContext
         viewModelScope.launch {
             _uiState.update { FestivalUiState.Loading }
 
             // Try to fetch actual festival
-            val fetchedFestival = reservationRepo.getFestival(context, 1)
+            val fetchedFestival = reservationRepo.getFestival(context, festivalId)
 
             val festivalData = fetchedFestival ?: Festival(
-                id = 1,
-                name = "Festival des Jeux 2026",
-                location = "Salle des Fêtes, Paris",
-                start_date = "2026-06-15",
-                end_date = "2026-06-17",
-                table_count = 100,
-                big_table_count = 20,
-                town_table_count = 5,
+                id = festivalId,
+                name = "",
+                location = "",
+                start_date = null,
+                end_date = null,
+                table_count = 0,
+                big_table_count = 0,
+                town_table_count = 0,
                 table_surface = null,
                 big_table_surface = null,
                 town_table_surface = null,
@@ -68,6 +67,17 @@ class FestivalViewModel : ViewModel() {
     }
 
     fun updateReservationNote(reservationId: Int, newNote: String) {
+        viewModelScope.launch {
+            val state = _uiState.value
+            if (state is FestivalUiState.Success) {
+                appContext?.let { ctx ->
+                    reservationRepo.updateReservation(
+                        ctx, state.festival.id, reservationId,
+                        UpdateReservationRequest(note = newNote)
+                    )
+                }
+            }
+        }
         _uiState.update { state ->
             if (state !is FestivalUiState.Success) return@update state
             state.copy(reservations = state.reservations.map { (name, res) ->
@@ -77,6 +87,17 @@ class FestivalViewModel : ViewModel() {
     }
 
     fun updateReservationStatus(reservationId: Int, newStatus: String) {
+        viewModelScope.launch {
+            val state = _uiState.value
+            if (state is FestivalUiState.Success) {
+                appContext?.let { ctx ->
+                    reservationRepo.updateReservation(
+                        ctx, state.festival.id, reservationId,
+                        UpdateReservationRequest(status = newStatus)
+                    )
+                }
+            }
+        }
         _uiState.update { state ->
             if (state !is FestivalUiState.Success) return@update state
             state.copy(reservations = state.reservations.map { (name, res) ->
@@ -120,6 +141,22 @@ class FestivalViewModel : ViewModel() {
         townTableCount: Int,
         imageUri: Uri? = null
     ) {
+        viewModelScope.launch {
+            val state = _uiState.value
+            if (state is FestivalUiState.Success) {
+                appContext?.let { ctx ->
+                    reservationRepo.updateFestival(
+                        ctx, state.festival.id,
+                        UpdateFestivalRequest(
+                            name = name, location = location,
+                            start_date = startDate, end_date = endDate,
+                            table_count = tableCount, big_table_count = bigTableCount,
+                            town_table_count = townTableCount
+                        )
+                    )
+                }
+            }
+        }
         _uiState.update { state ->
             if (state !is FestivalUiState.Success) return@update state
             state.copy(festival = state.festival.copy(
@@ -154,8 +191,9 @@ class FestivalViewModel : ViewModel() {
                 id = (state.festival.tarif_zones?.size ?: 0) + 1,
                 name = name,
                 price = price,
-                electricalOutlet = 1,
+                numberOutlets = 1,
                 electricalOutletPrice = outletPrice,
+                maxTable = 0,
                 game_zones = emptyList()
             )
             state.copy(festival = state.festival.copy(tarif_zones = (state.festival.tarif_zones ?: emptyList()) + newZone))
@@ -186,8 +224,7 @@ class FestivalViewModel : ViewModel() {
                     id = (zone.game_zones?.size ?: 0) + 1,
                     tarif_zone_id = zoneTarifId,
                     name = name,
-                    reserved_table = 0, reserved_big_table = 0, reserved_town_table = 0,
-                    reserved_electrical_outlets = 0, surface_area = 0.0
+                    reserved_table = 0, reserved_big_table = 0, reserved_town_table = 0
                 )
                 zone.copy(game_zones = (zone.game_zones ?: emptyList()) + newGameZone)
             }))

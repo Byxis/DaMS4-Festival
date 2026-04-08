@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -42,7 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.ImageLoader
 import coil.compose.AsyncImage
-import fr.ayae.festivals.data.Login.Festival
+import fr.ayae.festivals.data.Festival
 import fr.ayae.festivals.data.RetrofitInstance
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -51,7 +52,8 @@ import java.util.TimeZone
 @SuppressLint("NotConstructor")
 @Composable
 fun HomePage(
-    festivalViewModel: FestivalViewModel = viewModel()
+    festivalViewModel: FestivalViewModel = viewModel(),
+    onNavigateToFestival: (Int) -> Unit = {}
 ) {
     val context = LocalContext.current
     LaunchedEffect(Unit) {
@@ -137,7 +139,7 @@ fun HomePage(
                 ) {
 
                     items(filteredFestivals) { festival ->
-                        FestivalCard(festival)
+                        FestivalCard(festival, onNavigateToFestival)
                     }
                 }
             }
@@ -145,7 +147,7 @@ fun HomePage(
     }
 }
 @Composable
-fun FestivalCard(festival: Festival) {
+fun FestivalCard(festival: Festival, onNavigateToFestival: (Int) -> Unit) {
     val surfaceDark = Color(0xFF1E2124)
     val cyanAccent = Color(0xFF00E5FF)
     val textGray = Color(0xFFAAAAAA)
@@ -159,11 +161,11 @@ fun FestivalCard(festival: Festival) {
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable { onNavigateToFestival(festival.id) },
         colors = CardDefaults.cardColors(containerColor = surfaceDark),
         shape = RoundedCornerShape(12.dp)
     ) {
-        val baseUrl = "https://162.38.111.44:4000/api"
+        val baseUrl = fr.ayae.festivals.data.RetrofitInstance.BASE_URL
 
         Row(
             modifier = Modifier
@@ -199,8 +201,8 @@ fun FestivalCard(festival: Festival) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    val datesText = if (festival.startDate != null && festival.endDate != null) {
-                        "Du ${formatIsoDate(festival.startDate)} au ${formatIsoDate(festival.endDate)}"
+                    val datesText = if (festival.start_date != null && festival.end_date != null) {
+                        "Du ${formatIsoDate(festival.start_date!!)} au ${formatIsoDate(festival.end_date!!)}"
                     } else {
                         "Dates à venir"
                     }
@@ -220,7 +222,7 @@ fun FestivalCard(festival: Festival) {
                 Spacer(modifier = Modifier.width(16.dp))
 
                 AsyncImage(
-                    model = "$baseUrl${festival.logoUrl}",
+                    model = "${fr.ayae.festivals.data.RetrofitInstance.BASE_URL.removeSuffix("/")}${festival.logoUrl}",
                     imageLoader = customImageLoader,
                     contentDescription = "Logo de ${festival.name}",
                     contentScale = ContentScale.Crop,
@@ -237,20 +239,17 @@ fun FestivalCard(festival: Festival) {
     }
 }
 
-fun formatIsoDate(isoString: String): String {
-    return try {
-
-        val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
-        parser.timeZone = TimeZone.getTimeZone("UTC")
-        val date = parser.parse(isoString)
-
-
-        val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE)
-        formatter.timeZone = TimeZone.getDefault()
-
-        if (date != null) formatter.format(date) else isoString
+fun formatIsoDate(isoString: String, toFrenchFormat: Boolean = true): String {
+    try {
+        if (isoString.length >= 10) {
+            val yyyyMMdd = isoString.take(10)
+            if (!toFrenchFormat) return yyyyMMdd
+            val parts = yyyyMMdd.split("-")
+            if (parts.size == 3) {
+                return "${parts[2]}/${parts[1]}/${parts[0]}"
+            }
+        }
     } catch (e: Exception) {
-
-        isoString
     }
+    return isoString
 }

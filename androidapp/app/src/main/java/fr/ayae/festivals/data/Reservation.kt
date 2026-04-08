@@ -22,3 +22,25 @@ data class Reservation(
     val interactions: List<ReservationInteraction>? = null,
     val games: List<ReservationGame>? = null
 )
+
+@Serializable
+data class UpdateReservationRequest(
+    val table_count: Int? = null,
+    val big_table_count: Int? = null,
+    val town_table_count: Int? = null,
+    val electrical_outlets: Int? = null,
+    val note: String? = null,
+    val status: String? = null,
+    val presented_by_them: Boolean? = null
+)
+
+@Serializable
+data class AddReservationRequest(
+    val entity_id: Int,
+    val table_count: Int? = null,
+    val big_table_count: Int? = null,
+    val town_table_count: Int? = null,
+    val note: String? = null,
+    val status: String? = null,
+    val presented_by_them: Boolean? = null
+)

@@ -10,7 +10,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import fr.ayae.festivals.data.Festivals.FestivalRepository
-import fr.ayae.festivals.data.Login.Festival
+import fr.ayae.festivals.data.Festival
 
 import fr.ayae.festivals.data.Login.User
 import fr.ayae.festivals.ui.Login.UiState

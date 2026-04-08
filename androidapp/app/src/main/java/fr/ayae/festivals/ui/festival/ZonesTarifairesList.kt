@@ -115,10 +115,11 @@ fun ZoneTarifCard(
     var deletingGameZone by rememberSaveable { mutableStateOf<ZoneGame?>(null) }
     
     val gameZones = zone.game_zones ?: emptyList()
+    val totalElectricalOutlets = zone.game_zones?.sumOf { it.reserved_electrical_outlets ?: 0 } ?: 0
     val totalTables = gameZones.sumOf { it.reserved_table }
     val totalBigTables = gameZones.sumOf { it.reserved_big_table }
     val totalTownTables = gameZones.sumOf { it.reserved_town_table }
-    val totalSurface = gameZones.sumOf { it.surface_area }
+    val totalSurface = gameZones.sumOf { it.surface_area ?: 0.0 }
     val gameZonesCount = gameZones.size
 
     Card(
@@ -218,7 +219,7 @@ fun ZoneTarifCard(
                                     Icon(Icons.Default.SportsEsports, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(gz.name, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
-                                    Text(String.format(Locale.FRANCE, "%.1f m²", gz.surface_area), style = MaterialTheme.typography.labelMedium)
+                                    Text(String.format(Locale.FRANCE, "%.1f m²", gz.surface_area ?: 0.0), style = MaterialTheme.typography.labelMedium)
                                     Spacer(modifier = Modifier.width(8.dp))
                                     IconButton(onClick = { editingGameZone = gz }, modifier = Modifier.size(24.dp)) {
                                         Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(16.dp))
@@ -359,7 +360,7 @@ fun ZonesTarifairesListPreview() {
             id = 1,
             name = "Zone Standard",
             price = 15.0,
-            electricalOutlet = 1,
+            numberOutlets = 1,
             electricalOutletPrice = 5.0,
             game_zones = listOf(
                 ZoneGame(id = 1, tarif_zone_id = 1, name = "Jeux de société", reserved_table = 10, reserved_big_table = 2, reserved_town_table = 0, reserved_electrical_outlets = 2, surface_area = 20.0),
@@ -370,7 +371,7 @@ fun ZonesTarifairesListPreview() {
             id = 2,
             name = "Zone Premium",
             price = 30.0,
-            electricalOutlet = 2,
+            numberOutlets = 2,
             electricalOutletPrice = 10.0,
             game_zones = emptyList()
         )

@@ -63,7 +63,7 @@ class RegisterViewModel: ViewModel(){
                     else -> "Une erreur inconnue est survenue (${e.code()})"
                 }
                 internalState.value = AuthUiState.Error(errorMessage)
-    
+
             } catch (e: Exception) {
                 Log.e("REGISTER_DEBUG", "Problème lors du register: ${e.message}", e)
                 internalState.value = AuthUiState.Error("Impossible de joindre le serveur : ${e.localizedMessage}")

@@ -14,11 +14,25 @@ data class Festival(
     val start_date: String? = null,
     val end_date: String? = null,
     val table_count: Int? = null,
-    val big_table_count: Int,
-    val town_table_count: Int,
-    val table_surface: Int?,
-    val big_table_surface: Int?,
-    val town_table_surface: Int?,
-    val logoUrl: String?,
-    val tarif_zones: List<ZoneTarif>?
+    val big_table_count: Int = 0,
+    val town_table_count: Int = 0,
+    val table_surface: Int? = null,
+    val big_table_surface: Int? = null,
+    val town_table_surface: Int? = null,
+    val logoUrl: String? = null,
+    val tarif_zones: List<ZoneTarif>? = null
+)
+
+@Serializable
+data class UpdateFestivalRequest(
+    val name: String? = null,
+    val location: String? = null,
+    val start_date: String? = null,
+    val end_date: String? = null,
+    val table_count: Int? = null,
+    val big_table_count: Int? = null,
+    val town_table_count: Int? = null,
+    val table_surface: Int? = null,
+    val big_table_surface: Int? = null,
+    val town_table_surface: Int? = null
 )

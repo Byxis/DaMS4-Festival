@@ -83,12 +83,13 @@ import java.util.Locale
 
 @Composable
 fun FestivalScreen(
+    festivalId: Int = 1,
     viewModel: FestivalViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     LaunchedEffect(Unit) {
-        viewModel.loadData(context)
+        viewModel.loadData(context, festivalId)
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -152,6 +153,13 @@ fun FestivalScreenContent(
 ) {
     val scrollState = rememberScrollState()
     val fmt = SimpleDateFormat("dd MMM yyyy", Locale.FRANCE)
+    
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val customImageLoader = androidx.compose.runtime.remember {
+        coil.ImageLoader.Builder(context)
+            .okHttpClient { fr.ayae.festivals.data.RetrofitInstance.getSecureClient(context) }
+            .build()
+    }
 
     var showImportEntityDialog by rememberSaveable { mutableStateOf(false) }
     var showAddEntityDialog by rememberSaveable { mutableStateOf(false) }
@@ -176,7 +184,8 @@ fun FestivalScreenContent(
                 ) {
                     if (data.logoUrl != null) {
                         AsyncImage(
-                            model = data.logoUrl,
+                            model = "${fr.ayae.festivals.data.RetrofitInstance.BASE_URL.removeSuffix("/")}${data.logoUrl}",
+                            imageLoader = customImageLoader,
                             contentDescription = "Affiche du festival",
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
@@ -219,7 +228,14 @@ fun FestivalScreenContent(
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text("Date :", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
-                            Text("${data.start_date ?: "?"} - ${data.end_date ?: "?"}", style = MaterialTheme.typography.bodyLarge)
+                            if (data.start_date != null && data.end_date != null) {
+                                Text(
+                                    "Du ${fr.ayae.festivals.ui.HomePage.formatIsoDate(data.start_date)} au ${fr.ayae.festivals.ui.HomePage.formatIsoDate(data.end_date)}",
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                            } else {
+                                Text("Dates non définies", style = MaterialTheme.typography.bodyLarge)
+                            }
                         }
                     }
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -459,8 +475,8 @@ fun EditFestivalDialog(
     val fmt = SimpleDateFormat("yyyy-MM-dd", Locale.FRANCE)
     var name by rememberSaveable { mutableStateOf(festival.name) }
     var location by rememberSaveable { mutableStateOf(festival.location ?: "") }
-    var startDate by remember { mutableStateOf(festival.start_date ?: "2026-06-15") }
-    var endDate by remember { mutableStateOf(festival.end_date ?: "2026-06-17") }
+    var startDate by remember { mutableStateOf(festival.start_date?.let { fr.ayae.festivals.ui.HomePage.formatIsoDate(it, false) } ?: "") }
+    var endDate by remember { mutableStateOf(festival.end_date?.let { fr.ayae.festivals.ui.HomePage.formatIsoDate(it, false) } ?: "") }
     var tableCount by rememberSaveable { mutableStateOf(festival.table_count.toString()) }
     var bigTableCount by rememberSaveable { mutableStateOf(festival.big_table_count.toString()) }
     var townTableCount by rememberSaveable { mutableStateOf(festival.town_table_count.toString()) }
@@ -673,25 +689,25 @@ fun FestivalScreenPreview() {
                 id = 1,
                 name = "Zone Standard",
                 price = 15.0,
-                electricalOutlet = 1,
+                numberOutlets = 1,
                 electricalOutletPrice = 5.0,
                 game_zones = listOf(
                     ZoneGame(id = 1, tarif_zone_id = 1, name = "Jeux de société", reserved_table = 10, reserved_big_table = 2, reserved_town_table = 0, reserved_electrical_outlets = 2, surface_area = 20.0),
                     ZoneGame(id = 2, tarif_zone_id = 1, name = "Figurines", reserved_table = 5, reserved_big_table = 5, reserved_town_table = 0, reserved_electrical_outlets = 1, surface_area = 15.0)
                 )
             ),
-            ZoneTarif(id = 2, name = "Zone Premium", price = 30.0, electricalOutlet = 2, electricalOutletPrice = 10.0, game_zones = emptyList())
+            ZoneTarif(id = 2, name = "Zone Premium", price = 30.0, numberOutlets = 2, electricalOutletPrice = 10.0, game_zones = emptyList())
         )
         FestivalScreenContent(
             data = Festival(
                 id = 1,
-                name = "Festival des Jeux 2026",
-                location = "Salle des Fêtes, Paris",
-                start_date = "2026-06-15",
-                end_date = "2026-06-17",
-                table_count = 100,
-                big_table_count = 20,
-                town_table_count = 5,
+                name = "",
+                location = "",
+                start_date = null,
+                end_date = null,
+                table_count = 0,
+                big_table_count = 0,
+                town_table_count = 0,
                 table_surface = null,
                 big_table_surface = null,
                 town_table_surface = null,

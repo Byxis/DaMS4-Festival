@@ -143,10 +143,17 @@ fun AYAEFestivalsApp() {
                 }
 
                 Destination.Home -> {
-                    HomePage(onNavigateToFestival = { backStack.add("Festival") })
+                    HomePage(onNavigateToFestival = { id -> backStack.add("Festival/$id") })
                 }
-                "Festival" -> {
-                    FestivalScreen()
+                is String -> {
+                    if (currentRoute.startsWith("Festival/")) {
+                        val festivalId = currentRoute.substringAfter("Festival/").toIntOrNull() ?: 1
+                        FestivalScreen(festivalId = festivalId)
+                    } else if (currentRoute == "Festival") {
+                        FestivalScreen(festivalId = 1)
+                    } else {
+                        Text("Autre Écran", modifier = Modifier.align(Alignment.Center))
+                    }
                 }
                 Destination.Register->{
                     RegisterScreen(
