@@ -48,12 +48,12 @@ fun LoginScreen(
     val state by loginViewModel.state
     val context = LocalContext.current
 
-    // Couleurs personnalisées tirées de ton image
-    val bgColor = Color(0xFF141618)      // Fond très sombre
-    val cardColor = Color(0xFF1C1E21)    // Fond de la carte un peu plus clair
-    val borderColor = Color(0xFF333333)  // Bordure grise de la carte
-    val cyanAccent = Color(0xFF00E5FF)   // Cyan pour les textes/boutons
-    val textGray = Color(0xFFAAAAAA)     // Gris pour les sous-titres
+
+    val bgColor = Color(0xFF141618)
+    val cardColor = Color(0xFF1C1E21)
+    val borderColor = Color(0xFF333333)
+    val cyanAccent = Color(0xFF00E5FF)
+    val textGray = Color(0xFFAAAAAA)
 
     LaunchedEffect(state) {
         if (state is UiState.Success) {

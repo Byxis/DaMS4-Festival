@@ -99,7 +99,8 @@ fun ReservationCard(
     onNoteChanged: (String) -> Unit = {},
     onStatusChanged: (String) -> Unit = {},
     onPresentedByThemChanged: (Boolean) -> Unit = {},
-    onStockChanged: (Int, Int, Int, Int) -> Unit = { _, _, _, _ -> }
+    onStockChanged: (Int, Int, Int, Int) -> Unit = { _, _, _, _ -> },
+    onGameUpdated: (reservationGameId: Int, amount: Int, tables: Int, bigTables: Int, townTables: Int, outlets: Int, floorSpace: Double, status: String) -> Unit = { _, _, _, _, _, _, _, _ -> }
 ) {
     var isExpanded by rememberSaveable { mutableStateOf(false) }
     var statusMenuExpanded by rememberSaveable { mutableStateOf(false) }
@@ -306,7 +307,8 @@ fun ReservationCard(
                                 ), 
                                 it
                             ) 
-                        } ?: emptyList()
+                        } ?: emptyList(),
+                        onGameUpdated = onGameUpdated
                     )
                 }
             }

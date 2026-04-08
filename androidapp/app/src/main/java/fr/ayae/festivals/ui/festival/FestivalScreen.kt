@@ -51,6 +51,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -82,12 +83,13 @@ import java.util.Locale
 
 @Composable
 fun FestivalScreen(
+    festivalId: Int = 1,
     viewModel: FestivalViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     LaunchedEffect(Unit) {
-        viewModel.loadData(context)
+        viewModel.loadData(context, festivalId)
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -113,6 +115,7 @@ fun FestivalScreen(
                 onSurfaceChanged = viewModel::updateFestivalSurface,
                 onPresentedByThemChanged = viewModel::updateReservationPresented,
                 onReservationStockChanged = viewModel::updateReservationStock,
+                onGameUpdated = { resId, rgId, amt, t, bt, tt, o, fs, st -> viewModel.updateGameInReservation(resId, rgId, amt, t, bt, tt, o, fs, st) },
                 onAddEntity = viewModel::addEntityReservation,
                 onAddZoneTarif = viewModel::addZoneTarif,
                 onEditZoneTarif = viewModel::updateZoneTarif,
@@ -136,10 +139,11 @@ fun FestivalScreenContent(
     reservations: List<Pair<String, Reservation>>,
     onNoteChanged: (Int, String) -> Unit = { _, _ -> },
     onStatusChanged: (Int, String) -> Unit = { _, _ -> },
-    onFestivalDetailsChanged: (String, String, Date, Date, Int, Int, Int, Uri?) -> Unit = { _, _, _, _, _, _, _, _ -> },
+    onFestivalDetailsChanged: (String, String, String, String, Int, Int, Int, Uri?) -> Unit = { _, _, _, _, _, _, _, _ -> },
     onSurfaceChanged: (String, Double) -> Unit = { _, _ -> },
     onPresentedByThemChanged: (Int, Boolean) -> Unit = { _, _ -> },
     onReservationStockChanged: (Int, Int, Int, Int, Int) -> Unit = { _, _, _, _, _ -> },
+    onGameUpdated: (reservationId: Int, reservationGameId: Int, amount: Int, tables: Int, bigTables: Int, townTables: Int, outlets: Int, floorSpace: Double, status: String) -> Unit = { _, _, _, _, _, _, _, _, _ -> },
     onAddEntity: (String) -> Unit = {},
     onAddZoneTarif: (String, Double, Double) -> Unit = { _, _, _ -> },
     onEditZoneTarif: (Int, String, Double, Double) -> Unit = { _, _, _, _ -> },
@@ -151,6 +155,13 @@ fun FestivalScreenContent(
 ) {
     val scrollState = rememberScrollState()
     val fmt = SimpleDateFormat("dd MMM yyyy", Locale.FRANCE)
+    
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val customImageLoader = androidx.compose.runtime.remember {
+        coil.ImageLoader.Builder(context)
+            .okHttpClient { fr.ayae.festivals.data.RetrofitInstance.getSecureClient(context) }
+            .build()
+    }
 
     var showImportEntityDialog by rememberSaveable { mutableStateOf(false) }
     var showAddEntityDialog by rememberSaveable { mutableStateOf(false) }
@@ -175,7 +186,8 @@ fun FestivalScreenContent(
                 ) {
                     if (data.logoUrl != null) {
                         AsyncImage(
-                            model = data.logoUrl,
+                            model = "${fr.ayae.festivals.data.RetrofitInstance.BASE_URL.removeSuffix("/")}${data.logoUrl}",
+                            imageLoader = customImageLoader,
                             contentDescription = "Affiche du festival",
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
@@ -218,7 +230,14 @@ fun FestivalScreenContent(
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text("Date :", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
-                            Text("${fmt.format(data.start_date)} - ${fmt.format(data.end_date)}", style = MaterialTheme.typography.bodyLarge)
+                            if (data.start_date != null && data.end_date != null) {
+                                Text(
+                                    "Du ${fr.ayae.festivals.ui.HomePage.formatIsoDate(data.start_date)} au ${fr.ayae.festivals.ui.HomePage.formatIsoDate(data.end_date)}",
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                            } else {
+                                Text("Dates non définies", style = MaterialTheme.typography.bodyLarge)
+                            }
                         }
                     }
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -226,7 +245,7 @@ fun FestivalScreenContent(
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text("Lieu :", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
-                            Text(data.location, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.primary)
+                            data.location?.let { Text(it, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.primary) }
                         }
                     }
                 }
@@ -241,7 +260,7 @@ fun FestivalScreenContent(
                 val townReserved = reservations.sumOf { it.second.town_table_count }
 
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    StockItem("Tables", Icons.Default.TableBar, standardReserved to data.table_count, data.table_surface?.toString() ?: "4") { editingSurfaceType = "Tables" }
+                    StockItem("Tables", Icons.Default.TableBar, standardReserved to (data.table_count ?: 0), data.table_surface?.toString() ?: "4") { editingSurfaceType = "Tables" }
                     StockItem("Grandes Tables", Icons.Default.TableRestaurant, bigReserved to data.big_table_count, data.big_table_surface?.toString() ?: "4") { editingSurfaceType = "Grandes Tables" }
                     StockItem("Tables Municipales", Icons.Default.Desk, townReserved to data.town_table_count, data.town_table_surface?.toString() ?: "4") { editingSurfaceType = "Tables Municipales" }
                 }
@@ -299,6 +318,7 @@ fun FestivalScreenContent(
                         onStatusChanged = { status -> onStatusChanged(res.id, status) },
                         onPresentedByThemChanged = { presented -> onPresentedByThemChanged(res.id, presented) },
                         onStockChanged = { t, bt, tt, o -> onReservationStockChanged(res.id, t, bt, tt, o) },
+                        onGameUpdated = { rgId, amt, t, bt, tt, o, fs, st -> onGameUpdated(res.id, rgId, amt, t, bt, tt, o, fs, st) },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -358,10 +378,7 @@ fun FestivalScreenContent(
             festival = data,
             onDismissRequest = { showEditFestivalDialog = false },
             onSave = { name, location, startDate, endDate, tableCount, bigTableCount, townTableCount, imageUri ->
-                val dateFmt = SimpleDateFormat("yyyy-MM-dd", Locale.FRANCE)
-                val start = runCatching { dateFmt.parse(startDate) }.getOrNull() ?: data.start_date
-                val end = runCatching { dateFmt.parse(endDate) }.getOrNull() ?: data.end_date
-                onFestivalDetailsChanged(name, location, start, end, tableCount, bigTableCount, townTableCount, imageUri)
+                onFestivalDetailsChanged(name, location, startDate, endDate, tableCount, bigTableCount, townTableCount, imageUri)
                 showEditFestivalDialog = false
             }
         )
@@ -460,9 +477,9 @@ fun EditFestivalDialog(
 ) {
     val fmt = SimpleDateFormat("yyyy-MM-dd", Locale.FRANCE)
     var name by rememberSaveable { mutableStateOf(festival.name) }
-    var location by rememberSaveable { mutableStateOf(festival.location) }
-    var startDate by rememberSaveable { mutableStateOf(fmt.format(festival.start_date)) }
-    var endDate by rememberSaveable { mutableStateOf(fmt.format(festival.end_date)) }
+    var location by rememberSaveable { mutableStateOf(festival.location ?: "") }
+    var startDate by remember { mutableStateOf(festival.start_date?.let { fr.ayae.festivals.ui.HomePage.formatIsoDate(it, false) } ?: "") }
+    var endDate by remember { mutableStateOf(festival.end_date?.let { fr.ayae.festivals.ui.HomePage.formatIsoDate(it, false) } ?: "") }
     var tableCount by rememberSaveable { mutableStateOf(festival.table_count.toString()) }
     var bigTableCount by rememberSaveable { mutableStateOf(festival.big_table_count.toString()) }
     var townTableCount by rememberSaveable { mutableStateOf(festival.town_table_count.toString()) }
@@ -675,25 +692,25 @@ fun FestivalScreenPreview() {
                 id = 1,
                 name = "Zone Standard",
                 price = 15.0,
-                electricalOutlet = 1,
+                numberOutlets = 1,
                 electricalOutletPrice = 5.0,
                 game_zones = listOf(
                     ZoneGame(id = 1, tarif_zone_id = 1, name = "Jeux de société", reserved_table = 10, reserved_big_table = 2, reserved_town_table = 0, reserved_electrical_outlets = 2, surface_area = 20.0),
                     ZoneGame(id = 2, tarif_zone_id = 1, name = "Figurines", reserved_table = 5, reserved_big_table = 5, reserved_town_table = 0, reserved_electrical_outlets = 1, surface_area = 15.0)
                 )
             ),
-            ZoneTarif(id = 2, name = "Zone Premium", price = 30.0, electricalOutlet = 2, electricalOutletPrice = 10.0, game_zones = emptyList())
+            ZoneTarif(id = 2, name = "Zone Premium", price = 30.0, numberOutlets = 2, electricalOutletPrice = 10.0, game_zones = emptyList())
         )
         FestivalScreenContent(
             data = Festival(
                 id = 1,
-                name = "Festival des Jeux 2026",
-                location = "Salle des Fêtes, Paris",
-                start_date = Date(),
-                end_date = Date(),
-                table_count = 100,
-                big_table_count = 20,
-                town_table_count = 5,
+                name = "",
+                location = "",
+                start_date = null,
+                end_date = null,
+                table_count = 0,
+                big_table_count = 0,
+                town_table_count = 0,
                 table_surface = null,
                 big_table_surface = null,
                 town_table_surface = null,

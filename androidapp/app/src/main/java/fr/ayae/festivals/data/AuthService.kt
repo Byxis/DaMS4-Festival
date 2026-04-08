@@ -67,10 +67,10 @@ interface APIService {
         @Body userToUpdate: User
     ): Response<LoginResponse>
 
-    // --- Reservations ---
     @GET("festivals/{festivalId}/reservations")
     suspend fun getReservations(@Path("festivalId") festivalId: Int): List<fr.ayae.festivals.data.Reservation>
 
+<<<<<<< android-publisher-page
 
     // --- Publishers ---
     @GET("publishers")
@@ -116,10 +116,87 @@ interface APIService {
 
     @POST("publishers/addGameToPublisher")
     suspend fun addGameToPublisher(@Body gameRequest: GameCreationRequest): GameDto
+=======
+    @POST("festivals/{festivalId}/reservations")
+    suspend fun addReservation(
+        @Path("festivalId") festivalId: Int,
+        @Body request: AddReservationRequest
+    ): fr.ayae.festivals.data.Reservation
+
+    @PUT("festivals/{festivalId}/reservations/{reservationId}")
+    suspend fun updateReservation(
+        @Path("festivalId") festivalId: Int,
+        @Path("reservationId") reservationId: Int,
+        @Body request: UpdateReservationRequest
+    ): fr.ayae.festivals.data.Reservation
+
+    @GET("festivals/{festivalId}")
+    suspend fun getFestival(@Path("festivalId") festivalId: Int): fr.ayae.festivals.data.Festival
+
+    @PUT("festivals/{festivalId}")
+    suspend fun updateFestival(
+        @Path("festivalId") festivalId: Int,
+        @Body request: UpdateFestivalRequest
+    ): fr.ayae.festivals.data.Festival
+
+    @POST("festivals/{festivalId}/tarif-zones")
+    suspend fun addZoneTarif(
+        @Path("festivalId") festivalId: Int,
+        @Body request: AddZoneTarifRequest
+    ): ZoneTarif
+
+    @PUT("festivals/{festivalId}/tarif-zones/{tarifZoneId}")
+    suspend fun updateZoneTarif(
+        @Path("festivalId") festivalId: Int,
+        @Path("tarifZoneId") tarifZoneId: Int,
+        @Body request: AddZoneTarifRequest
+    ): ZoneTarif
+
+    @DELETE("festivals/{festivalId}/tarif-zones/{tarifZoneId}")
+    suspend fun deleteZoneTarif(
+        @Path("festivalId") festivalId: Int,
+        @Path("tarifZoneId") tarifZoneId: Int
+    ): Response<Unit>
+
+    @POST("festivals/{festivalId}/tarif-zones/{tarifZoneId}/game-zones")
+    suspend fun addGameZone(
+        @Path("festivalId") festivalId: Int,
+        @Path("tarifZoneId") tarifZoneId: Int,
+        @Body request: AddGameZoneRequest
+    ): ZoneGame
+
+    @PUT("festivals/{festivalId}/tarif-zones/{tarifZoneId}/game-zones/{gameZoneId}")
+    suspend fun updateGameZone(
+        @Path("festivalId") festivalId: Int,
+        @Path("tarifZoneId") tarifZoneId: Int,
+        @Path("gameZoneId") gameZoneId: Int,
+        @Body request: AddGameZoneRequest
+    ): ZoneGame
+
+    @DELETE("festivals/{festivalId}/tarif-zones/{tarifZoneId}/game-zones/{gameZoneId}")
+    suspend fun deleteGameZone(
+        @Path("festivalId") festivalId: Int,
+        @Path("tarifZoneId") tarifZoneId: Int,
+        @Path("gameZoneId") gameZoneId: Int
+    ): Response<Unit>
+
+    @PUT("festivals/{festivalId}/reservations/{reservationId}/games/{reservationGameId}")
+    suspend fun updateReservationGame(
+        @Path("festivalId") festivalId: Int,
+        @Path("reservationId") reservationId: Int,
+        @Path("reservationGameId") reservationGameId: Int,
+        @Body request: UpdateReservationGameRequest
+    ): fr.ayae.festivals.data.ReservationGame
+
+    @GET("festivals/")
+    suspend fun getAllFestivals():List<Festival>
+
+>>>>>>> dev
 }
 
 object RetrofitInstance {
-    private const val BASE_URL = "https://162.38.111.44:4000/api/"
+    const val BASE_URL = "https://162.38.111.44:4000/api/"
+    const val IMAGE_BASE_URL = "https://162.38.111.44:4000/"
 
     @Volatile
     private var apiService: APIService? = null
@@ -153,6 +230,10 @@ object RetrofitInstance {
             .addConverterFactory(Json { ignoreUnknownKeys = true }.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(APIService::class.java)
+    }
+
+    fun getSecureClient(context: Context): OkHttpClient {
+        return generateSecureOkHttpClient(context)
     }
 
     private fun generateSecureOkHttpClient(context: Context): OkHttpClient {

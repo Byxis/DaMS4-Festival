@@ -258,7 +258,12 @@ fun UserCard(user: User) {
                 Text(
 
 
-                    text = if (user.role == "admin") "Administrateur" else user.role.uppercase(),
+                    text = when (user.role) {
+                        "admin" -> "Administrateur"
+                        "guest" -> "Invité"
+                        "publisher" -> "Editeur"
+                        else -> user.role
+                    },
                     color = Color.White,
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                     style = MaterialTheme.typography.labelSmall

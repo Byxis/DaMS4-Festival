@@ -54,6 +54,7 @@ androidx-compose-material-icons-extended = { group = "androidx.compose.material"
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
+material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 retrofit2 = { group="com.squareup.retrofit2", name = "retrofit", version.ref ="retrofit" }
 retrofit2-converter-kotlinx-serialization = { group = "com.squareup.retrofit2", name ="converter-kotlinx-serialization", version.ref = "retrofit" }
 kotlinx-serialization-json = {module = "org.jetbrains.kotlinx:kotlinx-serialization-json",version.ref = "kotlinx-serialization"}
