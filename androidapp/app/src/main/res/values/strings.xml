@@ -1,5 +1,11 @@
 <resources>
     <string name="app_name" translatable="false">AYAE Festivals</string>
+
+    <!-- Guest Screen -->
+    <string name="guest_title">Compte en attente de validation</string>
+    <string name="guest_message">Votre compte a bien été créé, mais il doit être validé par un administrateur avant que vous puissiez accéder à l\'application.\n\nMerci de patienter ou de contacter votre administrateur.</string>
+    <string name="guest_logout_button">Se déconnecter</string>
+
     <string name="login_title">Connexion</string>
     <string name="login_subtitle">Entrez vos informations de connexion</string>
     <string name="login_email_label">Email*</string>
@@ -149,5 +155,31 @@
     <string name="error_unknown">Une erreur est survenue.</string>
     <string name="error_offline">Vous êtes hors ligne.</string>
     <string name="error_server">Serveur injoignable.</string>
+    <string name="game_add">Ajouter un jeu</string>
+    <string name="first_name">Prénom</string>
+    <string name="last_name">Nom de famille</string>
+    <string name="role">Rôle</string>
+    <string name="mobile_phone">Téléphone</string>
+    <string name="mail">Email</string>
+    <string name="number_of_contacts">Contacts (%1$d)</string>
+    <string name="no_contact">Aucun contact disponible.</string>
+    <string name="edit_contact">Modifier contact</string>
+    <string name="delete_contact">Supprimer contact</string>
+    <string name="game_name_required">Nom du jeu *</string>
+    <string name="game_type">Type de jeu</string>
+    <string name="min_players">Joueurs min.</string>
+    <string name="max_players">Joueurs max.</string>
+    <string name="default_pic">Image par défaut</string>
+    <string name="logo_of">Logo de %1$s</string>
+    <string name="players">Joueurs: %1$d - %2$d</string>
+    <string name="game_card_type">Type: %1$s</string>
+    <string name="game_list_editor">Jeux de l\'éditeur (%1$d)</string>
+    <string name="editor_no_game">Aucun jeu n\'est associé à cet éditeur pour le moment.</string>
+    <string name="edit">Modifier</string>
+    <string name="delete">Supprimer</string>
+    <string name="back">Retour</string>
+    <string name="add_game">Ajouter un jeu</string>
+    <string name="add_contact">Ajouter un contact</string>
+    <string name="edit_contact_info">Modifier le contact</string>
 
 </resources>

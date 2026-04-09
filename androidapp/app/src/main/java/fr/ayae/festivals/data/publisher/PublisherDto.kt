@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
 data class PublisherDto(
     val id: Int,
     val name: String,
-    val logo: String? = null, // Peut être null selon ton init.sql
+    val logo: String? = null,
     val contacts: List<ContactDto> = emptyList(),
     val games: List<GameDto> = emptyList()
 )

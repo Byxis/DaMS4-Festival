@@ -12,7 +12,7 @@ class PublisherRepository(private val apiService: APIService) {
     suspend fun getPublishers(): List<PublisherDto> {
         return apiService.getAllPublishers()
     }
-    // GET FUNCTIONS
+
     suspend fun getPublisherDetails(publisherId: Int): PublisherDto {
 
         val publisher = apiService.getPublisherById(publisherId)
@@ -38,10 +38,7 @@ class PublisherRepository(private val apiService: APIService) {
     }
 
 
-    //CRUD PUBLISHER
     suspend fun addPublisher(name: String) {
-        // L'API attend un objet, nous créons un DTO simple pour l'ajout.
-        // Adaptez ceci si votre API attend plus de champs.
         val request = PublisherCreationRequest(name = name)
         apiService.addPublisher(request)
     }
@@ -53,7 +50,6 @@ class PublisherRepository(private val apiService: APIService) {
         apiService.deletePublisher(publisherId)
     }
 
-    // CRUD CONTACT
 
     suspend fun addContact(publisherId: Int, contactRequest: ContactRequest): ContactDto {
         return apiService.addContactToPublisher(publisherId, contactRequest)
@@ -69,6 +65,5 @@ class PublisherRepository(private val apiService: APIService) {
 
 }
 
-//
 @kotlinx.serialization.Serializable
 data class PublisherCreationRequest(val name: String)

@@ -11,10 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
+import fr.ayae.festivals.R
 import fr.ayae.festivals.data.game.GameDto
 
 @Composable
@@ -33,12 +35,12 @@ fun GameCard(game: GameDto, modifier: Modifier = Modifier) {
         ) {
             SubcomposeAsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(game.logoUrl) // Utilise logoUrl qui semble être l'URL complète
+                    .data(game.logoUrl)
                     .crossfade(true)
                     .build(),
                 loading = { CircularProgressIndicator(modifier = Modifier.size(40.dp)) },
-                error = { Icon(Icons.Default.Casino, contentDescription = "Image par défaut", modifier = Modifier.size(40.dp)) },
-                contentDescription = "Logo de ${game.name}",
+                error = { Icon(Icons.Default.Casino, contentDescription = stringResource(R.string.default_pic), modifier = Modifier.size(40.dp)) },
+                contentDescription = stringResource(R.string.logo_of, game.name),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(60.dp)
@@ -54,15 +56,21 @@ fun GameCard(game: GameDto, modifier: Modifier = Modifier) {
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Joueurs: ${game.minPlayers} - ${game.maxPlayers}",
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Text(
-                    text = "Type: ${game.type}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                game.minPlayers?.let {
+                    game.maxPlayers?.let { it1 ->
+                        Text(
+                            text = stringResource(R.string.players, it, it1),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+                game.type?.let {
+                    Text(
+                        text = stringResource(R.string.game_card_type, it),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         }
     }

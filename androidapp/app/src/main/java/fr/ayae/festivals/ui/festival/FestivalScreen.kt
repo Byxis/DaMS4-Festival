@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.Desk
@@ -33,15 +34,15 @@ import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.ImageNotSupported
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.filled.TableBar
 import androidx.compose.material.icons.filled.TableRestaurant
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
+import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -73,12 +74,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.res.stringResource
 import fr.ayae.festivals.R
 import coil.compose.AsyncImage
-import fr.ayae.festivals.data.Festivals.Festival
-import fr.ayae.festivals.data.Reservation.Reservation
-import fr.ayae.festivals.data.Reservation.ReservationGame
-import fr.ayae.festivals.data.Reservation.ReservationInteraction
-import fr.ayae.festivals.data.Reservation.ZoneGame
-import fr.ayae.festivals.data.Reservation.ZoneTarif
+import fr.ayae.festivals.data.festivals.Festival
+import fr.ayae.festivals.data.reservation.Reservation
+import fr.ayae.festivals.data.reservation.ReservationGame
+import fr.ayae.festivals.data.reservation.ReservationInteraction
+import fr.ayae.festivals.data.reservation.ZoneGame
+import fr.ayae.festivals.data.reservation.ZoneTarif
 import fr.ayae.festivals.ui.reservation.ReservationCard
 import fr.ayae.festivals.ui.theme.AYAEFestivalsTheme
 import fr.ayae.festivals.ui.utils.DatePickerField
@@ -86,11 +87,14 @@ import fr.ayae.festivals.ui.utils.FestivalDialog
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+import fr.ayae.festivals.data.login.UserRole
+
 @Composable
 fun FestivalScreen(
     festivalId: Int = 1,
     viewModel: FestivalViewModel = viewModel(factory = FestivalViewModel.Factory),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    userRole: UserRole = UserRole.EDITOR
 ) {
     val context = LocalContext.current
     LaunchedEffect(Unit) {
@@ -115,6 +119,7 @@ fun FestivalScreen(
                 data = state.festival,
                 reservations = state.reservations,
                 isOffline = state.isOffline,
+                userRole = userRole,
                 onNoteChanged = viewModel::updateReservationNote,
                 onStatusChanged = viewModel::updateReservationStatus,
                 onFestivalDetailsChanged = viewModel::updateFestivalDetails,
@@ -144,6 +149,7 @@ fun FestivalScreenContent(
     data: Festival,
     reservations: List<Pair<String, Reservation>>,
     isOffline: Boolean = false,
+    userRole: UserRole = UserRole.EDITOR,
     onNoteChanged: (Int, String) -> Unit = { _, _ -> },
     onStatusChanged: (Int, String) -> Unit = { _, _ -> },
     onFestivalDetailsChanged: (String, String, String, String, Int, Int, Int, Uri?) -> Unit = { _, _, _, _, _, _, _, _ -> },
@@ -161,13 +167,28 @@ fun FestivalScreenContent(
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
-    val fmt = SimpleDateFormat("dd MMM yyyy", Locale.FRANCE)
+    SimpleDateFormat("dd MMM yyyy", Locale.FRANCE)
     
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
     val customImageLoader = androidx.compose.runtime.remember {
         coil.ImageLoader.Builder(context)
             .okHttpClient { fr.ayae.festivals.data.RetrofitInstance.getSecureClient(context) }
             .build()
+    }
+
+    // Derived permission flags (simpler to use locally)
+    val canEdit = userRole.canEdit && !isOffline
+    val canViewZones = userRole.canViewZones
+
+    // Map zone IDs to their names so Reservations can display them cleanly
+    val zoneMap = remember(data.tarif_zones) {
+        val map = mutableMapOf<Int, String>()
+        data.tarif_zones?.forEach { tz ->
+            tz.game_zones?.forEach { gz ->
+                map[gz.id] = gz.name
+            }
+        }
+        map
     }
 
     var showImportEntityDialog by rememberSaveable { mutableStateOf(false) }
@@ -202,7 +223,7 @@ fun FestivalScreenContent(
                 }
             }
 
-            // region ── Section 1: Header ─────────────────────────────────────────
+            // Section 1: Header
             Column(modifier = Modifier.fillMaxWidth()) {
                 Surface(
                     modifier = Modifier.fillMaxWidth().height(150.dp).padding(bottom = 16.dp),
@@ -242,7 +263,7 @@ fun FestivalScreenContent(
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.weight(1f)
                     )
-                    if (!isOffline) {
+                    if (canEdit) {
                         IconButton(onClick = { showEditFestivalDialog = true }) {
                             Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.festival_edit_title), tint = MaterialTheme.colorScheme.primary)
                         }
@@ -259,7 +280,7 @@ fun FestivalScreenContent(
                             Text(stringResource(R.string.festival_date_label), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
                             if (data.start_date != null && data.end_date != null) {
                                 Text(
-                                    stringResource(R.string.home_date_range, fr.ayae.festivals.ui.HomePage.formatIsoDate(data.start_date), fr.ayae.festivals.ui.HomePage.formatIsoDate(data.end_date)),
+                                    stringResource(R.string.home_date_range, fr.ayae.festivals.ui.homepage.formatIsoDate(data.start_date), fr.ayae.festivals.ui.homepage.formatIsoDate(data.end_date)),
                                     style = MaterialTheme.typography.bodyLarge
                                 )
                             } else {
@@ -277,7 +298,11 @@ fun FestivalScreenContent(
                     }
                 }
 
-                Divider(modifier = Modifier.padding(vertical = 24.dp))
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 24.dp),
+                    thickness = DividerDefaults.Thickness,
+                    color = DividerDefaults.color
+                )
 
                 Text(stringResource(R.string.festival_space_title), style = MaterialTheme.typography.titleLarge)
                 Spacer(modifier = Modifier.height(16.dp))
@@ -287,58 +312,75 @@ fun FestivalScreenContent(
                 val townReserved = reservations.sumOf { it.second.town_table_count }
 
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    StockItem(stringResource(R.string.festival_tables_label), Icons.Default.TableBar, standardReserved to (data.table_count ?: 0), data.table_surface?.toString() ?: "4") { if (!isOffline) editingSurfaceType = "Tables" }
-                    StockItem(stringResource(R.string.festival_big_tables_label), Icons.Default.TableRestaurant, bigReserved to data.big_table_count, data.big_table_surface?.toString() ?: "4") { if (!isOffline) editingSurfaceType = "Grandes Tables" }
-                    StockItem(stringResource(R.string.festival_town_tables_municipal), Icons.Default.Desk, townReserved to data.town_table_count, data.town_table_surface?.toString() ?: "4") { if (!isOffline) editingSurfaceType = "Tables Municipales" }
+                    StockItem(stringResource(R.string.festival_tables_label), Icons.Default.TableBar, standardReserved to (data.table_count ?: 0), data.table_surface?.toString() ?: "4") { if (canEdit) editingSurfaceType = "Tables" }
+                    StockItem(stringResource(R.string.festival_big_tables_label), Icons.Default.TableRestaurant, bigReserved to data.big_table_count, data.big_table_surface?.toString() ?: "4") { if (canEdit) editingSurfaceType = "Grandes Tables" }
+                    StockItem(stringResource(R.string.festival_town_tables_municipal), Icons.Default.Desk, townReserved to data.town_table_count, data.town_table_surface?.toString() ?: "4") { if (canEdit) editingSurfaceType = "Tables Municipales" }
                 }
             }
-            // endregion
 
-            Divider(modifier = Modifier.padding(vertical = 24.dp))
-
-            // region ── Section 2: Zones tarifaires ─────────────────────────────
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(stringResource(R.string.festival_zones_title), style = MaterialTheme.typography.titleLarge)
-                if (!isOffline) {
-                    IconButton(onClick = { showAddZoneDialog = true }) {
-                        Icon(Icons.Default.AddCircleOutline, contentDescription = stringResource(R.string.festival_add_zone), tint = MaterialTheme.colorScheme.primary)
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            ZonesTarifairesList(
-                zones = data.tarif_zones ?: emptyList(),
-                isOffline = isOffline,
-                onAddGameZone = onAddGameZone,
-                onEditGameZone = onEditGameZone,
-                onDeleteGameZone = onDeleteGameZone,
-                onEditZoneTarif = onEditZoneTarif,
-                onDeleteZoneTarif = onDeleteZoneTarif
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 24.dp),
+                thickness = DividerDefaults.Thickness,
+                color = DividerDefaults.color
             )
-            // endregion
 
-            Divider(modifier = Modifier.padding(vertical = 32.dp))
-
-            // region ── Section 3: Réservations ───────────────────────────────
-            Column(modifier = Modifier.fillMaxWidth()) {
+            // Section 2: Zones tarifaires (editor/admin uniquement)
+            if (canViewZones) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(stringResource(R.string.festival_reservations_title), style = MaterialTheme.typography.titleLarge)
-                    IconButton(onClick = { }) {
-                        Icon(Icons.Default.Sort, contentDescription = stringResource(R.string.festival_sort_by))
+                    Text(stringResource(R.string.festival_zones_title), style = MaterialTheme.typography.titleLarge)
+                    if (canEdit) {
+                        IconButton(onClick = { showAddZoneDialog = true }) {
+                            Icon(Icons.Default.AddCircleOutline, contentDescription = stringResource(R.string.festival_add_zone), tint = MaterialTheme.colorScheme.primary)
+                        }
                     }
                 }
+                Spacer(modifier = Modifier.height(16.dp))
+                ZonesTarifairesList(
+                    zones = data.tarif_zones ?: emptyList(),
+                    isOffline = !canEdit,
+                    onAddGameZone = onAddGameZone,
+                    onEditGameZone = onEditGameZone,
+                    onDeleteGameZone = onDeleteGameZone,
+                    onEditZoneTarif = onEditZoneTarif,
+                    onDeleteZoneTarif = onDeleteZoneTarif
+                )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 32.dp),
+                    thickness = DividerDefaults.Thickness,
+                    color = DividerDefaults.color
+                )
+            }
 
-                reservations.forEach { (entityName, res) ->
+            // Section 3: Réservations
+            Column(modifier = Modifier.fillMaxWidth()) {
+                if (!userRole.isPublisher) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(stringResource(R.string.festival_reservations_title), style = MaterialTheme.typography.titleLarge)
+                        IconButton(onClick = { }) {
+                            Icon(Icons.AutoMirrored.Filled.Sort, contentDescription = stringResource(R.string.festival_sort_by))
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
+                val displayedReservations = if (userRole.canViewAllReservations) {
+                    reservations
+                } else {
+                    emptyList()
+                    // TODO: filter only for the publisher
+                    //reservations.filter { it.second.entity_name == currentUserName }
+                }
+                displayedReservations.forEach { (entityName, res) ->
                     ReservationCard(
                         entityName = entityName,
                         hasLogo = false,
@@ -349,38 +391,40 @@ fun FestivalScreenContent(
                         onPresentedByThemChanged = { presented -> onPresentedByThemChanged(res.id, presented) },
                         onStockChanged = { t, bt, tt, o -> onReservationStockChanged(res.id, t, bt, tt, o) },
                         onGameUpdated = { rgId, amt, t, bt, tt, o, fs, st -> onGameUpdated(res.id, rgId, amt, t, bt, tt, o, fs, st) },
-                        isOffline = isOffline,
+                        isOffline = !canEdit,
+                        userRole = userRole,
+                        zoneMap = zoneMap,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Button(
-                        onClick = { showAddEntityDialog = true },
-                        enabled = !isOffline,
-                        modifier = Modifier.weight(1f)
+                // Add/import buttons only for editors and admins
+                if (canEdit) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(stringResource(R.string.festival_add_entity))
-                    }
-                    OutlinedButton(
-                        onClick = { showImportEntityDialog = true },
-                        enabled = !isOffline,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Icon(Icons.Default.FileUpload, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(stringResource(R.string.festival_import_entity))
+                        Button(
+                            onClick = { showAddEntityDialog = true },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(stringResource(R.string.festival_add_entity))
+                        }
+                        OutlinedButton(
+                            onClick = { showImportEntityDialog = true },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(Icons.Default.FileUpload, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(stringResource(R.string.festival_import_entity))
+                        }
                     }
                 }
             }
-            // endregion
 
             Spacer(modifier = Modifier.height(80.dp))
         }
@@ -508,11 +552,11 @@ fun EditFestivalDialog(
     onSave: (name: String, location: String, startDate: String, endDate: String,
              tableCount: Int, bigTableCount: Int, townTableCount: Int, imageUri: Uri?) -> Unit
 ) {
-    val fmt = SimpleDateFormat("yyyy-MM-dd", Locale.FRANCE)
+    SimpleDateFormat("yyyy-MM-dd", Locale.FRANCE)
     var name by rememberSaveable { mutableStateOf(festival.name) }
     var location by rememberSaveable { mutableStateOf(festival.location ?: "") }
-    var startDate by remember { mutableStateOf(festival.start_date?.let { fr.ayae.festivals.ui.HomePage.formatIsoDate(it, false) } ?: "") }
-    var endDate by remember { mutableStateOf(festival.end_date?.let { fr.ayae.festivals.ui.HomePage.formatIsoDate(it, false) } ?: "") }
+    var startDate by remember { mutableStateOf(festival.start_date?.let { fr.ayae.festivals.ui.homepage.formatIsoDate(it, false) } ?: "") }
+    var endDate by remember { mutableStateOf(festival.end_date?.let { fr.ayae.festivals.ui.homepage.formatIsoDate(it, false) } ?: "") }
     var tableCount by rememberSaveable { mutableStateOf(festival.table_count.toString()) }
     var bigTableCount by rememberSaveable { mutableStateOf(festival.big_table_count.toString()) }
     var townTableCount by rememberSaveable { mutableStateOf(festival.town_table_count.toString()) }
@@ -542,7 +586,7 @@ fun EditFestivalDialog(
                 DatePickerField(label = stringResource(R.string.festival_start_label), value = startDate, modifier = Modifier.weight(1f), onDateSelected = { startDate = it })
                 DatePickerField(label = stringResource(R.string.festival_end_label), value = endDate, modifier = Modifier.weight(1f), onDateSelected = { endDate = it })
             }
-            Divider()
+            HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
             Text(stringResource(R.string.festival_stocks_title), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.outline)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(value = tableCount, onValueChange = { tableCount = it },
@@ -555,7 +599,11 @@ fun EditFestivalDialog(
                     label = { Text(stringResource(R.string.festival_town_tables_label)) }, modifier = Modifier.weight(1f),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
             }
-            Divider(modifier = Modifier.padding(vertical = 4.dp))
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 4.dp),
+                thickness = DividerDefaults.Thickness,
+                color = DividerDefaults.color
+            )
             OutlinedButton(
                 onClick = { launcher.launch(PickVisualMediaRequest(ImageOnly)) },
                 modifier = Modifier.fillMaxWidth()

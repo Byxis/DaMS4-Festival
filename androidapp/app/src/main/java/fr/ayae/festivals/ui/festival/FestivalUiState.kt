@@ -1,7 +1,7 @@
 package fr.ayae.festivals.ui.festival
 
-import fr.ayae.festivals.data.Festivals.Festival
-import fr.ayae.festivals.data.Reservation.Reservation
+import fr.ayae.festivals.data.festivals.Festival
+import fr.ayae.festivals.data.reservation.Reservation
 
 /**
  * Represents the different UI states for the Festival screen.

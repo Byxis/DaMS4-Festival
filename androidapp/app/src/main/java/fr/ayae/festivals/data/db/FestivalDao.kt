@@ -3,7 +3,7 @@ package fr.ayae.festivals.data.db
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
-import fr.ayae.festivals.data.Festivals.Festival
+import fr.ayae.festivals.data.festivals.Festival
 import kotlinx.coroutines.flow.Flow
 
 /**

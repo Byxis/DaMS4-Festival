@@ -31,7 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
-import fr.ayae.festivals.data.Reservation.ReservationInteraction
+import fr.ayae.festivals.data.reservation.ReservationInteraction
 import fr.ayae.festivals.ui.theme.AYAEFestivalsTheme
 
 /**
@@ -138,7 +138,7 @@ fun InteractionsList(
                                             )
                                         }
                                         Text(
-                                            text = fr.ayae.festivals.ui.HomePage.formatIsoDate(interaction.interaction_date),
+                                            text = fr.ayae.festivals.ui.homepage.formatIsoDate(interaction.interaction_date),
                                             style = MaterialTheme.typography.labelSmall,
                                             fontWeight = FontWeight.SemiBold,
                                             color = MaterialTheme.colorScheme.outline
