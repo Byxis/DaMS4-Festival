@@ -39,10 +39,11 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Divider
+import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -69,9 +70,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import fr.ayae.festivals.data.Game
 import fr.ayae.festivals.data.GameType
-import fr.ayae.festivals.data.Reservation.Reservation
-import fr.ayae.festivals.data.Reservation.ReservationGame
-import fr.ayae.festivals.data.Reservation.ReservationInteraction
+import fr.ayae.festivals.data.reservation.Reservation
+import fr.ayae.festivals.data.reservation.ReservationGame
+import fr.ayae.festivals.data.reservation.ReservationInteraction
 import fr.ayae.festivals.ui.theme.AYAEFestivalsTheme
 
 /**
@@ -103,7 +104,9 @@ fun ReservationCard(
     onPresentedByThemChanged: (Boolean) -> Unit = {},
     onStockChanged: (Int, Int, Int, Int) -> Unit = { _, _, _, _ -> },
     onGameUpdated: (reservationGameId: Int, amount: Int, tables: Int, bigTables: Int, townTables: Int, outlets: Int, floorSpace: Double, status: String) -> Unit = { _, _, _, _, _, _, _, _ -> },
-    isOffline: Boolean = false
+    isOffline: Boolean = false,
+    userRole: fr.ayae.festivals.data.login.UserRole = fr.ayae.festivals.data.login.UserRole.EDITOR,
+    zoneMap: Map<Int, String> = emptyMap()
 ) {
     var isExpanded by rememberSaveable { mutableStateOf(false) }
     var statusMenuExpanded by rememberSaveable { mutableStateOf(false) }
@@ -221,7 +224,11 @@ fun ReservationCard(
                         .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    Divider(modifier = Modifier.padding(bottom = 4.dp))
+                    HorizontalDivider(
+                        modifier = Modifier.padding(bottom = 4.dp),
+                        thickness = DividerDefaults.Thickness,
+                        color = DividerDefaults.color
+                    )
 
                     // Tables & content
                     Column(modifier = Modifier.fillMaxWidth()) {
@@ -314,6 +321,8 @@ fun ReservationCard(
                             ) 
                         } ?: emptyList(),
                         isOffline = isOffline,
+                        userRole = userRole,
+                        zoneMap = zoneMap,
                         onGameUpdated = onGameUpdated
                     )
                 }

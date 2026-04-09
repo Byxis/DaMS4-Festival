@@ -26,10 +26,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Divider
+import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -53,7 +54,7 @@ import fr.ayae.festivals.data.Game
 import fr.ayae.festivals.data.GameType
 import androidx.compose.ui.res.stringResource
 import fr.ayae.festivals.R
-import fr.ayae.festivals.data.Reservation.ReservationGame
+import fr.ayae.festivals.data.reservation.ReservationGame
 import fr.ayae.festivals.ui.theme.AYAEFestivalsTheme
 import fr.ayae.festivals.ui.utils.AutoResizedText
 import fr.ayae.festivals.ui.utils.FestivalDialog
@@ -77,6 +78,8 @@ fun GamesReservations(
     modifier: Modifier = Modifier,
     games: List<Pair<Game, ReservationGame?>> = emptyList(),
     isOffline: Boolean = false,
+    userRole: fr.ayae.festivals.data.login.UserRole = fr.ayae.festivals.data.login.UserRole.EDITOR,
+    zoneMap: Map<Int, String> = emptyMap(),
     onGameUpdated: (reservationGameId: Int, amount: Int, tables: Int, bigTables: Int, townTables: Int, outlets: Int, floorSpace: Double, status: String) -> Unit = { _, _, _, _, _, _, _, _ -> }
 ) {
     var searchQuery by rememberSaveable { mutableStateOf("") }
@@ -197,7 +200,7 @@ fun GamesReservations(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(displayedGames) { (game, reservationGame) ->
-                    GameListItem(game = game, reservationGame = reservationGame, isOffline = isOffline, onGameUpdated = onGameUpdated)
+                    ReservationGameItem(game = game, reservationGame = reservationGame, isOffline = isOffline, userRole = userRole, zoneMap = zoneMap, onGameUpdated = onGameUpdated)
                 }
             }
         }
@@ -228,18 +231,20 @@ fun GamesReservations(
         ) {
             Text(stringResource(R.string.reservation_game_manage_desc))
         }
-        }
+    }
 }
 
 /**
  * Individual game item in the [GamesReservations] list.
  */
 @Composable
-fun GameListItem(
+fun ReservationGameItem(
+    modifier: Modifier = Modifier,
     game: Game,
     reservationGame: ReservationGame?,
-    modifier: Modifier = Modifier,
     isOffline: Boolean = false,
+    userRole: fr.ayae.festivals.data.login.UserRole = fr.ayae.festivals.data.login.UserRole.EDITOR,
+    zoneMap: Map<Int, String> = emptyMap(),
     onGameUpdated: (reservationGameId: Int, amount: Int, tables: Int, bigTables: Int, townTables: Int, outlets: Int, floorSpace: Double, status: String) -> Unit = { _, _, _, _, _, _, _, _ -> }
 ) {
     var showEditQuantitiesDialog by rememberSaveable { mutableStateOf(false) }
@@ -321,7 +326,7 @@ fun GameListItem(
             Spacer(modifier = Modifier.width(8.dp))
 
             // Edit button
-            if (!isOffline) {
+            if (!isOffline && userRole != fr.ayae.festivals.data.login.UserRole.PUBLISHER) {
                 IconButton(onClick = { showEditQuantitiesDialog = true }) {
                     Icon(
                         imageVector = Icons.Default.Edit,
@@ -452,7 +457,7 @@ fun EditGameQuantitiesDialog(
                     }
                 }
             }
-            Divider()
+            HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
             Text(stringResource(R.string.reservation_game_tables_allocated), style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.outline)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

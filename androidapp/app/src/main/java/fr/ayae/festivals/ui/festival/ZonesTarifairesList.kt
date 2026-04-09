@@ -23,7 +23,8 @@ import androidx.compose.material.icons.filled.PlaylistAdd
 import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.DividerDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -43,8 +44,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import fr.ayae.festivals.R
-import fr.ayae.festivals.data.Reservation.ZoneGame
-import fr.ayae.festivals.data.Reservation.ZoneTarif
+import fr.ayae.festivals.data.reservation.ZoneGame
+import fr.ayae.festivals.data.reservation.ZoneTarif
 import fr.ayae.festivals.ui.theme.AYAEFestivalsTheme
 import fr.ayae.festivals.ui.utils.FestivalDialog
 import java.util.Locale
@@ -192,8 +193,12 @@ fun ZoneTarifCard(
                         .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Divider(modifier = Modifier.padding(bottom = 8.dp))
-                    
+                    HorizontalDivider(
+                        modifier = Modifier.padding(bottom = 8.dp),
+                        thickness = DividerDefaults.Thickness,
+                        color = DividerDefaults.color
+                    )
+
                     Row(modifier = Modifier.fillMaxWidth()) {
                         InfoItem(label = stringResource(R.string.reservation_game_surface), value = String.format(Locale.FRANCE, "%.1f m²", totalSurface), modifier = Modifier.weight(1f))
                         InfoItem(label = stringResource(R.string.zone_outlet_price_label), value = "${zone.electricalOutletPrice} €", modifier = Modifier.weight(1f))

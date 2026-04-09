@@ -19,6 +19,5 @@ data class GameDto(
     @SerialName("editor_name")
     val editorName: String,
     val type: String?,
-    // MODIFICATION : Rendre le champ optionnel avec une valeur par défaut null
     val logoUrl: String? = null
 )

@@ -7,8 +7,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import fr.ayae.festivals.R
 import fr.ayae.festivals.data.contact.ContactDto
 import fr.ayae.festivals.data.contact.ContactRequest
 import fr.ayae.festivals.ui.utils.FestivalDialog
@@ -20,11 +23,11 @@ fun ContactEditDialog(
     onDismissRequest: () -> Unit,
     onSave: (ContactRequest) -> Unit
 ) {
-    var name by remember { mutableStateOf(contact?.name ?: "") }
-    var familyName by remember { mutableStateOf(contact?.familyName ?: "") }
-    var role by remember { mutableStateOf(contact?.role ?: "") }
-    var telephone by remember { mutableStateOf(contact?.telephone ?: "") }
-    var email by remember { mutableStateOf(contact?.email ?: "") }
+    var name by rememberSaveable { mutableStateOf(contact?.name ?: "") }
+    var familyName by rememberSaveable { mutableStateOf(contact?.familyName ?: "") }
+    var role by rememberSaveable { mutableStateOf(contact?.role ?: "") }
+    var telephone by rememberSaveable { mutableStateOf(contact?.telephone ?: "") }
+    var email by rememberSaveable { mutableStateOf(contact?.email ?: "") }
 
     FestivalDialog(
         title = title,
@@ -44,15 +47,25 @@ fun ContactEditDialog(
         }
     ) {
         Column {
-            OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Prénom") }, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text(
+                stringResource(R.string.first_name)
+            ) }, modifier = Modifier.fillMaxWidth())
             Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(value = familyName, onValueChange = { familyName = it }, label = { Text("Nom de famille") }, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(value = familyName, onValueChange = { familyName = it }, label = { Text(
+                stringResource(R.string.last_name)
+            ) }, modifier = Modifier.fillMaxWidth())
             Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(value = role, onValueChange = { role = it }, label = { Text("Rôle") }, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(value = role, onValueChange = { role = it }, label = { Text(
+                stringResource(R.string.role)
+            ) }, modifier = Modifier.fillMaxWidth())
             Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(value = telephone, onValueChange = { telephone = it }, label = { Text("Téléphone") }, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(value = telephone, onValueChange = { telephone = it }, label = { Text(
+                stringResource(R.string.mobile_phone)
+            ) }, modifier = Modifier.fillMaxWidth())
             Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email") }, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text(
+                stringResource(R.string.mail)
+            ) }, modifier = Modifier.fillMaxWidth())
         }
     }
 }

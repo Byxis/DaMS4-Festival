@@ -8,22 +8,24 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import fr.ayae.festivals.R
 import fr.ayae.festivals.data.game.GameDto
 
 @Composable
 fun GameList(games: List<GameDto>) {
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         Text(
-            text = "Jeux de l'éditeur (${games.size})",
+            text = stringResource(R.string.game_list_editor, games.size),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 8.dp)
         )
         if (games.isEmpty()) {
             Text(
-                text = "Aucun jeu n'est associé à cet éditeur pour le moment.",
+                text = stringResource(R.string.editor_no_game),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(vertical = 8.dp)
             )

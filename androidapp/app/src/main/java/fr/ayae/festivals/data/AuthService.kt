@@ -15,23 +15,23 @@ import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import fr.ayae.festivals.R
-import fr.ayae.festivals.data.Festivals.Festival
-import fr.ayae.festivals.data.Festivals.UpdateFestivalRequest
-import fr.ayae.festivals.data.Login.CreationResponse
-import fr.ayae.festivals.data.Login.LoginRequest
-import fr.ayae.festivals.data.Login.LoginResponse
-import fr.ayae.festivals.data.Login.MessageResponse
-import fr.ayae.festivals.data.Login.RegisterRequest
-import fr.ayae.festivals.data.Login.User
-import fr.ayae.festivals.data.Reservation.AddGameZoneRequest
-import fr.ayae.festivals.data.Reservation.AddReservationRequest
-import fr.ayae.festivals.data.Reservation.AddZoneTarifRequest
-import fr.ayae.festivals.data.Reservation.Reservation
-import fr.ayae.festivals.data.Reservation.ReservationGame
-import fr.ayae.festivals.data.Reservation.UpdateReservationGameRequest
-import fr.ayae.festivals.data.Reservation.UpdateReservationRequest
-import fr.ayae.festivals.data.Reservation.ZoneGame
-import fr.ayae.festivals.data.Reservation.ZoneTarif
+import fr.ayae.festivals.data.festivals.Festival
+import fr.ayae.festivals.data.festivals.UpdateFestivalRequest
+import fr.ayae.festivals.data.login.CreationResponse
+import fr.ayae.festivals.data.login.LoginRequest
+import fr.ayae.festivals.data.login.LoginResponse
+import fr.ayae.festivals.data.login.MessageResponse
+import fr.ayae.festivals.data.login.RegisterRequest
+import fr.ayae.festivals.data.login.User
+import fr.ayae.festivals.data.reservation.AddGameZoneRequest
+import fr.ayae.festivals.data.reservation.AddReservationRequest
+import fr.ayae.festivals.data.reservation.AddZoneTarifRequest
+import fr.ayae.festivals.data.reservation.Reservation
+import fr.ayae.festivals.data.reservation.ReservationGame
+import fr.ayae.festivals.data.reservation.UpdateReservationGameRequest
+import fr.ayae.festivals.data.reservation.UpdateReservationRequest
+import fr.ayae.festivals.data.reservation.ZoneGame
+import fr.ayae.festivals.data.reservation.ZoneTarif
 import fr.ayae.festivals.data.contact.ContactDto
 import fr.ayae.festivals.data.contact.ContactRequest
 import fr.ayae.festivals.data.game.GameCreationRequest
@@ -275,15 +275,14 @@ object RetrofitInstance {
             .addInterceptor { chain ->
                 val sharedPrefs = context.getSharedPreferences("AppCookies", Context.MODE_PRIVATE)
 
-                val savedCookie = sharedPrefs.getString("access_token", "") ?: ""
+                val savedToken = sharedPrefs.getString("access_token", "") ?: ""
 
                 //ajoute le header pour chaques requetes sortantes
                 val request = chain.request().newBuilder()
-                    // On l'ajoute au header "Cookie" tel quel
-                    .header("Cookie", savedCookie)
+                    .header("Cookie", "access_token=$savedToken")
                     .build()
 
-                Log.d("AUTH_DEBUG", "🚀 Correction envoi : $savedCookie")
+                Log.d("AUTH_DEBUG", "🚀 Envoi token : access_token=$savedToken")
                 chain.proceed(request)
             }
             .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
