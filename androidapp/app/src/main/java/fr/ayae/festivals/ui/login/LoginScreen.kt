@@ -35,10 +35,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
-import fr.ayae.festivals.R
-
 @Composable
 fun LoginScreen(
     loginViewModel: LoginViewModel = viewModel(),
@@ -50,32 +47,26 @@ fun LoginScreen(
     val state by loginViewModel.state
     val context = LocalContext.current
 
-
-    val bgColor = Color(0xFF141618)
-    val cardColor = Color(0xFF1C1E21)
-    val borderColor = Color(0xFF333333)
-    val cyanAccent = Color(0xFF00E5FF)
-    val textGray = Color(0xFFAAAAAA)
-
     LaunchedEffect(state) {
         if (state is UiState.Success) {
             loginSuccess()
         }
     }
 
-
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(bgColor),
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
 
         Card(
             modifier = Modifier.fillMaxWidth(0.85f),
             shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = cardColor),
-            border = BorderStroke(1.dp, borderColor)
+
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
         ) {
             Column(
                 modifier = Modifier
@@ -86,71 +77,45 @@ fun LoginScreen(
             ) {
 
                 Text(
-                    text = stringResource(R.string.login_title),
-                    color = Color.White,
+                    text = "Connexion",
+
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-
                 Text(
-                    text = stringResource(R.string.login_subtitle),
-                    color = textGray,
+                    text = "Entrez vos informations de connexion",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 14.sp
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-
-                    label = { Text(stringResource(R.string.login_email_label)) },
+                    label = { Text("Email*") },
                     shape = RoundedCornerShape(6.dp),
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = cyanAccent,
-                        unfocusedBorderColor = borderColor,
-                        focusedLabelColor = cyanAccent,
-                        unfocusedLabelColor = textGray,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        cursorColor = cyanAccent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent
-                    )
+                    singleLine = true
+
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text(stringResource(R.string.login_password_label)) },
+                    label = { Text("Mot de passe*") },
                     visualTransformation = PasswordVisualTransformation(),
                     shape = RoundedCornerShape(6.dp),
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = cyanAccent,
-                        unfocusedBorderColor = borderColor,
-                        focusedLabelColor = cyanAccent,
-                        unfocusedLabelColor = textGray,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        cursorColor = cyanAccent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent
-                    )
+                    singleLine = true
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
-
 
                 Button(
                     onClick = { loginViewModel.performLogin(context, password.trim(), email.trim()) },
@@ -159,22 +124,20 @@ fun LoginScreen(
                         .height(50.dp),
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = bgColor,
-                        contentColor = cyanAccent
-                    ),
-                    border = BorderStroke(1.dp, borderColor)
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
                 ) {
-                    Text(stringResource(R.string.login_title), fontSize = 16.sp)
+                    Text("Connexion", fontSize = 16.sp)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-
                 TextButton(onClick = { onNavigateToRegister() }) {
                     Text(
-                        text = stringResource(R.string.login_not_registered),
-                        color = textGray,
-                        textDecoration = TextDecoration.Underline, // 🚨 Ajout du soulignement
+                        text = "Pas encore inscrit ?",
+                        color = MaterialTheme.colorScheme.primary,
+                        textDecoration = TextDecoration.Underline,
                         fontSize = 14.sp
                     )
                 }

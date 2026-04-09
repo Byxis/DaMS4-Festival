@@ -39,10 +39,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
-import fr.ayae.festivals.R
-
 @Composable
 fun RegisterScreen(
     registerViewModel: RegisterViewModel = viewModel(),
@@ -61,12 +58,6 @@ fun RegisterScreen(
     val state by registerViewModel.state
     val scrollState = rememberScrollState()
 
-    val bgColor = Color(0xFF141618)
-    val cardColor = Color(0xFF1C1E21)
-    val borderColor = Color(0xFF333333)
-    val cyanAccent = Color(0xFF00E5FF)
-    val textGray = Color(0xFFAAAAAA)
-
     LaunchedEffect(state) {
         if (state is AuthUiState.Success) {
             showSuccessDialog = true
@@ -80,10 +71,10 @@ fun RegisterScreen(
                 registerSuccess()
             },
             title = {
-                Text(text = stringResource(R.string.register_success_title))
+                Text(text = "Félicitations !")
             },
             text = {
-                Text(text = stringResource(R.string.register_success_message))
+                Text(text = "Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.")
             },
             confirmButton = {
                 TextButton(
@@ -93,7 +84,7 @@ fun RegisterScreen(
                         registerSuccess()
                     }
                 ) {
-                    Text(stringResource(R.string.register_success_ok))
+                    Text("Super !")
                 }
             }
         )
@@ -102,7 +93,8 @@ fun RegisterScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(bgColor),
+
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
         Card(
@@ -110,8 +102,9 @@ fun RegisterScreen(
                 .fillMaxWidth(0.85f)
                 .padding(vertical = 16.dp),
             shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = cardColor),
-            border = BorderStroke(1.dp, borderColor)
+
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
         ) {
             Column(
                 modifier = Modifier
@@ -122,17 +115,17 @@ fun RegisterScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = stringResource(R.string.register_title),
-                    color = Color.White,
+                    text = "Inscription",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold
+
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = stringResource(R.string.register_subtitle),
-                    color = textGray,
+                    text = "Créez votre compte",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 14.sp
                 )
 
@@ -141,21 +134,11 @@ fun RegisterScreen(
                 OutlinedTextField(
                     value = firstName,
                     onValueChange = { firstName = it },
-                    label = { Text(stringResource(R.string.register_first_name_label)) },
+                    label = { Text("Prénom*") },
                     shape = RoundedCornerShape(6.dp),
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = cyanAccent,
-                        unfocusedBorderColor = borderColor,
-                        focusedLabelColor = cyanAccent,
-                        unfocusedLabelColor = textGray,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        cursorColor = cyanAccent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent
-                    )
+                    singleLine = true
+
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -163,21 +146,11 @@ fun RegisterScreen(
                 OutlinedTextField(
                     value = lastName,
                     onValueChange = { lastName = it },
-                    label = { Text(stringResource(R.string.register_last_name_label)) },
+                    label = { Text("Nom*") },
                     shape = RoundedCornerShape(6.dp),
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = cyanAccent,
-                        unfocusedBorderColor = borderColor,
-                        focusedLabelColor = cyanAccent,
-                        unfocusedLabelColor = textGray,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        cursorColor = cyanAccent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent
-                    )
+                    singleLine = true
+
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -185,34 +158,20 @@ fun RegisterScreen(
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text(stringResource(R.string.login_email_label)) },
+                    label = { Text("Email*") },
                     shape = RoundedCornerShape(6.dp),
                     isError = email.isNotEmpty() && !isEmailValid,
                     supportingText = {
                         if (!isEmailValid && email.isNotEmpty()) {
                             Text(
-                                text = stringResource(R.string.register_error_email_format),
+                                text = "Format d'email invalide",
                                 color = MaterialTheme.colorScheme.error
                             )
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = cyanAccent,
-                        unfocusedBorderColor = borderColor,
-                        focusedLabelColor = cyanAccent,
-                        unfocusedLabelColor = textGray,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        cursorColor = cyanAccent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent,
-                        errorBorderColor = MaterialTheme.colorScheme.error,
-                        errorLabelColor = MaterialTheme.colorScheme.error,
-                        errorTextColor = Color.White,
-                        errorSupportingTextColor = MaterialTheme.colorScheme.error
-                    )
+                    singleLine = true
+
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -220,22 +179,12 @@ fun RegisterScreen(
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text(stringResource(R.string.login_password_label)) },
+                    label = { Text("Mot de passe*") },
                     visualTransformation = PasswordVisualTransformation(),
                     shape = RoundedCornerShape(6.dp),
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = cyanAccent,
-                        unfocusedBorderColor = borderColor,
-                        focusedLabelColor = cyanAccent,
-                        unfocusedLabelColor = textGray,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        cursorColor = cyanAccent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent
-                    )
+                    singleLine = true
+
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -243,27 +192,17 @@ fun RegisterScreen(
                 OutlinedTextField(
                     value = confirmedPassword,
                     onValueChange = { confirmedPassword = it },
-                    label = { Text(stringResource(R.string.register_confirm_password_label)) },
+                    label = { Text("Confirmer le mot de passe*") },
                     visualTransformation = PasswordVisualTransformation(),
                     shape = RoundedCornerShape(6.dp),
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = cyanAccent,
-                        unfocusedBorderColor = borderColor,
-                        focusedLabelColor = cyanAccent,
-                        unfocusedLabelColor = textGray,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        cursorColor = cyanAccent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent
-                    )
+                    singleLine = true
+
                 )
 
                 if (confirmedPassword.isNotEmpty() && confirmedPassword != password) {
                     Text(
-                        text = stringResource(R.string.register_error_password_mismatch),
+                        text = "Les mots de passe ne correspondent pas",
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.labelSmall,
                         modifier = Modifier
@@ -288,21 +227,21 @@ fun RegisterScreen(
                         .fillMaxWidth()
                         .height(50.dp),
                     shape = RoundedCornerShape(8.dp),
+
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = bgColor,
-                        contentColor = cyanAccent
-                    ),
-                    border = BorderStroke(1.dp, borderColor)
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
                 ) {
-                    Text(stringResource(R.string.register_title), fontSize = 16.sp)
+                    Text("Inscription", fontSize = 16.sp)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 TextButton(onClick = { onNavigateToLogin() }) {
                     Text(
-                        text = stringResource(R.string.register_already_registered),
-                        color = textGray,
+                        text = "Déjà inscrit ? Connectez-vous",
+                        color = MaterialTheme.colorScheme.primary,
                         textDecoration = TextDecoration.Underline,
                         fontSize = 14.sp
                     )

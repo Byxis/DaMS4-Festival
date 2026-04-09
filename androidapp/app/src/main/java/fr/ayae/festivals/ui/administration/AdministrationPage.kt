@@ -135,9 +135,13 @@ fun AdministrationPage(adminViewModel: AdminViewModel = viewModel()) {
 
             FilledIconButton(
                 onClick = {
-
-                    userToEdit = null
-                    showUserForm = true
+                    
+                    if (isInternetAvailable(context)) {
+                        userToEdit = null
+                        showUserForm = true
+                    } else {
+                        Toast.makeText(context, "Impossible d'ajouter un utilisateur hors ligne", Toast.LENGTH_SHORT).show()
+                    }
                 },
                 modifier = Modifier.size(56.dp),
                 shape = RoundedCornerShape(12.dp)

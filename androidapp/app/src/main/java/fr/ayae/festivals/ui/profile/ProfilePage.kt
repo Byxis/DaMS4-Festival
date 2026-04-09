@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -44,16 +45,10 @@ fun ProfilePage(
     val user = loginViewModel.userProfile
     val role = loginViewModel.userRole
 
-    val bgDark = Color(0xFF121416)
-    val textGray = Color(0xFFAAAAAA)
-    val salmonRed = Color(0xFFF27070)
-    val avatarBg = Color(0xFFE0E0E0)
-    val avatarIconDark = Color(0xFF1E2124)
-
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(bgDark)
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -61,28 +56,24 @@ fun ProfilePage(
         Box(
             modifier = Modifier
                 .size(120.dp)
-                .background(avatarBg, CircleShape),
+                .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = "Avatar",
                 modifier = Modifier.size(90.dp),
-                tint = avatarIconDark
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-
-
-
-
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
             text = user?.email ?: "",
-            color = textGray,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 16.sp
         )
 
@@ -98,7 +89,7 @@ fun ProfilePage(
 
         Text(
             text = "Vous êtes $roleDisplay",
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onBackground,
             fontSize = 18.sp,
             fontWeight = FontWeight.Medium
         )
@@ -112,8 +103,8 @@ fun ProfilePage(
                 .height(55.dp),
             shape = RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(
-                containerColor = salmonRed,
-                contentColor = Color.White
+                containerColor = MaterialTheme.colorScheme.error,
+                contentColor = MaterialTheme.colorScheme.onError
             )
         ) {
             Text(
