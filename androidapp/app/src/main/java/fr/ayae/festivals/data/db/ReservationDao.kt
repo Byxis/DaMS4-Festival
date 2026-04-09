@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Update
 import androidx.room.Upsert
-import fr.ayae.festivals.data.Reservation.Reservation
+import fr.ayae.festivals.data.reservation.Reservation
 import kotlinx.coroutines.flow.Flow
 
 /**

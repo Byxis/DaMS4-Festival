@@ -5,8 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import fr.ayae.festivals.data.Festivals.Festival
-import fr.ayae.festivals.data.Reservation.Reservation
+import fr.ayae.festivals.data.festivals.Festival
+import fr.ayae.festivals.data.reservation.Reservation
 
 /**
  * Room database for the Festivals app.

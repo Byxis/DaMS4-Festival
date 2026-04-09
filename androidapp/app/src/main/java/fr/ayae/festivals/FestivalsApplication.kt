@@ -1,7 +1,7 @@
 package fr.ayae.festivals
 
 import android.app.Application
-import fr.ayae.festivals.data.Reservation.ReservationRepository
+import fr.ayae.festivals.data.reservation.ReservationRepository
 import fr.ayae.festivals.data.db.AppDatabase
 
 /**

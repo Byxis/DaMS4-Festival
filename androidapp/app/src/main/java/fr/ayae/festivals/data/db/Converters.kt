@@ -1,9 +1,9 @@
 package fr.ayae.festivals.data.db
 
 import androidx.room.TypeConverter
-import fr.ayae.festivals.data.Reservation.ReservationGame
-import fr.ayae.festivals.data.Reservation.ReservationInteraction
-import fr.ayae.festivals.data.Reservation.ZoneTarif
+import fr.ayae.festivals.data.reservation.ReservationGame
+import fr.ayae.festivals.data.reservation.ReservationInteraction
+import fr.ayae.festivals.data.reservation.ZoneTarif
 import kotlinx.serialization.json.Json
 
 private val json = Json { ignoreUnknownKeys = true }
@@ -46,7 +46,6 @@ class Converters {
     // |          ReservationInteraction list              |
     // |                                                   |
     // +---------------------------------------------------+
-    // region  list
     @TypeConverter
     fun fromReservationInteractionList(value: List<ReservationInteraction>?): String =
         json.encodeToString(value ?: emptyList())

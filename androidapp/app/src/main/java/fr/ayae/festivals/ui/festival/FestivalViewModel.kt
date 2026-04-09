@@ -9,21 +9,22 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import fr.ayae.festivals.FestivalsApplication
 import fr.ayae.festivals.R
-import fr.ayae.festivals.data.Reservation.ReservationRepository
-import fr.ayae.festivals.data.Festivals.UpdateFestivalRequest
-import fr.ayae.festivals.data.Reservation.UpdateReservationGameRequest
-import fr.ayae.festivals.data.Reservation.UpdateReservationRequest
-import fr.ayae.festivals.data.Reservation.AddGameZoneRequest
-import fr.ayae.festivals.data.Reservation.AddReservationRequest
-import fr.ayae.festivals.data.Reservation.AddZoneTarifRequest
-import fr.ayae.festivals.data.Reservation.Reservation
-import fr.ayae.festivals.data.Reservation.ZoneGame
-import fr.ayae.festivals.data.Reservation.ZoneTarif
+import fr.ayae.festivals.data.reservation.ReservationRepository
+import fr.ayae.festivals.data.festivals.UpdateFestivalRequest
+import fr.ayae.festivals.data.reservation.UpdateReservationGameRequest
+import fr.ayae.festivals.data.reservation.UpdateReservationRequest
+import fr.ayae.festivals.data.reservation.AddGameZoneRequest
+import fr.ayae.festivals.data.reservation.AddReservationRequest
+import fr.ayae.festivals.data.reservation.AddZoneTarifRequest
+import fr.ayae.festivals.data.reservation.Reservation
+import fr.ayae.festivals.data.reservation.ZoneGame
+import fr.ayae.festivals.data.reservation.ZoneTarif
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 /**
  * ViewModel for the Festival screen, responsible for managing festival data
@@ -100,12 +101,20 @@ class FestivalViewModel(private val repository: ReservationRepository) : ViewMod
                     Log.w("FestivalVM", "Could not refresh reservations: ${e.message}")
                 }
 
-                _uiState.update { state ->
-                    if (state is FestivalUiState.Success) {
-                        state.copy(isOffline = false)
-                    } else state
+                if (fest == null) {
+                    _uiState.update { state ->
+                        if (state is FestivalUiState.Loading) {
+                            FestivalUiState.Error(appContext?.getString(R.string.error_server) ?: "Erreur lors du chargement du festival depuis le serveur.")
+                        } else state
+                    }
+                } else {
+                    _uiState.update { state ->
+                        if (state is FestivalUiState.Success) {
+                            state.copy(isOffline = false)
+                        } else state
+                    }
                 }
-            } catch (e: java.io.IOException) {
+            } catch (_: IOException) {
                 // Connection error
                 _uiState.update { state ->
                     if (state is FestivalUiState.Success) {
