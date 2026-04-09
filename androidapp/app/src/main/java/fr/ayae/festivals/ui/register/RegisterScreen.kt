@@ -34,12 +34,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.ayae.festivals.R
+
 @Composable
 fun RegisterScreen(
     registerViewModel: RegisterViewModel = viewModel(),
@@ -71,10 +74,10 @@ fun RegisterScreen(
                 registerSuccess()
             },
             title = {
-                Text(text = "Félicitations !")
+                Text(text = stringResource(R.string.register_success_title))
             },
             text = {
-                Text(text = "Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.")
+                Text(text = stringResource(R.string.register_success_message))
             },
             confirmButton = {
                 TextButton(
@@ -84,7 +87,7 @@ fun RegisterScreen(
                         registerSuccess()
                     }
                 ) {
-                    Text("Super !")
+                    Text(stringResource(R.string.register_success_ok))
                 }
             }
         )
@@ -115,7 +118,7 @@ fun RegisterScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Inscription",
+                    text = stringResource(R.string.register_title),
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold
 
@@ -124,7 +127,7 @@ fun RegisterScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Créez votre compte",
+                    text = stringResource(R.string.register_subtitle),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 14.sp
                 )
@@ -134,7 +137,7 @@ fun RegisterScreen(
                 OutlinedTextField(
                     value = firstName,
                     onValueChange = { firstName = it },
-                    label = { Text("Prénom*") },
+                    label = { Text(stringResource(R.string.register_first_name_label)) },
                     shape = RoundedCornerShape(6.dp),
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
@@ -146,7 +149,7 @@ fun RegisterScreen(
                 OutlinedTextField(
                     value = lastName,
                     onValueChange = { lastName = it },
-                    label = { Text("Nom*") },
+                    label = { Text(stringResource(R.string.register_last_name_label)) },
                     shape = RoundedCornerShape(6.dp),
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
@@ -158,13 +161,13 @@ fun RegisterScreen(
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text("Email*") },
+                    label = { Text(stringResource(R.string.login_email_label)) },
                     shape = RoundedCornerShape(6.dp),
                     isError = email.isNotEmpty() && !isEmailValid,
                     supportingText = {
                         if (!isEmailValid && email.isNotEmpty()) {
                             Text(
-                                text = "Format d'email invalide",
+                                text = stringResource(R.string.register_error_email_format),
                                 color = MaterialTheme.colorScheme.error
                             )
                         }
@@ -179,7 +182,7 @@ fun RegisterScreen(
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("Mot de passe*") },
+                    label = { Text(stringResource(R.string.login_password_label)) },
                     visualTransformation = PasswordVisualTransformation(),
                     shape = RoundedCornerShape(6.dp),
                     modifier = Modifier.fillMaxWidth(),
@@ -192,7 +195,7 @@ fun RegisterScreen(
                 OutlinedTextField(
                     value = confirmedPassword,
                     onValueChange = { confirmedPassword = it },
-                    label = { Text("Confirmer le mot de passe*") },
+                    label = { Text(stringResource(R.string.register_confirm_password_label)) },
                     visualTransformation = PasswordVisualTransformation(),
                     shape = RoundedCornerShape(6.dp),
                     modifier = Modifier.fillMaxWidth(),
@@ -202,7 +205,7 @@ fun RegisterScreen(
 
                 if (confirmedPassword.isNotEmpty() && confirmedPassword != password) {
                     Text(
-                        text = "Les mots de passe ne correspondent pas",
+                        text = stringResource(R.string.register_error_password_mismatch),
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.labelSmall,
                         modifier = Modifier
@@ -233,14 +236,14 @@ fun RegisterScreen(
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
-                    Text("Inscription", fontSize = 16.sp)
+                    Text(stringResource(R.string.register_title), fontSize = 16.sp)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 TextButton(onClick = { onNavigateToLogin() }) {
                     Text(
-                        text = "Déjà inscrit ? Connectez-vous",
+                        text = stringResource(R.string.register_already_registered),
                         color = MaterialTheme.colorScheme.primary,
                         textDecoration = TextDecoration.Underline,
                         fontSize = 14.sp
